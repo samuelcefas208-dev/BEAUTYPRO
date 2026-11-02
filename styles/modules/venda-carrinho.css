@@ -1,0 +1,1295 @@
+/* BelezaPro — styles/modules/venda-carrinho.css — Etapa 4: carrinho + venda + recibo (ex-login-carrinho-venda) */
+/* ===== CARRINHO (com botões +/‑ e profissional por item) ===== */
+/* F7-13 — layout: nome | preço | stepper interligado | X
+   HTML do bundle (ordem DOM): name → qty → val → del
+   Visual via grid-column: name → val → qty → del
+   Acabamento tipo Alibaba: grupo unificado, cantos suaves (não círculo cheio) */
+.cart-item-row {
+  /* nome | preço (juntos) | espaço | stepper | X */
+  display: grid;
+  grid-template-columns: max-content max-content 1fr auto 28px;
+  gap: 0 6px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.cart-item-row .ci-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+.cart-item-row .ci-name {
+  grid-column: 1;
+  grid-row: 1;
+  font-size: var(--text-sm, 0.88rem);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 42vw;
+  min-width: 0;
+}
+.cart-item-row .ci-prof {
+  font-size: var(--text-xs, 0.65rem);
+  color: var(--text-muted);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Preço — junto ao nome (não junto ao stepper) */
+.cart-item-row .ci-val {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  white-space: nowrap;
+  margin-left: 2px;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+.cart-item-row .ci-val.is-bump {
+  color: var(--text-primary);
+  transform: scale(1.04);
+}
+/* Stepper — coluna 4 (direita, separado do preço) */
+.cart-item-row .ci-qty-controls {
+  grid-column: 4;
+  grid-row: 1;
+  display: inline-flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+  height: 30px;
+  padding: 0;
+  background: #f5f5f5;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px; /* interligado, NÃO círculo */
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.cart-item-row .qty-btn {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  min-height: 30px;
+  border-radius: 0; /* cantos do grupo pai */
+  border: none;
+  background: transparent;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 400;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  box-shadow: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.cart-item-row .qty-btn:hover {
+  background: #ebebeb;
+  color: #333;
+}
+.cart-item-row .qty-btn:active {
+  background: #e0e0e0;
+}
+.cart-item-row .qty-btn:disabled {
+  opacity: 0.28;
+  pointer-events: none;
+  color: #aaa;
+}
+.cart-item-row .qty-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 30px;
+  padding: 0 4px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--text-primary, #1c1a18);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  background: #fff;
+  border-left: 1px solid #e8e8e8;
+  border-right: 1px solid #e8e8e8;
+  box-sizing: border-box;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.cart-item-row .qty-number.is-bump {
+  transform: scale(1.12);
+}
+/* X eliminar — coluna 5 */
+.cart-item-row .ci-del {
+  grid-column: 5;
+  grid-row: 1;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  opacity: 0.5;
+  color: var(--text-muted);
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 0;
+  border-radius: 6px; /* igual ao stepper — não 50% */
+  transition: opacity 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.cart-item-row .ci-del::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  z-index: -1;
+}
+.cart-item-row .ci-del:hover,
+.cart-item-row .ci-del:active {
+  opacity: 1;
+  color: var(--red);
+  background: var(--red-50, #FDE8E8);
+}
+
+.cart-item-row.adding {
+  animation: cartItemAdd 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes cartItemAdd {
+  0% { opacity: 0; transform: translateY(-10px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.cart-item-row.removing {
+  animation: cartItemRemove 0.28s ease-in forwards;
+  pointer-events: none;
+}
+@keyframes cartItemRemove {
+  0% { opacity: 1; transform: translateX(0); max-height: 56px; }
+  100% { opacity: 0; transform: translateX(24px); max-height: 0; margin: 0; padding-top: 0; padding-bottom: 0; border: 0; overflow: hidden; }
+}
+.cart-item-row.is-qty-flash {
+  background: color-mix(in srgb, var(--gold-50, #FBF6E9) 80%, transparent);
+  border-radius: 8px;
+  transition: background 0.35s ease;
+}
+
+.cart-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0 0;
+  margin-top: 4px;
+  border-top: 1px solid var(--border-soft, #e8e4de);
+}
+.cart-total-row .ct-val {
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
+}
+.cart-total-row .ct-val.ct-val--pulse {
+  transform: scale(1.08);
+  color: var(--text-primary, #1c1a18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-item-row.adding,
+  .cart-item-row.removing,
+  .cart-item-row .qty-number,
+  .cart-item-row .ci-val,
+  .cart-total-row .ct-val {
+    animation: none !important;
+    transition: none !important;
+  }
+  .cart-item-row.removing {
+    opacity: 0;
+    max-height: 0;
+  }
+}
+.cart-total-row .ct-label {
+  font-weight: 600;
+  font-size: .9rem;
+  color: var(--text-secondary);
+}
+.cart-total-row .ct-val {
+  font-family: var(--font-sans);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary, #1c1a18); /* preto — sem dourado */
+  text-align: right;
+}
+
+.add-item-row {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+/* ===== RECIBO E DETALHE DE VENDA ===== */
+/* Recibo de venda premium — logótipo com gradiente dourado ("foil") */
+.recibo-logo-gold {
+  background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 45%, var(--gold-50) 55%, var(--gold) 65%, var(--gold-dark) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--gold);
+}
+.modal-sheet--recibo #detalhe-venda-itens .r-item-row {
+  display: grid;
+  grid-template-columns: 1fr 36px 48px 56px;
+  gap: 4px;
+  padding: 4px 0;
+  font-size: .7rem;
+  color: var(--text-primary);
+}
+.modal-sheet--recibo #detalhe-venda-itens .r-item-row span:nth-child(2) { text-align: center; color: var(--text-secondary); }
+.modal-sheet--recibo #detalhe-venda-itens .r-item-row span:nth-child(3),
+.modal-sheet--recibo #detalhe-venda-itens .r-item-row span:nth-child(4) { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Modal "Venda registada" — animação de check */
+@keyframes drawCircle {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes drawCheck {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ===== DETALHE VENDA ===== */
+.detalhe-meta {
+  background: var(--bg-soft);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+.detalhe-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 4px 0;
+  font-size: .82rem;
+}
+.detalhe-meta-row .label { color: var(--text-secondary); font-weight: 500; }
+.detalhe-meta-row .val { font-weight: 600; text-align: right; max-width: 60%; }
+.detalhe-itens-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px 76px 80px;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: .62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--text-muted);
+  align-items: center;
+}
+.detalhe-item-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px 76px 80px;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: .8125rem;
+  align-items: center;
+}
+.detalhe-item-row .desc {
+  font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.detalhe-item-row .qty,
+.detalhe-item-row .pu,
+.detalhe-item-row .sub {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.detalhe-item-row .qty { color: var(--text-secondary); font-weight: 500; }
+.detalhe-item-row .pu { color: var(--text-secondary); font-weight: 500; font-size: 0.75rem; }
+.detalhe-item-row .sub { color: var(--text-primary); font-weight: 600; }
+.detalhe-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0 0;
+}
+.detalhe-total .label { font-weight: 600; font-size: .9rem; color: var(--text-secondary); }
+.detalhe-total .val {
+  font-family: var(--font-sans);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--gold-dark);
+  text-align: right;
+}
+.pagamento-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  font-size: .7rem;
+  font-weight: 600;
+  background: var(--gold-light);
+  color: var(--gold-dark);
+}
+/* ===== NOVA VENDA — bloco "Adicionar Serviço/Produto" reorganizado ===== */
+/* CORREÇÃO (layout "caótico"): Serviço e Valor Fixo estavam espremidos
+   lado a lado numa coluna de 100px, com um rótulo de 0.55rem. Cada
+   campo passa a ter a sua própria linha, com o padrão .input-group já
+   usado em todo o resto da aplicação — elimina a sobreposição visual. */
+.venda-add-item-box {
+  background: var(--bg-soft);
+  border-radius: var(--radius-sm);
+  padding: 14px 12px;
+  margin-bottom: 12px;
+}
+.venda-add-item-titulo {
+  font-size: .7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.venda-valor-wrap {
+  display: flex;
+  align-items: center;
+  background: var(--card-white);
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: 0 12px;
+}
+.venda-valor-wrap .input-field {
+  border: none;
+  background: transparent;
+  padding: 10px 4px 10px 0;
+  font-weight: 700;
+  color: var(--green);
+  text-align: left;
+}
+.venda-valor-sufixo {
+  font-weight: 700;
+  color: var(--gold-dark);
+  font-size: .85rem;
+  flex-shrink: 0;
+}
+
+/* ===== Modal Registar venda — hierarquia e previsibilidade ===== */
+.modal-sheet--venda {
+  max-height: min(92vh, 720px);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.modal-sheet--venda .venda-modal-footer {
+  position: sticky;
+  bottom: 0;
+  background: var(--card-white, #fff);
+  padding-top: 8px;
+  z-index: 2;
+}
+.modal-sheet--venda .handle { flex-shrink: 0; }
+.venda-modal-head {
+  flex-shrink: 0;
+  margin-bottom: 8px;
+}
+.venda-modal-head .modal-title {
+  margin-bottom: 4px;
+}
+.venda-modal-sub {
+  margin: 0 0 12px;
+  font-size: var(--text-sm, 0.85rem);
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+.venda-section {
+  margin-bottom: 14px;
+}
+.venda-section-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.venda-field-tight {
+  margin-bottom: 8px;
+}
+.venda-field-tight:last-child {
+  margin-bottom: 0;
+}
+.venda-cart-list {
+  max-height: 160px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-md, 8px);
+}
+.venda-cart-empty {
+  padding: 10px 4px 12px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+.venda-cart-empty-title {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-muted, #8c8980);
+  margin: 0 0 2px;
+}
+.venda-cart-empty-hint {
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.35;
+}
+.venda-cart-total {
+  margin-top: 8px;
+}
+/* F7-15 — restaurar fundo da secção Adicionar serviço (estado pré-F7-14)
+   Mantém: botão branco, total preto, preço junto ao nome */
+.venda-section--add {
+  padding: 12px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: none;
+}
+.venda-section--add .input-field,
+.venda-section--add select.input-field {
+  background: var(--card-white, #fff);
+  border: 1px solid var(--border-soft, #e0dcd6);
+}
+.venda-add-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 12px;
+  margin-bottom: 10px;
+}
+.venda-add-grid-full {
+  grid-column: 1 / -1;
+}
+.venda-modal-footer {
+  flex-shrink: 0;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-soft);
+  background: var(--card-white, #fff);
+}
+#modal-venda-save:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+@media (max-width: 380px) {
+  .venda-add-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ===== MODO VISUALIZAR vs EDITAR ===== */
+.modal-sheet--view {
+  background: var(--card-white);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-floating, 0 12px 32px rgba(15, 23, 42, 0.16));
+}
+.bp-view-kicker {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 4px;
+}
+.bp-view-title {
+  margin-bottom: 14px !important;
+  color: var(--text-primary) !important;
+  font-weight: 700;
+}
+.bp-view-panel { display: block; }
+/* BUG: display:block anulava o atributo HTML [hidden] → formulário + ficha visíveis ao mesmo tempo */
+.bp-view-panel[hidden],
+.bp-form-panel[hidden] {
+  display: none !important;
+}
+.bp-form-panel:not([hidden]) {
+  display: block;
+}
+.bp-view-body {
+  margin-bottom: 8px;
+}
+.bp-view-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  margin-bottom: 14px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md, 10px);
+}
+.bp-view-hero-av {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.15rem;
+  background: var(--gold-50, #FBF6E9);
+  color: var(--gold-dark);
+  border: 1px solid var(--border-soft);
+}
+.bp-view-hero-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+.bp-view-hero-meta {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+/* Tier no hero: chip discreto, alinhado à especialidade do profissional */
+.bp-view-hero-meta .bp-tier {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm, 6px);
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+.bp-view-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.bp-view-stats > div {
+  text-align: center;
+  padding: 10px 6px;
+  background: var(--bg-soft);
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--border-soft);
+}
+.bp-view-stats .stat-valor {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.bp-view-stats .stat-legenda {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.bp-view-dl {
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md, 10px);
+  overflow: hidden;
+  background: var(--card-white);
+  margin-bottom: 12px;
+}
+.bp-view-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.bp-view-row:last-child { border-bottom: none; }
+.bp-view-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+.bp-view-value {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: right;
+  line-height: 1.35;
+  word-break: break-word;
+}
+.bp-view-value--muted {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.bp-view-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  margin-top: 4px;
+  background: var(--gold-50, #FBF6E9);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md, 10px);
+}
+.bp-view-total .bp-view-label { color: var(--text-secondary); }
+.bp-view-total .bp-view-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--gold-dark);
+  font-variant-numeric: tabular-nums;
+}
+.bp-view-section-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 12px 0 8px;
+}
+.detalhe-itens-header {
+  color: var(--text-secondary) !important;
+}
+.detalhe-item-row .desc { color: var(--text-primary); font-weight: 600; }
+.detalhe-item-row .qty,
+.detalhe-item-row .pu,
+.detalhe-item-row .sub { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+/* Form panel never looks like disabled ghost inputs in view */
+.bp-form-panel .input-field:disabled,
+.bp-form-panel .input-field[readonly] {
+  opacity: 1;
+}
+
+.bp-view-contact-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+.bp-view-contact-actions .btn {
+  min-height: 40px;
+  height: 40px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bp-chip-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--bg-soft);
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  cursor: pointer;
+  color: var(--text-primary);
+  margin: 0 6px 6px 0;
+}
+.bp-chip-check input { margin: 0; }
+
+.bp-tier {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+.bp-tier--bronze {
+  background: color-mix(in srgb, #B87333 18%, transparent);
+  color: #8B5A2B;
+}
+.bp-tier--prata {
+  background: color-mix(in srgb, #94A3B8 22%, transparent);
+  color: #475569;
+}
+.bp-tier--ouro {
+  background: var(--gold-50, #FBF6E9);
+  color: var(--gold-dark);
+  border: 1px solid var(--border-soft);
+}
+
+
+/* Avatar com foto na ficha */
+.bp-view-hero-av--img {
+  padding: 0;
+  overflow: hidden;
+}
+.bp-view-hero-av--img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* CTA Adicionar à venda — branco cascata (sem dourado, sem emoji) */
+#btn-add-item {
+  background: linear-gradient(180deg, #ffffff 0%, #f7f5f2 100%);
+  color: var(--text-primary, #1c1a18);
+  font-weight: 600;
+  border: 1px solid var(--border-soft, #e0dcd6);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 2px 8px rgba(20, 17, 15, 0.06);
+  position: relative;
+  animation: none;
+}
+#btn-add-item:hover {
+  background: linear-gradient(180deg, #ffffff 0%, #f3f0eb 100%);
+  border-color: #d4cfc7;
+}
+#btn-add-item:active {
+  transform: scale(0.98);
+  background: #f0ece7;
+  box-shadow: 0 1px 3px rgba(20, 17, 15, 0.08);
+}
+#btn-add-item::after {
+  content: none !important;
+  display: none !important;
+}
+@keyframes bpAddPulse {
+  0%, 100% { box-shadow: none; }
+  50% { box-shadow: none; }
+}
+@keyframes bpPoint {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 0; }
+}
+
+
+/* Validação venda — destaque de campo (sem toast de risco) */
+.input-field.bp-field-invalid,
+select.bp-field-invalid {
+  /* F5-02: mesma autoridade de erro que modais-toast-fab / DS (token --red) */
+  border-color: var(--red) !important;
+  background: var(--card-white);
+  box-shadow: 0 0 0 2px rgba(179, 58, 74, 0.15);
+}
+
+
+/* Detalhe venda — Cancelar ocupa a largura disponível */
+#modal-detalhe-venda .modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+#modal-detalhe-venda .modal-actions #modal-detalhe-fechar,
+#modal-detalhe-venda .modal-actions #btn-imprimir-recibo {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 0;
+}
+#modal-detalhe-venda .modal-actions #btn-cancelar-venda {
+  flex: 1 1 100%;
+  width: 100%;
+  min-height: 40px;
+  height: 40px;
+}
+
+/* Confirmar venda — resumo estruturado */
+.bp-confirm-summary {
+  margin: 0 0 18px;
+  padding: 0;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--card-white);
+}
+.bp-confirm-summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+.bp-confirm-summary-row:last-of-type { border-bottom: none; }
+.bp-confirm-summary-label {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+.bp-confirm-summary-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-align: right;
+  word-break: break-word;
+}
+.bp-confirm-summary-note {
+  margin: 10px 2px 0;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  font-weight: 400;
+}
+#modal-confirm .confirm-title {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+#modal-confirm .confirm-actions .btn {
+  min-height: 36px;
+  height: 36px;
+  font-size: 0.8125rem;
+}
+
+
+#confirm-message.confirm-message--summary {
+  white-space: normal !important;
+  margin-bottom: 16px;
+}
+
+
+/* UI-audit: reforço grelha itens (evita overrides antigos) */
+.bp-view-dl--itens .detalhe-itens-header,
+.bp-view-dl--itens .detalhe-item-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px 76px 80px;
+  gap: 8px;
+  align-items: center;
+}
+
+
+/* ==================================================================
+   UI polish — Detalhe venda (Caixa) + Confirmar venda
+   Organização, hierarquia tipográfica, botões alinhados (SaaS)
+   ================================================================== */
+#modal-detalhe-venda .modal-sheet {
+  padding-top: 12px;
+}
+#modal-detalhe-venda .bp-view-kicker {
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+}
+#modal-detalhe-venda .bp-view-title {
+  font-size: 1.05rem !important;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px !important;
+}
+#modal-detalhe-venda .bp-view-dl {
+  border-radius: 10px;
+  margin-bottom: 14px;
+}
+#modal-detalhe-venda .bp-view-row {
+  padding: 10px 12px;
+  align-items: center;
+}
+#modal-detalhe-venda .bp-view-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+#modal-detalhe-venda .bp-view-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+#modal-detalhe-venda .pagamento-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--bg-soft, #f5f2eb);
+  border: 1px solid var(--border-soft);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+#modal-detalhe-venda .bp-view-section-title {
+  margin: 4px 0 6px;
+  padding: 0 2px;
+}
+#modal-detalhe-venda .bp-view-dl--itens {
+  margin-bottom: 12px;
+}
+#modal-detalhe-venda .detalhe-itens-header {
+  background: var(--bg-soft, #f7f4ed);
+}
+#modal-detalhe-venda .bp-view-total {
+  padding: 12px 14px;
+  margin-top: 0;
+  margin-bottom: 4px;
+  border-radius: 10px;
+}
+#modal-detalhe-venda .bp-view-total .bp-view-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+#modal-detalhe-venda .bp-view-total .bp-view-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+#modal-detalhe-venda .modal-actions {
+  margin-top: 12px;
+  gap: 8px;
+}
+#modal-detalhe-venda .modal-actions .btn {
+  height: 40px;
+  min-height: 40px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 10px;
+}
+#modal-detalhe-venda .modal-actions #btn-cancelar-venda {
+  margin-top: 0;
+  background: #a33b3b;
+  border-color: #a33b3b;
+}
+
+/* Confirmar venda — mesmo idioma visual do detalhe (sem Cancelar venda) */
+#modal-confirm .modal-confirm-sheet {
+  padding: 20px 18px 16px;
+  border-radius: 14px;
+}
+#modal-confirm .confirm-title {
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+}
+#modal-confirm .bp-confirm-summary {
+  margin: 0 0 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  overflow: hidden;
+}
+#modal-confirm .bp-confirm-summary-row {
+  padding: 9px 12px;
+  align-items: center;
+}
+#modal-confirm .bp-confirm-summary-label {
+  font-size: 0.6875rem;
+}
+#modal-confirm .bp-confirm-summary-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+#modal-confirm .bp-confirm-summary-note {
+  margin: 0 0 14px;
+  padding: 0 2px;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+#modal-confirm .confirm-actions {
+  gap: 8px;
+}
+#modal-confirm .confirm-actions .btn {
+  height: 40px;
+  min-height: 40px;
+  border-radius: 10px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+
+/* F7-5 — Finalizar: Registar dourado (primary), Cancelar branco/secondary */
+#modal-finalizar #modal-finalizar-save.btn-primary {
+  /* herda .btn-primary do design-system (dourado) */
+}
+#modal-finalizar #modal-finalizar-cancel.btn-secondary {
+  background: var(--card-white);
+  color: var(--text-primary);
+  border: 1px solid var(--border-soft);
+}
+/* Detalhe venda — Imprimir recibo = estilo Voltar/Fechar (secondary branco) */
+#modal-detalhe-venda #btn-imprimir-recibo.btn-secondary {
+  background: var(--card-white);
+  color: var(--text-primary);
+  border: 1px solid var(--border-soft);
+  box-shadow: none;
+}
+
+
+/* ====================================================================
+   BP-LOCK-F7-18 — Modal venda / carrinho (decisões fechadas)
+   - Adicionar à venda: branco cascata, SEM emoji, SEM dourado
+   - Secção serviço: fundo bg-soft restaurado
+   - Total itens: PRETO
+   - Layout: nome+preço | spacer | stepper | X
+   ==================================================================== */
+#modal-venda #btn-add-item,
+#btn-add-item {
+  background: linear-gradient(180deg, #ffffff 0%, #f7f5f2 100%) !important;
+  color: var(--text-primary, #1c1a18) !important;
+  border: 1px solid var(--border-soft, #e0dcd6) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 2px 8px rgba(20,17,15,0.06) !important;
+  animation: none !important;
+}
+#modal-venda #btn-add-item::after,
+#btn-add-item::after {
+  content: none !important;
+  display: none !important;
+}
+
+#modal-venda .venda-section--add {
+  padding: 12px !important;
+  background: var(--bg-soft, #f3efe9) !important;
+  border: 1px solid var(--border-soft) !important;
+  border-radius: var(--radius-md, 8px) !important;
+}
+
+#modal-venda .cart-total-row .ct-val,
+.cart-total-row .ct-val {
+  color: var(--text-primary, #1c1a18) !important;
+}
+#modal-venda .cart-total-row {
+  border-top-color: var(--border-soft, #e8e4de) !important;
+}
+
+/* Stepper interligado (não círculos cheios) */
+#modal-venda .cart-item-row .ci-qty-controls,
+.cart-item-row .ci-qty-controls {
+  border-radius: 6px !important;
+  overflow: hidden !important;
+  background: #f5f5f5 !important;
+  border: 1px solid #e8e8e8 !important;
+}
+#modal-venda .cart-item-row .qty-btn,
+.cart-item-row .qty-btn {
+  border-radius: 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+#modal-venda .cart-item-row .ci-del,
+.cart-item-row .ci-del {
+  border-radius: 6px !important;
+}
+
+
+/* ===== P1b — fluxo guiado limpo (sem fundo dourado) ===== */
+.venda-flow-hint {
+  display: none !important;
+}
+#modal-venda .venda-section {
+  transition: opacity 0.15s ease;
+  border-radius: 10px;
+  padding: 6px 0;
+  margin-left: 0;
+  margin-right: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+#modal-venda .venda-section.venda-step-active,
+#modal-venda .venda-section.venda-step-done {
+  opacity: 1;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+#modal-venda .venda-section.venda-step-locked {
+  opacity: 0.55;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+#modal-venda .venda-section.venda-step-locked .venda-section-label::after {
+  content: ' (adicione um serviço)';
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6b6560);
+}
+/* Secção serviço: fundo neutro (bg-soft), sem dourado */
+#modal-venda .venda-section--add {
+  background: var(--bg-soft, #f5f3f0) !important;
+  border: 1px solid var(--border-soft, #e8e4de) !important;
+  border-radius: 10px !important;
+  padding: 10px 12px !important;
+}
+
+/* Campos densos — mesmo contrato que #modal-agenda (40px) */
+#modal-venda .input-field,
+#modal-venda select.input-field,
+#modal-venda select.venda-select-field,
+#modal-venda .venda-valor-wrap {
+  min-height: 40px !important;
+  height: 40px !important;
+  padding: 8px 12px !important;
+  font-size: 0.875rem !important;
+  border-radius: var(--radius-md);
+  background: var(--card-white, #fff) !important;
+  border-color: var(--border-soft, #e0dcd6) !important;
+  box-shadow: none !important;
+}
+#modal-venda .venda-valor-wrap {
+  padding: 0 12px !important;
+}
+#modal-venda .venda-valor-wrap .input-field {
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 6px 4px 6px 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+#modal-venda .input-group,
+#modal-venda .venda-field-tight {
+  margin-bottom: 10px;
+}
+#modal-venda #btn-add-item,
+#modal-venda #venda-add-cliente-rapido {
+  min-height: 36px !important;
+  height: 36px !important;
+  font-size: 0.8125rem !important;
+  padding: 0 12px !important;
+}
+
+/* Footer Fechar / Cobrar — escala agenda (40px), grid compacto */
+#modal-venda .modal-actions.venda-modal-footer,
+#modal-venda .venda-modal-footer.modal-actions {
+  display: grid !important;
+  grid-template-columns: 1fr 1.35fr !important;
+  gap: 10px;
+  margin-top: 12px;
+  width: 100%;
+  align-items: stretch;
+  padding-top: 10px;
+}
+#modal-venda .venda-modal-footer .btn,
+#modal-venda #modal-venda-cancel,
+#modal-venda #modal-venda-save {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 40px !important;
+  height: 40px !important;
+  max-height: 40px !important;
+  padding: 0 14px !important;
+  margin: 0 !important;
+  font-size: 0.8125rem !important;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+#modal-venda select.input-field:disabled,
+#modal-venda #venda-pagamento:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Selects clicáveis — chevron ▼ à direita (não nos botões) */
+#modal-venda .venda-select-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+#modal-venda .venda-select-wrap select.venda-select-field,
+#modal-venda .venda-select-wrap select.input-field {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 100%;
+  padding-right: 2.4rem !important;
+  background-image: none !important;
+  cursor: pointer;
+}
+/* V aberto (chevron outline), não triângulo cheio */
+#modal-venda .venda-select-wrap::after { display: none !important; content: none !important; }
+#modal-venda .venda-select-wrap:has(select:disabled)::after {
+  opacity: 0.35;
+}
+#modal-venda #venda-modal-sub[hidden] {
+  display: none !important;
+}
+#modal-venda .venda-section-label {
+  color: var(--text-secondary, #5c5650);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+#modal-venda .input-label {
+  color: var(--text-secondary, #5c5650);
+}
+#modal-venda .modal-title {
+  color: var(--text-primary, #1c1a18);
+}
+#modal-venda .venda-modal-sub {
+  color: var(--text-secondary, #6b6560);
+}
+#modal-venda #btn-add-item.venda-add-ready {
+  box-shadow: 0 0 0 2px rgba(28, 26, 24, 0.12);
+  outline: none;
+}
+
+
+
+
+/* Agenda — mesmo V aberto dos selects da venda */
+#modal-agenda .venda-select-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+#modal-agenda .venda-select-wrap select.venda-select-field,
+#modal-agenda .venda-select-wrap select.input-field {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 100%;
+  padding-right: 2.4rem !important;
+  background-image: none !important;
+  cursor: pointer;
+}
+#modal-agenda .venda-select-wrap::after { display: none !important; content: none !important; }
+
+
+/* Sem V nos selects (venda + agenda) */
+#modal-venda .venda-select-wrap::after,
+#modal-agenda .venda-select-wrap::after {
+  display: none !important;
+  content: none !important;
+}
+#modal-venda select.venda-select-field,
+#modal-agenda select.venda-select-field {
+  -webkit-appearance: menulist;
+  -moz-appearance: menulist;
+  appearance: auto;
+  padding-right: 12px !important;
+}
+
+/* fix montagem modal venda */
+.venda-add-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+}
+#modal-venda .venda-section { position: relative; z-index: 1; }
+#modal-venda .venda-cart-list { position: relative; z-index: 1; overflow: visible; max-height: none; }
+#modal-venda .venda-modal-footer { position: sticky; bottom: 0; z-index: 3; }

@@ -1,0 +1,152 @@
+/* BeautyPro — Ops como aba (igual Agenda/IA), não overlay por cima */
+
+#tab-ops.tab-pane {
+  display: none;
+}
+#tab-ops.tab-pane.active {
+  display: block;
+}
+
+.bp-ops-tab-inner {
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
+.bp-ops-tab-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 0 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--bp-border-soft, rgba(31, 41, 55, 0.08));
+}
+
+.bp-ops-tab-bar .bp-ops-back {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--bp-text, #1F2937);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bp-ops-tab-bar .bp-ops-back:active {
+  background: rgba(31, 41, 55, 0.06);
+}
+
+.bp-ops-tab-heading {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-top: 4px;
+}
+
+.bp-ops-tab-eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bp-accent, #B7791F);
+  margin: 0 0 2px;
+}
+
+.bp-ops-tab-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--bp-text, #1F2937);
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+.bp-ops-mount {
+  min-height: 40vh;
+}
+
+/* Overlay hospedado na aba: deixa de ser modal fixo */
+#bp-ops-mount .bp-ops-overlay.modal-overlay,
+#bp-ops-mount .modal-overlay.bp-ops-overlay {
+  position: relative !important;
+  inset: auto !important;
+  left: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0;
+  display: none;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
+  margin: 0;
+  background: transparent !important;
+  z-index: auto !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+#bp-ops-mount .bp-ops-overlay.modal-overlay.open,
+#bp-ops-mount .modal-overlay.bp-ops-overlay.open {
+  display: flex !important;
+}
+
+#bp-ops-mount .bp-ops-sheet,
+#bp-ops-mount .bp-sheet.bp-ops-sheet {
+  width: 100%;
+  max-width: none !important;
+  max-height: none !important;
+  height: auto;
+  min-height: 0;
+  border-radius: 0 !important;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: none !important;
+  animation: none !important;
+  background: transparent;
+  overflow: visible;
+}
+
+#bp-ops-mount .bp-sheet-handle,
+#bp-ops-mount .handle {
+  display: none !important;
+}
+
+/* Topbar interna do sheet: escondida — o ← da aba manda */
+#bp-ops-mount .bp-ops-topbar {
+  display: none !important;
+}
+
+#bp-ops-mount .bp-sheet-subtitle {
+  margin: 0 0 10px;
+  padding: 0;
+  font-size: 0.85rem;
+  color: rgba(31, 41, 55, 0.65);
+}
+
+#bp-ops-mount .bp-sheet-body {
+  flex: 1 1 auto;
+  overflow: visible;
+  padding: 0;
+  max-height: none;
+}
+
+#bp-ops-mount .bp-sheet-footer {
+  margin-top: 16px;
+  padding: 12px 0 0;
+  background: transparent;
+  border-top: 1px solid var(--bp-border-soft, rgba(31, 41, 55, 0.08));
+}
+
+/* Tab bar principal continua visível (comportamento de aba) */
+body.bp-ops-open .bottom-nav {
+  visibility: visible;
+  pointer-events: auto;
+}

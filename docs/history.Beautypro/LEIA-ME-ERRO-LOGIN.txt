@@ -1,0 +1,11 @@
+Erro no ecrã: "withSyncFlushLock(...) is not a function"
+Causa: no login, loadState → flushSyncQueue; se o browser/SW tiver uma versão
+antiga da fila ou falha de ordem, a função de lock multi-tab não existia.
+
+Correção:
+1) core/sync-queue.js — fallback se lock em falta + export window.withSyncFlushLock
+2) index.html — ?v= novo no sync-queue (força download)
+3) sw.js — CACHE_NAME novo (invalida shell antigo)
+
+Após copiar: fecha o SPCK/browser, limpa dados do site OU hard refresh,
+volta a abrir e testa login.

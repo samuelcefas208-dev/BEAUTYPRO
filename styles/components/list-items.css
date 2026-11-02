@@ -1,0 +1,144 @@
+/* BelezaPro — styles/components/list-items.css — Etapa 6 (listas partilhadas) */
+/* ===== LIST ITEMS ===== */
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--card-white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow-rest);
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: listItemIn 0.15s ease-out forwards;
+}
+.list-item:nth-child(1) { animation-delay: 0.02s; }
+.list-item:nth-child(2) { animation-delay: 0.06s; }
+.list-item:nth-child(3) { animation-delay: 0.10s; }
+.list-item:nth-child(4) { animation-delay: 0.14s; }
+.list-item:nth-child(5) { animation-delay: 0.18s; }
+.list-item:nth-child(6) { animation-delay: 0.22s; }
+.list-item:nth-child(7) { animation-delay: 0.26s; }
+.list-item:nth-child(8) { animation-delay: 0.30s; }
+.list-item:nth-child(9) { animation-delay: 0.34s; }
+.list-item:nth-child(10) { animation-delay: 0.38s; }
+.list-item:nth-child(n+11) { animation-delay: 0.40s; }
+@keyframes listItemIn {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.list-item:active { background: var(--bg-soft); }
+.list-item .avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #E8E6E1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0;
+  color: transparent;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.list-item .avatar.bp-avatar-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.list-item .info { flex: 1; min-width: 0; }
+.list-item .info .title {
+  font-weight: 600;
+  font-size: var(--text-sm, 0.95rem);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.list-item .info .sub {
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+/* Perfil do cliente com mais contexto (em vez de "Nome e X visitas") */
+.cliente-stats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.cliente-stat {
+  font-size: .65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-soft);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+/* F7-19: gastos = mesma tipologia do «Novo» (verde) */
+.cliente-stat--gasto { color: var(--green); background: var(--green-50); }
+.cliente-stat--novo { color: var(--green); background: var(--green-50); }
+/* Paralelo ao --gasto: estados de risco / agenda (mesmos tokens de cor da plataforma) */
+.cliente-stat--risco { color: var(--red); background: var(--red-50); }
+.cliente-stat--agenda { color: var(--gold-dark); background: var(--gold-50, var(--gold-light)); }
+.list-item .action {
+  font-weight: 700;
+  font-size: .8rem;
+  color: var(--text-primary);
+  flex-shrink: 0;
+  text-align: right;
+  min-width: 60px;
+}
+.list-item .actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Resumo de estatísticas no topo do perfil do cliente (modal de edição) */
+.cliente-perfil-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  background: var(--bg-soft);
+  border-radius: var(--radius-md);
+  padding: 12px 8px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.cliente-perfil-stats .stat-valor {
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.cliente-perfil-stats .stat-legenda {
+  font-size: .62rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+
+
+
+
+/* SRV — mesma tipologia do círculo dourado do modal (.bp-view-hero-av) */
+.list-item .avatar.bp-servico-avatar {
+  background: var(--gold-50, var(--gold-light, #FBF6E9)) !important;
+  color: var(--gold-dark) !important;
+  border: 1px solid var(--border-soft);
+  font-family: var(--font-sans) !important;
+  font-size: 0.65rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+}

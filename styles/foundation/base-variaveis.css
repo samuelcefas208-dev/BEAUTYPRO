@@ -1,0 +1,171 @@
+/* ====================================================================
+   base-variaveis.css — tokens únicos BeautyPro (fonte de verdade)
+   Paleta · Tipografia · Sombras · Raios · Transições
+   Hex cru só aqui; resto do projeto usa var(--...)
+   ==================================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  /* ---- Fontes ---- */
+  --font-serif: 'Playfair Display', 'Inter', serif;
+  --font-sans: 'Inter', -apple-system, system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Segoe UI Mono', Menlo, Consolas, monospace;
+
+  /* ---- Dourado — 4 passos (auditoria 1.1 / 1.2) ---- */
+  --gold-50:   #FBF6E9;   /* fundo / light */
+  --gold:      #D4AF37;   /* base */
+  --gold-600:  #A7872B;   /* hover / dark */
+  --gold-900:  #8A6E1C;   /* active / texto escuro */
+
+  /* Aliases de compatibilidade (não introduzir novos hex) */
+  --gold-light: var(--gold-50);
+  --gold-dark:  var(--gold-600);
+  --amber:      var(--gold);
+  --amber-dark: var(--gold-600);
+  --amber-light: var(--gold-50);
+
+  /* Escala expandida só como alias (compat dark-mode / utilitários legados) */
+  --gold-100: var(--gold-50);
+  --gold-200: var(--gold-50);
+  --gold-300: var(--gold);
+  --gold-400: var(--gold);
+  --gold-500: var(--gold);
+  --gold-700: var(--gold-600);
+  --gold-800: var(--gold-900);
+
+  --neutral-25:  #FCFBFA;
+  --neutral-75:  #ECE9E4;
+  --neutral-200: #C7BDAF;
+  --neutral-300: #ADA090;
+  --neutral-400: #948673;
+  --neutral-500: #766A5C;
+  --neutral-700: #423E38;
+  --neutral-800: #2A241E;
+
+  /* ---- Neutros quentes — 4 passos + utilitários ---- */
+  --neutral-0:   #FFFFFF;
+  --neutral-50:  #F3F2EF;
+  --neutral-100: #DCD5C9;
+  --neutral-600: #5C564E;
+  --neutral-900: #17140F;
+
+  --ink:           #14110F;
+  --ink-800:       #1C1815;
+  --bg-soft:       var(--neutral-50);
+  --card-white:    var(--neutral-0);
+  --text-primary:  var(--neutral-900);
+  --text-secondary: var(--neutral-600);
+  --text-muted:    #6B6560; /* WCAG AA ≥4.5:1 */
+  --text-on-ink:   #ECE7DF;
+  --border-soft:   var(--neutral-100);
+  --border-ink:    #2A241E;
+  --warm-ivory:    #F9F7F5;
+  --navy:          var(--neutral-900);
+  --navy-soft:     var(--border-ink);
+  --ivory:         var(--warm-ivory);
+  --ivory-deep:    var(--neutral-50);
+
+  /* ---- Superfícies desktop (canvas fora do app shell) ---- */
+  --surface-canvas:      #E6E2DA; /* fundo página ≥1024px */
+  --surface-canvas-deep: #DDD8CF; /* fundo página ≥1600px */
+
+  /* ---- Semântico (verde / vermelho) ---- */
+  --green:    #2C7A4D;
+  --green-50: #E6F4EC;
+  --red:      #B33A4A;
+  --red-50:   #FDE8E8;
+
+  /* ---- Tipografia — 7 passos (auditoria §2) ---- */
+  --text-2xs: 0.65rem;  /* badges, legendas */
+  --text-xs:  0.75rem;  /* labels, sub-texto */
+  --text-sm:  0.85rem;  /* corpo secundário */
+  --text-base: 0.95rem; /* corpo principal */
+  --text-lg:  1.1rem;   /* subtítulos */
+  --text-xl:  1.4rem;   /* títulos de secção */
+  --text-2xl: 2.2rem;   /* KPIs, splash */
+
+  /* Aliases legados (mapear para escala) */
+  --fs-xs:   var(--text-2xs);
+  --fs-sm:   var(--text-xs);
+  --fs-md:   var(--text-sm);
+  --fs-base: var(--text-base);
+  --fs-lg:   var(--text-lg);
+  --fs-xl:   var(--text-xl);
+  --fs-2xl:  var(--text-2xl);
+
+  /* ---- Sombras — 4 níveis (auditoria §3) ---- */
+  --shadow-rest:     0 1px 3px rgba(23, 20, 15, 0.06);
+  --shadow-raised:   0 4px 12px rgba(23, 20, 15, 0.10);
+  --shadow-floating: 0 12px 32px rgba(23, 20, 15, 0.16);
+  --shadow-gold:     0 4px 14px rgba(212, 175, 55, 0.25);
+
+  /* Aliases legados */
+  --shadow-premium: var(--shadow-rest);
+  --shadow-strong:  var(--shadow-raised);
+  --shadow-card:    var(--shadow-rest);
+  --shadow-modal:   var(--shadow-floating);
+
+  /* ---- Raios — escala tipo Tailwind (rounded-*) ---- */
+  --radius-none: 0;
+  --radius-sm:   4px;   /* rounded-sm */
+  --radius-md:   8px;   /* rounded-md */
+  --radius-lg:   12px;  /* rounded-lg */
+  --radius-xl:   16px;  /* rounded-xl */
+  --radius-2xl:  20px;  /* rounded-2xl */
+  --radius-full: 9999px;
+
+  /* ---- Bordas — escala tipo Tailwind (border / border-*) ---- */
+  --border-0: 0;
+  --border-1: 1px;
+  --border-2: 2px;
+  --border-default: var(--border-1) solid var(--border-soft);
+  --border-muted:   var(--border-1) solid rgba(23, 20, 15, 0.06);
+  --border-strong:  var(--border-1) solid var(--neutral-100);
+  --ring-gold: 0 0 0 3px rgba(212, 175, 55, 0.18);
+
+  /* ---- Motion — easings tipo Framer (spring / easeOut) ---- */
+  /* cubic-bezier aproximam spring leve e easeOut Expo */
+  --ease-out:        cubic-bezier(0.16, 1, 0.3, 1);      /* Framer easeOut */
+  --ease-out-soft:   cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring:     cubic-bezier(0.34, 1.3, 0.64, 1);   /* overshoot leve */
+  --ease-in-out:     cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---- Transições — 3 níveis + motion tokens ---- */
+  --transition-fast: 150ms var(--ease-out);
+  --transition-base: 250ms var(--ease-out);
+  --transition-slow: 400ms var(--ease-out-soft);
+  --transition: var(--transition-fast);
+  --duration-enter: 380ms;
+  --duration-stagger: 60ms;
+
+
+  /* ---- Espaçamento 8px (já em uso) ---- */
+  --s1: 8px;
+  --s2: 16px;
+  --s3: 24px;
+  --s4: 32px;
+  --s5: 40px;
+  --s6: 48px;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-soft);
+  color: var(--text-primary);
+  line-height: 1.5;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.flex { display: flex; align-items: center; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mb-4 { margin-bottom: 16px; }

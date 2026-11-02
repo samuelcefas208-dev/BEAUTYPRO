@@ -1,0 +1,25 @@
+{
+  "name": "belezapro",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "BelezaPro — SaaS gestão salões (offline-first)",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint domain tests",
+    "format": "prettier --write \"domain/**/*.{js,mjs}\" \"tests/**/*.{js,mjs}\" \"*.md\" --ignore-unknown",
+    "lint:legacy": "eslint ../auth-supabase.js ../core-constants.js ../core-state.js ../crud-operations.js ../db-indexeddb.js ../sync-queue.js ../sync-rest.js",
+    "test:e2e": "playwright test",
+    "test:e2e:smoke": "playwright test e2e/smoke.spec.js",
+    "dev:experimental": "vite --config vite.config.js",
+    "build:experimental": "vite build --config vite.config.js"
+  },
+  "devDependencies": {
+    "eslint": "^9.16.0",
+    "prettier": "^3.4.2",
+    "vitest": "^2.1.8",
+    "@playwright/test": "^1.49.0",
+    "vite": "^5.4.11"
+  }
+}

@@ -1,0 +1,836 @@
+/* ====================================================================
+   design-system-final.css — Quality Gate Internacional BeautyPro
+   Espaçamento 8px · Botões Primary/Secondary/Ghost/Danger · Inputs · Cards
+   Identidade BeautyPro SW v12: Gold var(--gold) · Gold-dark var(--gold-dark) · Ivory var(--warm-ivory) · Ink var(--text-primary)
+   ==================================================================== */
+
+/* Tokens: ver base-variaveis.css (fonte única) */
+
+body {
+  background: var(--bg-soft);
+  color: var(--text-primary);
+  font-size: var(--fs-base);
+}
+
+/* ===== BOTÕES — Primary / Secondary / Ghost / Danger ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s1);
+  height: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), opacity var(--transition), box-shadow var(--transition);
+  touch-action: manipulation;
+  position: relative;
+}
+.btn:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 1px;
+}
+.btn:disabled,
+.btn.is-disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+.btn.is-loading {
+  pointer-events: none;
+  color: transparent !important;
+}
+.btn.is-loading::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: var(--card-white);
+  border-radius: 50%;
+  animation: bp-spin 0.65s linear infinite;
+  top: 50%;
+  left: 50%;
+  margin: -9px 0 0 -9px;
+}
+.btn-secondary.is-loading::after {
+  border-color: rgba(31,41,55,0.2);
+  border-top-color: var(--text-primary);
+}
+@keyframes bp-spin { to { transform: rotate(360deg); } }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: var(--card-white);
+  box-shadow: var(--shadow-gold);
+}
+.btn-primary:hover { background: linear-gradient(135deg, var(--gold-600), var(--gold-900)); }
+.btn-primary:active { background: var(--gold-900); }
+
+.btn-secondary {
+  background: var(--card-white);
+  border-color: var(--border-soft);
+  color: var(--text-primary);
+  box-shadow: none;
+}
+.btn-secondary:hover { background: var(--ivory-deep); }
+.btn-secondary:active { background: var(--border-soft); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: transparent;
+}
+.btn-ghost:hover { background: rgba(23,20,15,0.05); color: var(--text-primary); }
+
+.btn-danger,
+.btn-danger.btn-primary {
+  background: var(--red);
+  color: var(--card-white);
+}
+.btn-danger:hover { background: var(--red); }
+
+.btn-sm {
+  height: 36px;
+  min-height: 36px;
+  padding: 0 10px;
+  font-size: 0.75rem;
+}
+/* F3-03 Design Language: default 44px · sm 36px. */
+.btn-block {
+  width: 100%;
+  justify-content: center;
+}
+.btn-success {
+  background: var(--green);
+  color: var(--card-white);
+  box-shadow: 0 4px 12px rgba(44, 122, 77, 0.2);
+}
+.btn-success:hover {
+  filter: brightness(0.94);
+}
+.btn-success:active {
+  filter: brightness(0.88);
+}
+.btn-success.is-loading::after {
+  border-top-color: var(--card-white);
+}
+.btn-danger:active {
+  filter: brightness(0.92);
+}
+
+/* ===== INPUTS ===== */
+.input-group { margin-bottom: var(--s2); }
+.input-label {
+  display: block;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.input-field {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  background: var(--card-white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  transition: border-color var(--transition), background var(--transition);
+  outline: none;
+}
+.input-field:focus,
+.input-field:focus-visible {
+  outline: none !important;
+  border-color: var(--gold);
+  border-width: 1px;
+  background: var(--card-white);
+  box-shadow: none;
+}
+.input-field::placeholder { color: var(--text-muted); }
+.input-field:disabled {
+  background: var(--ivory-deep);
+  color: var(--text-muted);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+/* F5-04: readonly ≠ disabled — legível, sem parecer campo activo editável */
+.input-field:read-only,
+.input-field[readonly] {
+  background: var(--bg-soft);
+  color: var(--text-primary);
+  opacity: 1;
+  cursor: default;
+  border-color: var(--border-soft);
+}
+.input-field.error,
+.input-field.has-error,
+.input-field[aria-invalid="true"] {
+  border-color: var(--red);
+  background: var(--card-white);
+}
+.input-field.error:focus,
+.input-field.has-error:focus,
+.input-field[aria-invalid="true"]:focus {
+  border-color: var(--red);
+  box-shadow: none;
+}
+/* Mensagem de erro de formulário (quando existir no markup) */
+.field-error,
+.input-error-msg {
+  display: block;
+  margin-top: 6px;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--red);
+  line-height: 1.35;
+}
+textarea.input-field {
+  height: auto;
+  min-height: 96px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+select.input-field {
+  /* F5-04: mesma família Input — 48px herdado; seta nativa custom */
+  height: 48px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6560' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+/* ===== CARDS — autoridade única (P0) ===== */
+.card {
+  background: var(--card-white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: var(--s2);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--transition-fast, 0.15s ease), transform var(--transition-fast, 0.15s ease);
+}
+.card-highlight {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, var(--gold-light) 0%, var(--card-white) 48%);
+}
+
+/* ===== MODAIS ===== */
+.modal-sheet {
+  /* F3-04: radius alinhado a modais-toast-fab (autoridade estrutural sheet) */
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  padding: var(--s3) var(--s2) calc(var(--s3) + env(safe-area-inset-bottom, 16px));
+  box-shadow: var(--shadow-floating);
+}
+.modal-title {
+  font-family: var(--font-sans) !important;
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: var(--s2);
+}
+.modal-confirm-sheet {
+  /* F3-04: radius token; padding denso coerente */
+  border-radius: var(--radius-lg);
+  padding: var(--s3) var(--s2) var(--s2);
+  box-shadow: var(--shadow-floating);
+  border: 1px solid var(--border-soft);
+}
+.modal-confirm-sheet .confirm-title {
+  font-family: var(--font-sans) !important;
+  font-weight: 700;
+  font-size: var(--fs-lg);
+  color: var(--text-primary);
+  text-align: left;
+}
+.modal-confirm-sheet .confirm-message {
+  text-align: left !important;
+  font-size: var(--fs-md);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* ===== NAV ===== */
+.bottom-nav {
+  background: rgba(255,255,255,0.96);
+  border-top: 1px solid var(--border-soft);
+  height: 64px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.nav-item {
+  color: var(--text-muted);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  gap: 2px;
+  min-height: 48px;
+}
+.nav-item svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.75;
+}
+.nav-item.active {
+  color: var(--gold);
+}
+.nav-item.active svg {
+  transform: none;
+  stroke: var(--gold);
+}
+
+/* ===== HEADER ===== */
+.app-header {
+  background: rgba(248, 247, 244, 0.92);
+  border-bottom: 1px solid var(--border-soft);
+  padding: 12px var(--s2);
+}
+.app-header .logo {
+  font-family: var(--font-sans) !important;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+.app-header .logo span {
+  color: var(--gold);
+}
+
+/* ===== SECTION TITLES ===== */
+.tab-inner > span[style*="font-serif"],
+.tab-inner span[style*="font-family:var(--font-serif)"] {
+  font-family: var(--font-sans) !important;
+  font-weight: 700 !important;
+  font-size: var(--fs-lg) !important;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+/* ===== LIST ITEMS ===== */
+.list-item {
+  /* F5-03: tipografia oficial; layout cartão = kpis-caixa-listas (autoridade estrutural) */
+  padding: 12px var(--s2);
+  gap: var(--s1);
+  align-items: center;
+}
+.list-item .avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%; /* avatar circular — não confundir com radius de controlos */
+  font-size: var(--text-sm);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.list-item .title,
+.list-item .info .title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.list-item .sub,
+.list-item .info .sub {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ===== EMPTY STATE ===== */
+/* F5-03: autoridade visual única para empty estrutural */
+.empty-state {
+  padding: var(--s4) var(--s2);
+  text-align: center;
+  background: var(--card-white);
+  border: 1px dashed var(--border-soft);
+  border-radius: var(--radius-md);
+}
+.empty-state p {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+  line-height: 1.45;
+  max-width: 28ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+.empty-state svg {
+  width: 40px;
+  height: 40px;
+  stroke: var(--gold);
+  margin: 0 auto 12px;
+  display: block;
+}
+
+/* ===== KPI ===== */
+.kpi-card {
+  background: var(--card-white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  box-shadow: var(--shadow-rest);
+}
+.kpi-value {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.kpi-sub {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ===== TOAST ===== */
+/* Toast: autoridade em modais-toast-fab.css — não forçar bottom / não disputar linha única nem ::after de sucesso */
+.toast {
+  bottom: auto !important;
+  height: auto !important;
+}
+.toast.success,
+.toast.info,
+.toast.warning {
+  color: var(--text-primary, #1c1a18);
+  background: var(--card-white, #fff);
+  border-left: none;
+}
+.toast.error {
+  color: #C62828;
+  background: var(--card-white, #fff);
+  border-left: none;
+}
+
+/* ===== FILTER / POPOVER ===== */
+.agenda-filter-popover {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-modal);
+  padding: 10px;
+  background: var(--card-white);
+}
+/* P1: chip de filtro (Agenda e contextos que reutilizam a classe) */
+.agenda-periodo-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  height: auto;
+  padding: 6px 8px;
+  font-family: var(--font-sans);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-soft);
+  background: var(--card-white);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.agenda-periodo-filter.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--card-white);
+}
+
+/* ===== PILLS ===== */
+.pill {
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+}
+.pill-warning {
+  background: var(--gold-light);
+  color: var(--gold-dark);
+}
+.pill-success {
+  background: var(--green-50);
+  color: var(--green);
+}
+.pill-danger {
+  background: var(--red-50);
+  color: var(--red);
+}
+.pill-gray {
+  background: var(--bg-soft);
+  color: var(--text-muted);
+}
+
+/* ===== FAB =====
+   P0 autoridade estrutural única: .fab completo em modais-toast-fab.css
+   (56px, círculo, scroll state, z-index). Não redefinir geometria aqui.
+   Ajustes de posição desktop ficam em desktop-responsive / login-carrinho. */
+
+/* ===== TAB INNER ===== */
+.tab-inner {
+  padding: var(--s2);
+}
+
+/* ===== UTILIDADES DE ESPAÇAMENTO 8px ===== */
+.gap-1 { gap: 8px; }
+.gap-2 { gap: 16px; }
+.gap-3 { gap: 24px; }
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 16px; }
+.mb-1 { margin-bottom: 8px; }
+.mb-2 { margin-bottom: 16px; }
+.p-2 { padding: 16px; }
+.p-3 { padding: 24px; }
+
+/* Skeleton loading */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-soft) 25%, var(--border-soft) 50%, var(--bg-soft) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.2s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Focus global */
+*:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 1px;
+}
+input.input-field:focus-visible,
+select.input-field:focus-visible,
+textarea.input-field:focus-visible,
+.input-field:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+
+.plano-badge[data-bp-plano-ready="0"] {
+  visibility: hidden !important;
+  min-width: 3.5rem;
+}
+.plano-badge[data-bp-plano-ready="1"] {
+  visibility: visible !important;
+}
+
+/* ===== Modal expiração agendamento — alinhado à plataforma ===== */
+.bp-modal-expirar {
+  background: var(--card-white, #fff);
+  border-top: none;
+  box-shadow: var(--shadow-floating, 0 12px 40px rgba(20, 17, 15, 0.14));
+  max-width: 360px;
+  width: calc(100% - 32px);
+  padding: 22px 20px 16px;
+  border-radius: var(--radius-md, 12px);
+}
+.bp-expirar-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+.bp-expirar-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+.bp-expirar-title-main {
+  color: var(--ink, #14110F);
+  font-weight: 700;
+  font-size: 1.12rem;
+  line-height: 1.2;
+}
+/* Menor que «Atenção», maior que o corpo; cor cascata (não preto) */
+.bp-expirar-title-sub {
+  color: var(--gold-dark, #A7872B);
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+.bp-expirar-subtitle {
+  color: var(--text-muted, #6B6560);
+  font-weight: 500;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+}
+.bp-expirar-msg {
+  margin: 10px 0 18px;
+  color: var(--text-secondary, #5C564E);
+  font-size: var(--text-sm, 0.85rem);
+  line-height: 1.45;
+}
+.bp-expirar-msg strong {
+  color: var(--ink, #14110F);
+  font-weight: 600;
+}
+.bp-expirar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bp-expirar-actions-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+.bp-expirar-actions-row .bp-btn-call,
+.bp-expirar-actions-row .bp-btn-whatsapp {
+  flex: 1 1 0;
+}
+.bp-expirar-ignore {
+  width: 100%;
+  background: #fff !important;
+  border: 1px solid var(--border-soft, #DCD5C9) !important;
+  color: var(--text-muted, #6B6560) !important;
+  font-weight: 500 !important;
+  min-height: 40px;
+}
+.bp-expirar-ignore:active {
+  background: var(--bg-soft, #F3F2EF) !important;
+}
+#modal-expirar .bp-btn-call.is-disabled,
+#modal-expirar .bp-btn-whatsapp.is-disabled,
+#modal-expirar .bp-btn-call:disabled,
+#modal-expirar .bp-btn-whatsapp:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+
+/* Splash BeautyPro banido — override absoluto */
+#splash-screen { display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
+#bp-checkmark-overlay { display: none !important; }
+
+/* Boot overlay: nunca preso após sessão estabelecida */
+html:not(.bp-booting) #bp-boot-overlay {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+.bp-expirar-cliente {
+  color: var(--gold-dark, #B8962E);
+  font-weight: 600;
+}
+.bp-expirar-tempo {
+  color: var(--red, #C45C4A);
+  font-weight: 600;
+}
+.bp-expirar-actions-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+.bp-expirar-actions-row .bp-btn-whatsapp,
+.bp-expirar-actions-row .bp-btn-call {
+  flex: 1 1 0;
+}
+
+html.bp-has-session #login-view,
+html.bp-has-session #login-view.view,
+html.bp-has-session #login-view.view.active {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Ícone Ligar: vibração suave do telefone + 3 ondas do centro (pequenas) */
+.bp-call-icon-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  overflow: visible;
+}
+.bp-call-icon-wrap .bp-ic-call {
+  position: relative;
+  z-index: 2;
+  display: block;
+}
+.bp-call-ripple { display: none !important; }
+#expirar-ligar.bp-call-anim:not(.is-disabled):not(:disabled) .bp-ic-call {
+  animation: bp-call-icon-shake 1.55s ease-in-out infinite;
+  transform-origin: 50% 50%;
+}
+/* F7-close: ondas removidas — só vibração do ícone */
+#expirar-ligar .bp-call-ripple { display: none !important; }
+
+/* Vibração só do ícone (não do botão inteiro) */
+@keyframes bp-call-icon-shake {
+  0%, 100% { transform: rotate(0deg) translateX(0); }
+  15% { transform: rotate(-11deg) translateX(-0.5px); }
+  30% { transform: rotate(10deg) translateX(0.5px); }
+  45% { transform: rotate(-8deg) translateX(-0.4px); }
+  60% { transform: rotate(7deg) translateX(0.3px); }
+  75% { transform: rotate(-4deg) translateX(-0.2px); }
+  90% { transform: rotate(2deg) translateX(0); }
+}
+/* F7-perf: ondas removidas (HTML sem .bp-call-ripple) */
+
+/* anti-flash final — vence .view.active de layout-nav-tabs.css */
+html.bp-has-session #login-view,
+html.bp-has-session #login-view.view.active {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+
+/* BP_TAB_HEADERS v5 — espelho cascata (só shell Resumo) */
+.app-container:not(:has(#tab-dashboard.active)) > .app-header {
+  display: none !important;
+}
+.app-container:has(#tab-dashboard.active) > .app-header {
+  display: flex !important;
+}
+.app-container:not(:has(#tab-dashboard.active)) .venda-cta-bar {
+  display: none !important;
+}
+.app-header .store-name {
+  display: inline-block !important;
+  max-width: min(40vw, 160px);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--text-muted, #8c8980);
+}
+.app-header .logo {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 0 !important;
+}
+.app-header .logo span { display: none !important; }
+.app-header .logo img,
+.app-header .logo .logo-mark { height: 28px !important; width: auto !important; }
+.app-header .logo::after {
+  content: 'BeautyPro';
+  font-family: var(--font-sans) !important;
+  font-size: 1.0625rem !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+  letter-spacing: -0.03em !important;
+  white-space: nowrap;
+}
+
+/* F7-close: título modal expirar */
+#expirar-title.bp-expirar-title {
+  display: block;
+  text-align: center;
+}
+#expirar-title .bp-expirar-title-main {
+  font-family: var(--font-sans) !important;
+  font-size: 1.0625rem !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.25 !important;
+}
+#expirar-title .bp-expirar-title-sub { display: none !important; }
+#expirar-ligar .bp-call-ripple { display: none !important; }
+/* ====================================================================
+   F7-14c — Modal expirar: botões mais FINOS (só altura)
+   Largura e posição iguais ao original. Não encolher horizontalmente.
+   ==================================================================== */
+
+/* Título: sistema (sans) */
+#modal-expirar .bp-expirar-title-main,
+#expirar-title .bp-expirar-title-main {
+  font-family: var(--font-sans) !important;
+  font-size: 1.0625rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* WhatsApp + Ligar: mesma largura de antes (flex 1), só mais baixos */
+#modal-expirar .bp-expirar-actions-row {
+  display: flex !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+#modal-expirar .bp-expirar-actions-row .bp-btn-whatsapp,
+#modal-expirar .bp-expirar-actions-row .bp-btn-call {
+  flex: 1 1 0 !important;   /* como o original — não mudar posição/largura */
+  width: auto !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  /* padding esquerda/direita: não forçar — herda o que já tinha */
+  font-size: 0.8125rem !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  box-sizing: border-box !important;
+}
+
+/* Visto: continua full width, só mais baixo */
+#modal-expirar .bp-expirar-ignore {
+  width: 100% !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  font-size: 0.8125rem !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 600 !important;
+  line-height: 36px !important;
+  box-sizing: border-box !important;
+}/* ====================================================================
+   F7-18f — Faturamento: valores das linhas pretos (só CSS)
+   ==================================================================== */
+
+#modal-revenue-detail #revenue-detail-list .list-item,
+#modal-revenue-detail #revenue-detail-list .list-item * {
+  color: var(--text-primary, #1c1a18) !important;
+}
+
+#modal-revenue-detail .bp-revenue-detail-list .list-item,
+#modal-revenue-detail .bp-revenue-detail-list .list-item * {
+  color: var(--text-primary, #1c1a18) !important;
+}
+
+/* se o valor usar classe gold / token */
+#modal-revenue-detail #revenue-detail-list .gold,
+#modal-revenue-detail #revenue-detail-list .gold-word,
+#modal-revenue-detail #revenue-detail-list [class*="gold"],
+#modal-revenue-detail #revenue-detail-list [class*="Gold"] {
+  color: var(--text-primary, #1c1a18) !important;
+}
+
+
+/* BP-LOCK-F7-18 — IDs correctos do detalhe faturamento */
+#modal-revenue-detail #revenue-detail-list .list-item,
+#modal-revenue-detail #revenue-detail-list .list-item * {
+  color: var(--text-primary, #1c1a18) !important;
+}
+#modal-revenue-detail #revenue-detail-list .sub {
+  color: var(--text-muted, #8c8980) !important;
+}
+#modal-revenue-detail #revenue-detail-total,
+#modal-revenue-detail .bp-rev-detail-totals-val {
+  color: var(--green, #2C7A4D) !important;
+}

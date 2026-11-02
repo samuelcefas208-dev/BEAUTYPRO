@@ -1,0 +1,192 @@
+/* BelezaPro — styles/modules/login.css — Etapa 4: extraído de login-carrinho-venda.css */
+/* ====================================================================
+   login-carrinho-venda.css — extraído do style.css (Fase C da modularização)
+   Conteúdo: Ecrã de login, carrinho e detalhe de venda
+   Linhas originais: 1029-1226
+   ==================================================================== */
+/* ===== LOGIN ===== */
+#login-view {
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  background: linear-gradient(160deg, var(--bg-soft) 0%, var(--bg-soft) 100%);
+}
+.login-brand { text-align: center; margin-bottom: 32px; }
+.login-brand .logo {
+  font-family: var(--font-sans);
+  font-size: 2.2rem;
+  color: var(--gold-dark);
+  letter-spacing: -.02em;
+}
+.login-brand .logo span { color: var(--text-primary); }
+.login-brand p { font-size: .85rem; color: var(--text-secondary); margin-top: 4px; }
+.login-card { width: 100%; max-width: 400px; }
+
+@media (min-width: 600px) {
+  .app-container { border-left: 1px solid var(--border-soft); border-right: 1px solid var(--border-soft); box-shadow: var(--shadow-floating); }
+  .fab { right: calc(50% - 220px); }
+}
+input[type="date"], input[type="datetime-local"] { appearance: none; -webkit-appearance: none; }
+
+
+
+/* ===== F1 Auth entry — hierarquia visual BeautyPro ===== */
+.login-tagline {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #6b7280);
+  font-weight: 400;
+}
+.login-title {
+  margin: 0 0 1.1rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--bp-text, #1F2937);
+  font-family: var(--font-sans, system-ui, sans-serif);
+  letter-spacing: -0.01em;
+}
+.login-pass-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.login-pass-wrap .input-field {
+  padding-right: 44px;
+  width: 100%;
+}
+.login-pass-toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #6b7280);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  padding: 0;
+}
+.login-pass-toggle:hover,
+.login-pass-toggle:focus-visible {
+  color: var(--bp-text, #1F2937);
+  background: rgba(31, 41, 55, 0.06);
+  outline: none;
+}
+.login-pass-toggle .login-pass-icon-hide[hidden],
+.login-pass-toggle .login-pass-icon-show[hidden] {
+  display: none !important;
+}
+.login-row-links {
+  display: flex;
+  justify-content: flex-end;
+  margin: -4px 0 12px;
+}
+.login-text-btn {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #6b7280);
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+}
+.login-text-btn:hover {
+  color: var(--bp-text, #1F2937);
+  text-decoration: underline;
+}
+.login-text-btn-accent {
+  color: var(--bp-accent, #B7791F);
+  font-weight: 600;
+}
+.login-text-btn-accent:hover {
+  color: var(--gold-dark, #8a7019);
+}
+.login-error {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: #7f1d1d;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+}
+.login-error[hidden] {
+  display: none !important;
+}
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  color: var(--text-muted, #9ca3af);
+  font-size: 0.75rem;
+}
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--bp-border-soft, rgba(31, 41, 55, 0.1));
+}
+.login-btn-google {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #fff !important;
+  color: var(--bp-text, #1F2937) !important;
+  border: 1px solid var(--bp-border, rgba(31, 41, 55, 0.14)) !important;
+  font-weight: 550;
+  box-shadow: none !important;
+}
+.login-btn-google:hover {
+  background: #f9fafb !important;
+}
+.login-btn-google:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+.login-footer-line {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #6b7280);
+}
+#login-btn.is-loading {
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.login-recovery-lead {
+  margin: 0 0 1rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--text-secondary, #6b7280);
+}
+#login-recovery-card[hidden] {
+  display: none !important;
+}
+
+#login-signup-card[hidden] {
+  display: none !important;
+}
+#signup-success:not([hidden]) {
+  color: var(--text-secondary, #374151);
+  margin: 0 0 0.75rem;
+}
+
+.login-optional {
+  font-weight: 400;
+  text-transform: none;
+  color: var(--text-secondary, #9ca3af);
+  font-size: 0.75em;
+}
+
+#login-onboarding-card[hidden] { display: none !important; }

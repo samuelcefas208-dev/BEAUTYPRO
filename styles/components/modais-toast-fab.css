@@ -1,0 +1,800 @@
+/* ====================================================================
+   modais-toast-fab.css — extraído do style.css (Fase C da modularização)
+   Conteúdo: Modais, toast e botão flutuante (FAB)
+   Linhas originais: 868-1028
+   ==================================================================== */
+.pill.gray { background: var(--bg-soft); color: var(--text-muted); }/* ===== MODAIS ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 26, 24, .35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 2000;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+/* Scroll lock: uma vez por stack de modais — sem position:fixed (evita salto no Android) */
+body.bp-modal-open {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+.modal-overlay.open { display: flex; }
+.modal-sheet {
+  background: var(--card-white);
+  width: 100%;
+  max-width: 480px;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  padding: 24px 20px calc(24px + env(safe-area-inset-bottom, 16px));
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-floating);
+  /* animação só no sheet quando o overlay abre (evita re-trigger em reflows) */
+  animation: slideUp .35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.modal-sheet .handle {
+  width: 36px;
+  height: 4px;
+  background: var(--border-soft);
+  border-radius: var(--radius-sm);
+  margin: 0 auto 16px;
+}
+.modal-title {
+  font-family: var(--font-sans);
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+/* Modal centrado (Fase 1) */
+.modal-confirm-sheet {
+  background: #F7F5F1;
+  width: min(92vw, 400px);
+  max-width: 400px;
+  border-radius: var(--radius-lg);
+  padding: 24px 22px 20px;
+  box-shadow: var(--shadow-floating);
+  animation: confirmIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+  margin: auto;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 8px));
+  border: 1px solid var(--border-soft, #e8e4dc);
+}
+@keyframes confirmIn {
+  from { opacity: 0; transform: scale(0.92) translateY(16px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-overlay#modal-confirm {
+  align-items: center;
+  justify-content: center;
+  background: rgba(28,26,24,0.36);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+.modal-overlay#modal-confirm.open { display: flex; }
+
+/* ===== MODAL DE LOGOUT (personalizado) ===== */
+/* CORREÇÃO (modal de sair mal posicionado): existia aqui uma regra
+   "#modal-confirm .modal-confirm-sheet" com mais especificidade do que
+   a regra base ".modal-confirm-sheet" (Modal centrado — Fase 1, acima).
+   Isso fazia o diálogo de logout ficar alinhado à esquerda em vez de
+   centrado, com uma largura (340px) e um padding diferentes dos de
+   qualquer outro modal de confirmação da app, e sem a folga de
+   segurança no fundo (safe-area-inset) que a regra base garante.
+   Removida: o contentor volta a usar sempre a mesma regra base do
+   diálogo centrado; só os elementos filhos (ícone, título, mensagem,
+   ações) têm estilo próprio, abaixo. */
+#modal-confirm .confirm-icon {
+  font-size: 2.8rem;
+  line-height: 1;
+  margin-bottom: 12px;
+  display: block;
+}
+#modal-confirm .confirm-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+#modal-confirm .confirm-message {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: 20px;
+}
+#modal-confirm .confirm-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+#modal-confirm label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+#modal-confirm label input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+
+/* ===== TOAST — compacto topo (tipologia bp-boot-card, reduzido) ===== */
+/* Autoridade única: uma linha · texto limpo (sem marca tipográfica) */
+.toast {
+  position: fixed;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  bottom: auto !important;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%) translateY(-6px);
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none;
+  background: var(--card-white, #ffffff);
+  color: var(--text-primary, #1c1a18);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 0.8125rem; /* ~13px, abaixo do título "A sincronizar" (1rem) */
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  z-index: 2500;
+  opacity: 0;
+  transition: opacity .2s ease, transform .2s ease;
+  pointer-events: none;
+  /* Uma linha: expressões curtas (venda, alteração, login) não partem */
+  white-space: nowrap;
+  max-width: min(calc(100vw - 32px), 340px);
+  width: max-content;
+  box-sizing: border-box;
+  box-shadow: var(--shadow-floating, 0 8px 28px rgba(28, 26, 24, 0.14));
+  border: none;
+  display: block;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+/* Sucesso / info / aviso: texto preto */
+.toast.success,
+.toast.info,
+.toast.warning {
+  background: var(--card-white, #ffffff);
+  color: var(--text-primary, #1c1a18);
+  border-left: none;
+}
+/* Sucesso: sem marca tipográfica — texto limpo apenas */
+/* Erro: texto vermelho, mesmo cartão branco */
+.toast.error {
+  background: var(--card-white, #ffffff);
+  color: #C62828;
+  border-left: none;
+}
+
+/* ===== FAB — autoridade única (P0): círculo 56px ===== */
+.fab {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: var(--card-white);
+  border: none;
+  box-shadow: var(--shadow-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  font-weight: 300;
+  line-height: 1;
+  cursor: pointer;
+  transition: opacity var(--transition-fast, 0.15s ease), transform var(--transition-fast, 0.15s ease), box-shadow var(--transition-fast, 0.15s ease);
+  z-index: 400;
+  touch-action: manipulation;
+}
+.fab.fab-scrolling {
+  opacity: 0.35;
+  transform: scale(0.8);
+  pointer-events: none;
+}
+.fab::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  z-index: -1;
+}
+.fab:active {
+  opacity: 0.9;
+  transform: scale(0.96);
+  box-shadow: var(--shadow-gold);
+}
+/* FAB Registar serviço — esquerda, menor, cor faturamento (gold-dark) */
+.fab.fab-venda {
+  left: 16px;
+  right: auto;
+  width: 48px;
+  height: 48px;
+  font-size: 0;
+  background: var(--gold-dark, #A7872B);
+  color: var(--card-white, #fff);
+  box-shadow: 0 4px 14px rgba(167, 135, 43, 0.35);
+}
+.fab.fab-venda svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+.fab.fab-venda:active {
+  opacity: 0.9;
+  transform: scale(0.96);
+}
+.fab.fab-venda.fab-scrolling,
+.fab.fab-scrolling {
+  opacity: 0.32;
+  transform: scale(0.82);
+  pointer-events: none;
+}
+
+/* P1: fecho usa .btn / .btn-sm — não forçar height 30px nem radius-full */
+
+/* ET4.8b — overlays centrados (info / confirm / erro) */
+.modal-overlay--center,
+.modal-overlay#modal-confirm,
+.modal-overlay#modal-erro,
+.modal-overlay#modal-cliente-nao-encontrado {
+  align-items: center;
+  justify-content: center;
+  background: rgba(28, 26, 24, 0.42);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+/* ET4.8b — tipografia e organização (peso: modal 50% / tipo 20% / copy no HTML) */
+.modal-confirm-sheet .confirm-title,
+.modal-info-sheet .confirm-title {
+  font-family: var(--font-sans, Inter, system-ui, sans-serif);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  color: var(--text-primary, #1c1a18);
+  margin: 0 0 10px;
+  text-align: left;
+}
+
+.modal-confirm-sheet .confirm-message,
+.modal-info-sheet .confirm-message {
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary, #5a554c);
+  margin: 0 0 20px;
+  text-align: left;
+}
+
+.modal-info-sheet {
+  text-align: left;
+}
+
+.confirm-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  margin: 0;
+  padding-top: 8px;
+  border-top: none;
+}
+
+.confirm-actions--end {
+  justify-content: flex-end;
+}
+
+/*
+  P0 — Acções de diálogo: só tipografia (referência tipo Cancelar / Eliminar).
+  Sem fundo preenchido, sem borda de botão. Família = .btn + variante semântica.
+  .btn-modal-compact / .btn-modal-quiet deixam de forçar “botão caixa”.
+*/
+.confirm-actions .btn,
+.confirm-actions .btn-modal-compact,
+.modal-confirm-sheet .confirm-actions .btn,
+.modal-info-sheet .confirm-actions .btn {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 0;
+  min-height: 44px;
+  height: auto;
+  padding: 10px 14px;
+  margin: 0;
+  background: transparent !important;
+  border: none !important;
+  border-radius: var(--radius-md);
+  box-shadow: none !important;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-align: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Cancelar / Fechar / secundário — tinta principal */
+.confirm-actions .btn-secondary,
+.modal-confirm-sheet .confirm-actions .btn-secondary,
+.modal-info-sheet .confirm-actions .btn-secondary {
+  color: var(--text-primary) !important;
+  background: transparent !important;
+  border: none !important;
+}
+.confirm-actions .btn-secondary:active,
+.modal-confirm-sheet .confirm-actions .btn-secondary:active {
+  opacity: 0.55;
+  background: transparent !important;
+}
+
+/* Eliminar / Sair / destrutivo — só vermelho tipográfico */
+.confirm-actions .btn-danger,
+.modal-confirm-sheet .confirm-actions .btn-danger {
+  color: var(--red) !important;
+  background: transparent !important;
+  border: none !important;
+}
+.confirm-actions .btn-danger:active,
+.modal-confirm-sheet .confirm-actions .btn-danger:active {
+  opacity: 0.7;
+  background: transparent !important;
+}
+
+/* Afirmativo pontual (Entendi, Tentar novamente) — tipografia ink, sem dourado de fundo */
+.confirm-actions .btn-primary,
+.modal-confirm-sheet .confirm-actions .btn-primary,
+.modal-info-sheet .confirm-actions .btn-primary {
+  color: var(--text-primary) !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.confirm-actions .btn-primary:active,
+.modal-confirm-sheet .confirm-actions .btn-primary:active {
+  opacity: 0.55;
+  background: transparent !important;
+}
+
+.confirm-actions .btn:focus-visible {
+  outline: 1px solid rgba(13, 12, 11, 0.25);
+  outline-offset: 2px;
+}
+
+/* Entendi / CTAs de info — sem contorno dourado em lado nenhum */
+#modal-erro .confirm-actions .btn,
+#modal-erro .confirm-actions .btn-primary,
+#modal-erro .btn-primary,
+#modal-erro .btn-secondary,
+.modal-info-sheet .confirm-actions .btn,
+.modal-info-sheet .confirm-actions .btn-primary,
+#modal-confirm .confirm-actions .btn-primary,
+#modal-confirm .confirm-actions .btn-secondary {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+#modal-erro .confirm-actions .btn-primary,
+#modal-erro .btn-primary,
+.modal-info-sheet .confirm-actions .btn-primary {
+  color: #0d0c0b !important;
+  font-weight: 700 !important;
+}
+
+/* Ink — confirmação financeira: Entendi (preto carregado) + Voltar (escuro suave) */
+#modal-confirm .confirm-actions .bp-btn-ink-strong,
+.modal-confirm-sheet .confirm-actions .bp-btn-ink-strong {
+  color: #0d0c0b !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em;
+}
+#modal-confirm .confirm-actions .bp-btn-ink-strong:active {
+  opacity: 0.55;
+  background: transparent !important;
+}
+#modal-confirm .confirm-actions .bp-btn-ink-muted,
+.modal-confirm-sheet .confirm-actions .bp-btn-ink-muted {
+  color: #3d3a36 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-weight: 600 !important;
+}
+#modal-confirm .confirm-actions .bp-btn-ink-muted:active {
+  opacity: 0.55;
+  background: transparent !important;
+}
+
+/* Campo senha do controlo financeiro — permanece visível e legível */
+#prof-fin-pwd-box.bp-fin-pwd-active {
+  display: block !important;
+  margin-top: 14px;
+  padding: 12px 0 4px;
+  border-top: 1px solid var(--border-soft, #E8E4DC);
+}
+#prof-fin-pwd-box.bp-fin-pwd-active #prof-fin-pwd {
+  border-color: var(--gold, #D4AF37) !important;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.22);
+}
+
+/* P2: bundle ainda atribui btn-modal-compact / btn-modal-quiet no OK —
+   herdam tipografia de .confirm-actions .btn; sem caixa própria */
+.confirm-actions .btn-modal-quiet {
+  color: var(--text-primary);
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+#modal-confirm .confirm-icon {
+  display: none !important;
+}
+
+#modal-confirm label {
+  display: none !important;
+}
+
+/* Título / mensagem — hierarquia limpa (padrão diálogo) */
+.modal-confirm-sheet .confirm-title,
+#modal-confirm .confirm-title {
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+  text-align: left;
+}
+.modal-confirm-sheet .confirm-message,
+#modal-confirm .confirm-message {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0 0 8px;
+  text-align: left;
+}
+
+/* Offline info — mesmo padrão tipográfico */
+#modal-offline-info.modal-overlay {
+  align-items: center;
+  justify-content: center;
+  z-index: 2100;
+}
+
+
+/* R24 — resumo multilinha no modal de confirmação */
+#confirm-message {
+  white-space: pre-line;
+}
+
+
+/* R24 — confirmação por cima do modal de venda */
+.modal-overlay#modal-confirm {
+  z-index: 2200;
+}
+.modal-overlay#modal-erro {
+  z-index: 2210;
+}
+#confirm-message {
+  white-space: pre-line;
+}
+
+
+/* Campo inválido — F3-05: tokens oficiais; !important pré-existente mantido para aria-invalid */
+.bp-field-invalid,
+[aria-invalid="true"].input-field {
+  border-color: var(--red) !important;
+  background: var(--card-white);
+  box-shadow: 0 0 0 2px rgba(179, 58, 74, 0.15);
+}
+
+
+
+/* ===== Fundo / Despesa / Agenda — botões .btn (compact 40px), não tipografia pura ===== */
+#modal-fundo .modal-actions.modal-actions--compact,
+#modal-despesa .modal-actions.modal-actions--compact,
+#modal-agenda .modal-actions.modal-actions--compact {
+  display: grid !important;
+  grid-template-columns: 1fr 1.35fr !important;
+  gap: 10px;
+  margin-top: 14px;
+  width: 100%;
+  align-items: stretch;
+}
+/* Botões: família .btn intacta, só escala menor (não 48px) */
+#modal-fundo .modal-actions.modal-actions--compact .btn,
+#modal-despesa .modal-actions.modal-actions--compact .btn,
+#modal-agenda .modal-actions.modal-actions--compact .btn {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 40px !important;
+  height: 40px !important;
+  max-height: 40px !important;
+  padding: 0 14px !important;
+  margin: 0 !important;
+  font-size: 0.8125rem !important;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  /* NÃO forçar transparent — herda .btn-primary / .btn-secondary do design system */
+}
+
+/* Campos densos (mantido) */
+#modal-fundo .input-field,
+#modal-despesa .input-field,
+#modal-agenda .input-field {
+  min-height: 40px !important;
+  height: 40px !important;
+  padding: 8px 12px !important;
+  font-size: 0.875rem !important;
+  border-radius: var(--radius-md);
+}
+#modal-fundo .input-group,
+#modal-despesa .input-group,
+#modal-agenda .input-group {
+  margin-bottom: 12px;
+}
+#modal-agenda #agenda-add-cliente-rapido.btn {
+  min-height: 36px !important;
+  height: 36px !important;
+  font-size: 0.8125rem;
+}
+
+/* Compactação pontual de acções em modais de negócio */
+.modal-actions .btn {
+  min-height: 40px;
+  height: 40px;
+  font-size: 0.8125rem;
+}
+.modal-sheet .btn-block {
+  min-height: 40px;
+  height: 40px;
+}
+
+
+#confirm-message.confirm-message--summary {
+  white-space: normal !important;
+  margin-bottom: 16px;
+}
+/* ====================================================================
+   F7-15 — Modal Confirmar venda: Voltar branco + Confirmar dourado (estreito)
+   ==================================================================== */
+
+#modal-confirm .confirm-actions,
+.modal-confirm-sheet .confirm-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  padding-top: 12px !important;
+}
+
+/* Voltar — botão branco */
+#modal-confirm .confirm-actions .btn-secondary,
+.modal-confirm-sheet .confirm-actions .btn-secondary {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  padding: 0 14px !important;
+  margin: 0 !important;
+  background: var(--card-white) !important;
+  border: 1px solid var(--border-soft) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: none !important;
+  color: var(--text-primary) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.8125rem !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+}
+
+#modal-confirm .confirm-actions .btn-secondary:active {
+  background: var(--bg-soft, #f3efe9) !important;
+  opacity: 1 !important;
+}
+
+/* Confirmar venda — dourado SÓ #modal-confirm (não vaza para offline/info) */
+#modal-confirm .confirm-actions .btn-primary {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  padding: 0 14px !important;
+  margin: 0 !important;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark)) !important;
+  border: none !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-gold) !important;
+  color: var(--card-white) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.8125rem !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+}
+
+#modal-confirm .confirm-actions .btn-primary:active {
+  background: var(--gold-dark) !important;
+  opacity: 1 !important;
+}
+
+/* Título do confirm — tipografia de sistema */
+#modal-confirm .confirm-title,
+.modal-confirm-sheet .confirm-title {
+  font-family: var(--font-sans) !important;
+  font-size: 1.0625rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+}/* F7-19b — Manter: só texto (sem caixa de botão) */
+#modal-confirm .confirm-actions .btn-secondary,
+#modal-confirm #confirm-cancel-btn {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 10px 8px !important;
+  min-height: 44px !important;
+  height: auto !important;
+  color: var(--text-primary) !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 600 !important;
+}/* Entendi offline — só texto, sem botão */
+#modal-offline-info .confirm-actions .btn-primary,
+#modal-offline-info-ok {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  color: var(--text-primary, #1c1a18) !important;
+  font-weight: 600 !important;
+  font-size: 0.9375rem !important;
+  cursor: pointer !important;
+}
+#modal-offline-info-ok:active {
+  opacity: 0.55 !important;
+  background: none !important;
+}
+
+/* ====================================================================
+   BP-LOCK-F7-18 — Offline Entendi = SÓ TEXTO (sem botão, sem dourado)
+   Isolado de #modal-confirm (Confirmar venda continua dourado)
+   ==================================================================== */
+#modal-offline-info .confirm-actions .btn-primary,
+#modal-offline-info #modal-offline-info-ok,
+#modal-offline-info-ok {
+  background: none !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  width: auto !important;
+  color: var(--text-primary, #1c1a18) !important;
+  font-weight: 600 !important;
+  font-size: 0.9375rem !important;
+  cursor: pointer !important;
+}
+#modal-offline-info-ok:active,
+#modal-offline-info .confirm-actions .btn-primary:active {
+  opacity: 0.55 !important;
+  background: none !important;
+  background-image: none !important;
+}
+
+/* Cliente não encontrado — mesmo padrão texto se usar Entendi */
+#modal-cliente-nao-encontrado .confirm-actions .btn-primary,
+#modal-cliente-nao-encontrado-ok {
+  background: none !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--text-primary, #1c1a18) !important;
+  font-weight: 600 !important;
+}
+
+
+/* === BP-OFFLINE-VISIBLE — modal offline sempre por cima do boot === */
+#modal-offline-info.modal-overlay,
+#modal-offline-info.modal-overlay.open {
+  z-index: 10060 !important;
+  display: none;
+}
+#modal-offline-info.modal-overlay.open {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(28, 26, 24, 0.45) !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+#modal-offline-info .modal-confirm-sheet,
+#modal-offline-info .modal-info-sheet {
+  background: var(--card-white, #fff) !important;
+  max-width: 320px;
+  width: calc(100% - 40px);
+  padding: 22px 20px 18px;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(20, 17, 15, 0.18);
+}
+#modal-offline-info .confirm-title {
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  color: var(--text-primary, #1c1a18) !important;
+  margin: 0 0 8px !important;
+}
+#modal-offline-info .confirm-message {
+  font-size: 0.875rem !important;
+  line-height: 1.45 !important;
+  color: var(--text-secondary, #5c574e) !important;
+  margin: 0 0 16px !important;
+}
+#modal-offline-info .confirm-actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+  margin-top: 4px !important;
+}
+/* CTA legível (texto forte, área de toque) */
+#modal-offline-info #modal-offline-info-ok,
+#modal-offline-info-ok {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 44px !important;
+  padding: 10px 8px !important;
+  color: var(--gold-dark, #a8841a) !important;
+  font-weight: 700 !important;
+  font-size: 0.9375rem !important;
+  letter-spacing: 0.01em !important;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+}

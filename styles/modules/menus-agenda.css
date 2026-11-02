@@ -1,0 +1,500 @@
+/* ====================================================================
+   menus-agenda.css — extraído do style.css (Fase C da modularização)
+   Conteúdo: Menu de ações da linha (⋮), empty state e agenda
+   Linhas originais: 723-867
+   ==================================================================== */
+/* ===== MENU DE ACÇÕES DA LINHA (⋮) ===== */
+.row-menu-btn {
+  width: 32px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+.row-menu-btn:active,
+.row-menu-btn.is-open {
+  background: var(--bg-soft);
+  color: var(--text-primary);
+}
+.row-menu {
+  position: fixed;
+  display: none;
+  flex-direction: column;
+  min-width: 168px;
+  background: var(--card-white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-floating);
+  padding: 6px;
+  z-index: 500;
+  opacity: 0;
+  transform: scale(.94) translateY(-4px);
+  transform-origin: top right;
+  transition: opacity .14s cubic-bezier(0.16,1,0.3,1), transform .14s cubic-bezier(0.16,1,0.3,1);
+}
+.row-menu.is-open {
+  display: flex;
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+.row-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.row-menu-item:active { background: var(--bg-soft); }
+.row-menu-item svg { flex-shrink: 0; opacity: .7; }
+.row-menu-danger { color: var(--red); }
+.row-menu-danger svg { opacity: 1; }
+.list-item-venda::after {
+  content: '›';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  font-weight: 300;
+}
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, .15);
+  transform: scale(0);
+  animation: rippleAnim 0.4s linear forwards; /* CORREÇÃO (regra 8.6): 0.5s excedia o limite de 400ms para microinterações */
+  pointer-events: none;
+}
+.btn-primary .ripple-effect,
+.btn-success .ripple-effect,
+.btn-danger .ripple-effect {
+  background: rgba(255, 255, 255, 0.25);
+}
+@keyframes rippleAnim {
+  to { transform: scale(4); opacity: 0; }
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  /* F5-03: alinha a design-system-final (cascata: DS carrega depois; aqui fallback) */
+  text-align: center;
+  padding: var(--s4, 32px) var(--s2, 16px);
+  color: var(--text-muted);
+  background: var(--card-white);
+  border: 1px dashed var(--border-soft);
+  border-radius: var(--radius-md);
+}
+.empty-state p { font-weight: 500; font-size: var(--text-sm, 0.85rem); color: var(--text-muted); line-height: 1.45; }
+.empty-state svg { display: block; margin: 0 auto 8px; }
+
+/* ===== AGENDA ===== */
+.timeline-item {
+  display: flex;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-soft);
+  align-items: flex-start;
+}
+.timeline-item .time {
+  font-weight: 700;
+  font-size: .8rem;
+  color: var(--text-secondary);
+  min-width: 46px;
+}
+.timeline-item .event { flex: 1; }
+.timeline-item .event .service {
+  font-weight: 600;
+  font-size: .9rem;
+  color: var(--gold-dark);
+}
+.timeline-item .event .client {
+  font-weight: 500;
+  font-size: .85rem;
+  margin-top: 2px;
+}
+.timeline-item .event .meta {
+  font-size: .7rem;
+  color: var(--text-muted);
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+/* CORREÇÃO (botão "Realizar"/Finalizar mal enquadrado): as ações
+   competiam com os pills de informação na mesma linha flex-wrap,
+   quebrando de forma imprevisível dependendo do nome do profissional
+   e do preço. Passam a ter a sua própria linha, com espaçamento fixo. */
+.timeline-item .event .timeline-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.timeline-item .event .timeline-actions .btn-success { flex: 1; }
+/* P1: ícone-only = .btn + esta utilidade (não família paralela) */
+.btn.btn-icon-only,
+.btn-icon-only {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  flex: 0 0 auto;
+}
+.pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--radius-sm);
+  font-size: .6rem;
+  font-weight: 600;
+  background: var(--gold-light);
+  color: var(--gold-dark);
+}
+.pill.green { background: var(--green-50); color: var(--green); }
+/* ===== PILLS DA AGENDA (sem emojis, mais profissionais) ===== */
+.pill-success {
+  background: var(--green);
+  color: var(--card-white);
+}
+.pill-danger {
+  background: var(--red);
+  color: var(--card-white);
+}
+.pill-warning {
+  background: var(--gold);
+  color: var(--card-white);
+}
+.pill-gray {
+  background: var(--neutral-200);
+  color: var(--text-muted);
+}
+/* ===== POPOVER DE FILTRO DA AGENDA ===== */
+/* CORREÇÃO: os botões usavam estilo inline para indicar qual estava
+   ativo — o inline nunca era substituído pela classe "active" (o JS
+   já a alternava, mas nada de CSS lhe dava efeito visual), por isso
+   depois do primeiro clique o botão "Hoje" continuava sempre dourado
+   mesmo com outro período selecionado. Passa a ser tudo via classe. */
+/* ===== POPOVER FILTRO AGENDA — abrir/fechar só via style.display do bundle ===== */
+.agenda-filter-popover {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: auto;
+  bottom: auto;
+  background: var(--card-white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-floating);
+  padding: 10px;
+  z-index: 400;
+  min-width: 172px;
+  width: max-content;
+  max-width: min(280px, calc(100vw - 32px));
+  height: auto;
+  max-height: min(70vh, 420px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  align-self: flex-end;
+  margin: 0;
+}
+
+
+/* Âncora do filtro Agenda — popover alinha ao ícone, não ao header inteiro */
+.bp-agenda-controls {
+  /* denser toolbar */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  position: relative;
+  gap: 4px;
+}
+.bp-agenda-filter-anchor {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  z-index: 5;
+}
+
+/* #agenda-filter-popover: FECHADO por defeito com !important;
+   ABERTO só quando o JS define style.display = "block" (inline). */
+#agenda-filter-popover {
+  display: none !important;
+  position: absolute !important;
+  /* Por defeito mobile: abaixo do ícone, alinhado à esquerda da âncora */
+  left: 0 !important;
+  right: auto !important;
+  transform: none !important;
+  top: calc(100% + 6px) !important;
+  bottom: auto !important;
+  width: max-content !important;
+  min-width: 200px !important;
+  max-width: min(280px, calc(100vw - 24px)) !important;
+  height: auto !important;
+  flex: 0 0 auto !important;
+  z-index: 500 !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+}
+#agenda-filter-popover[style*="display: block"],
+#agenda-filter-popover[style*="display:block"] {
+  display: block !important;
+}
+
+/* Organização interna — grelha estável */
+#agenda-filter-popover .agenda-periodo-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 6px !important;
+  width: 100%;
+  margin: 0;
+}
+#agenda-filter-popover .agenda-periodo-filter {
+  width: 100%;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.agenda-periodo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+.agenda-periodo-separador {
+  height: 1px;
+  background: var(--border-soft);
+  margin: 8px 0;
+}
+/* P1: chip de período — tokens; active = brand (não novo Button) */
+.agenda-periodo-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 8px;
+  font-family: var(--font-sans);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  background: var(--card-white);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-soft);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  touch-action: manipulation;
+}
+.agenda-periodo-filter.active {
+  background: var(--gold);
+  color: var(--card-white);
+  border-color: var(--gold);
+}
+/* Dia exacto: largura total só no popover da Agenda (não na Caixa) */
+#agenda-filter-popover .agenda-periodo-filter--dia {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.agenda-periodo-filter--status.active { background: var(--text-primary); border-color: var(--text-primary); }
+
+
+.timeline-item .event .timeline-actions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-top: 10px;
+  align-items: stretch;
+}
+.timeline-item .event .timeline-actions .btn {
+  min-height: 40px;
+  height: 40px;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+
+/* Agenda — pendentes / pulse / secção */
+.bp-ag-pulse-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  margin-right: 6px;
+  vertical-align: middle;
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55);
+  animation: bp-ag-pulse 1.4s ease-out infinite;
+}
+@keyframes bp-ag-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55); }
+  70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+.agenda-periodo-filter--pendentes.has-pending .bp-ag-pulse-dot { opacity: 1; }
+.agenda-periodo-filter--pendentes:not(.has-pending) .bp-ag-pulse-dot {
+  animation: none;
+  background: var(--border-soft);
+  box-shadow: none;
+}
+.bp-ag-card--pulse { position: relative; }
+/* Ponto verde no card (sobre o avatar) desactivado — mantém-se só o da secção */
+.bp-ag-card--pulse::before {
+  content: none !important;
+  display: none !important;
+}
+.bp-ag-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-primary, #1c1a18);
+  margin: 12px 0 8px;
+  padding: 0 2px;
+}
+.bp-ag-section-title--muted {
+  color: var(--text-muted, #8a8580);
+  font-weight: 600;
+}
+.bp-ag-detail-totals {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  background: var(--bg-soft, #f7f4ef);
+  border: 1px solid var(--border-soft, #e8e4df);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+.bp-ag-detail-totals strong {
+  font-size: 0.95rem;
+  color: var(--green, #2C7A4D);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.bp-ag-actions .bp-btn-whatsapp {
+  min-height: 34px !important;
+  height: 34px !important;
+  max-height: 34px !important;
+  padding: 0 10px !important;
+  font-size: 0.75rem !important;
+}
+
+
+/* Filtro status: Pendentes linha inteira */
+/* Pendentes: linha inteira no popover Agenda */
+#agenda-filter-popover .agenda-periodo-filter--full,
+#agenda-filter-popover .agenda-periodo-filter--pendentes {
+  grid-column: 1 / -1;
+}
+.agenda-periodo-grid--status {
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+/* Uniformidade: mesma altura mínima em todos os botões do filtro */
+#agenda-filter-popover .agenda-periodo-filter,
+#caixa-localizar-periodos .agenda-periodo-filter,
+#caixa-filter-popover .agenda-periodo-filter {
+  min-height: 32px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+/* Dia exacto Caixa filtro: full-width — ver caixa.css */
+
+/* removido bloqueio full-width Dia exacto no filtro movimentos Caixa */
+
+
+
+/* F7-7 agenda list gap — mais perto do filtro */
+#tab-agenda #agenda-full-list {
+  margin-top: 0;
+  padding-top: 0;
+}
+#tab-agenda #agenda-full-list .timeline-item:first-child,
+#tab-agenda #agenda-full-list > .timeline-day:first-child,
+#tab-agenda #agenda-full-list > div:first-child {
+  margin-top: 4px;
+}
+
+
+/* BP-LOCK-F7-18 — total agenda detalhe = verde */
+#modal-agenda-detail .bp-ag-detail-totals strong,
+#modal-agenda-detail #agenda-detail-totals strong {
+  color: var(--green, #2C7A4D) !important;
+  font-weight: 700 !important;
+}
+#modal-agenda-detail #agenda-detail-list .list-item .action {
+  color: var(--text-primary, #1c1a18) !important;
+}
+
+
+/* BP-LOCK-F7-19 — ⋮ compacto na linha do título (Clientes/Equipa) */
+.list-item.cliente-item .row-menu-btn,
+.list-item[data-prof-id] .row-menu-btn {
+  width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+
+/* res12i — filtro e chrome da Agenda mais compactos */
+.bp-agenda-controls {
+  gap: 6px;
+  padding: 4px 0 6px;
+}
+.bp-agenda-filter-anchor,
+#agenda-filter-btn,
+.bp-agenda-period-nav {
+  min-height: 32px;
+  font-size: 0.75rem;
+}
+.bp-agenda-period-label,
+#agenda-period-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.agenda-periodo-filter {
+  padding: 6px 10px !important;
+  font-size: 0.72rem !important;
+  min-height: 32px;
+}
+#agenda-filter-popover {
+  max-width: min(300px, 92vw);
+}

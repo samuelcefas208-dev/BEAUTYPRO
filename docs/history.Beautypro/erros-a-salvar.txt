@@ -1,0 +1,90 @@
+================================================================================
+ERROS A SALVAR — precisam de alteração no app.bundle.js (ou JS)
+BeautyPro | linguagem simples | NÃO corrigidos em CSS
+================================================================================
+
+Como usar este ficheiro
+- Cada item = algo que o humano quer e que o CSS/HTML sozinhos NÃO resolvem.
+- Só se corrige quando houver ordem explícita para mexer no bundle/JS.
+
+--------------------------------------------------------------------------------
+1) CAIXA — botão «Dia exacto» não filtra sozinho
+--------------------------------------------------------------------------------
+O que o humano quer:
+  Clicar em «Dia exacto», escolher o dia, e a lista de movimentos filtrar
+  para esse dia de forma fiável.
+
+O que o código faz hoje (bundle):
+  - Ao clicar só abre o calendário (input.click).
+  - Só depois de escolher data (evento change) grava a data e chama renderCaixa.
+  - Se o calendário não disparar change, o filtro nunca corre.
+
+O que tem de se fazer no app.bundle.js:
+  - Garantir que, ao confirmar a data, o período fica «dia» e a lista actualiza.
+  - Ideal: também ouvir o evento «input», não só «change».
+  - Opcional: se clicar «Dia exacto» sem data, usar hoje e filtrar na mesma.
+
+--------------------------------------------------------------------------------
+2) Números a zero com «ponto zero» (ex.: 0.0) no computador
+--------------------------------------------------------------------------------
+O que o humano quer:
+  Ver 0 limpo (ex.: «0 Kz»), sem «0.0» ou «.0», sem mudar cores nem família
+  de letra.
+
+O que se sabe (bundle):
+  - fmtKz arredonda e usa ponto só como milhares (1.000), zero deve ser «0 Kz».
+  - Há toFixed(1) em percentagens (já tenta tirar «.0»).
+  - Há fallbacks com toLocaleString('pt-AO') noutros sítios.
+
+O que tem de se fazer no app.bundle.js:
+  - Procurar todos os sítios que escrevem números no ecrã (KPIs, saldo, ticket,
+    percentagens, gráficos).
+  - Garantir formatação sem casas decimais desnecessárias no zero.
+  - CSS NÃO consegue apagar texto «.0» que o JS escreveu.
+
+--------------------------------------------------------------------------------
+3) AGENDA — detalhe do agendamento: data na mesma linha do serviço (à direita)
+--------------------------------------------------------------------------------
+O que o humano quer:
+  No modal/sheet que abre ao tocar num cartão da agenda, a data/hora
+  (ex.: «13:29 · 2026-07-23») NÃO deve ficar por cima do nome do serviço
+  (ex.: «Coloração»). Deve ficar na MESMA linha do serviço, alinhada o
+  máximo possível à DIREITA.
+
+  Exemplo desejado:
+    Coloração                    13:29 · 2026-07-23
+
+O que o código faz hoje:
+  - O HTML desse detalhe é gerado em runtime pelo app.bundle.js (não está
+    fixo no index.html).
+  - A data/hora é renderizada num bloco ACIMA do título do serviço.
+  - CSS sozinho não resolve de forma fiável: não há classes estáveis
+    documentadas no index.html para o contentor (meta + serviço), e o
+    markup exacto só existe depois do clique.
+
+O que tem de se fazer no app.bundle.js:
+  - Na função que monta o HTML do detalhe do agendamento, colocar data/hora
+    e nome do serviço no MESMO contentor em linha (flex/space-between):
+      serviço à esquerda · data/hora à direita.
+  - Ideal: classes estáveis, ex.:
+      .bp-ag-det-head
+      .bp-ag-det-servico
+      .bp-ag-det-when
+  - Não alterar a lógica de estados, valores nem botões do cartão.
+  - Opcional (mesmo sítio): valor do «Estado» com data-estado /
+    classe (realizado | nao_realizado | cancelado | pendente) para o CSS
+    poder colorir (verde / vermelho / vermelho / dourado) sem fundo de botão.
+
+Porque ficou neste ficheiro:
+  - Pedido explícito do humano (layout do detalhe).
+  - Confirmado que o markup não está no index.html estático.
+  - Tentativas só com CSS (F7-16/F7-17) sem classes reais = sem efeito.
+
+--------------------------------------------------------------------------------
+4) (reservado) futuras falhas de lógica / sync / auth
+--------------------------------------------------------------------------------
+  Acrescentar aqui quando forem identificadas e dependerem do bundle.
+
+================================================================================
+Fim do ficheiro — actualizar em cada descoberta nova.
+================================================================================

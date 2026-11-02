@@ -1,0 +1,1195 @@
+/* ====================================================================
+   layout-nav-tabs.css — extraído do style.css (Fase C da modularização)
+   Conteúdo: Layout do app, navegação inferior e abas
+   Linhas originais: 306-511
+   ==================================================================== */
+/* ===== LAYOUT ===== */
+.view { display: none; min-height: 100vh; flex-direction: column; }
+.view.active { display: flex; }
+
+.app-container {
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--bg-soft);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* HEADER – STICKY (gruda no topo, sem espaço extra) */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  flex-shrink: 0;
+  background: rgba(249, 247, 245, .96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-soft);
+  padding: 8px 14px 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* menu alinhado ao topo */
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+.app-header .logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  /* Wordmark BeautyPro removido — só marca gráfica */
+  font-size: 0;
+  color: transparent;
+}
+.app-header .logo span {
+  display: none !important;
+}
+.app-header .logo .logo-mark,
+.app-header .logo img {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+.app-header .store-name {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: none;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  max-width: min(52vw, 220px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+.app-header .plano-badge {
+  font-size: 0.5rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+.app-header .plano-trial { background: var(--gold-light); color: var(--gold-dark); }
+.app-header .plano-starter { background: var(--green-50); color: var(--green); }
+.app-header .plano-pro { background: var(--gold-light); color: var(--gold-900); }
+.app-header .plano-premium { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--card-white); }
+.app-header .trial-countdown {
+  font-size: .55rem;
+  color: var(--text-muted);
+  background: var(--card-white);
+  padding: 1px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-soft);
+  white-space: nowrap;
+}
+.header-actions {
+  display: flex;
+  align-items: flex-start; /* menu no topo do header */
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+.sync-status {
+  display: none; /* só visível com fila / offline / erro */
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  font-size: .65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  max-width: 36vw;
+}
+.sync-status.is-visible {
+  display: flex;
+}
+.sync-status .sync-dot { display: none; } /* legado: usamos .sync-spin */
+.sync-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  transition: var(--transition);
+}
+.sync-dot.online { background: var(--green); }
+.sync-status[data-state="pending"] .sync-dot { background: var(--gold, #C9A227); }
+.sync-status[data-state="offline"] .sync-dot { background: var(--red); }
+.sync-status[data-state="error"] .sync-dot { background: var(--red); }
+.offline-banner-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold-dark); flex-shrink: 0;
+}
+#sync-status-container { max-width: 42vw; }
+#sync-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#menu-btn:hover, #menu-btn:focus-visible { background: rgba(0,0,0,.05); }
+#menu-btn:active { background: rgba(0,0,0,.08); }
+.offline-banner {
+  display: none;
+  background: var(--gold-light);
+  color: var(--gold-dark);
+  text-align: center;
+  padding: 8px 16px;
+  font-size: .7rem;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(167, 135, 43, .15);
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+}
+.offline-banner.show { display: flex; }
+
+/* MAIN CONTENT – ocupa o resto, sem padding extra */
+.main-content {
+  flex: 1;
+  min-height: 0; /* flex scroll: sem isto o overflow-y falha em alguns WebViews */
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding: 0 0 190px;
+  /* Remove qualquer padding-top que possa ter sido adicionado */
+  padding-top: 0 !important;
+  margin: 0;
+}
+.tab-inner { padding: 16px 20px; }
+
+/* ===== NAV ===== */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 480px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, .95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-soft);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 72px;
+  z-index: 500;
+  box-shadow: var(--shadow-rest); /* F6-02 */
+  padding-bottom: env(safe-area-inset-bottom, 8px);
+}
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  font-size: .6rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 0;
+  transition: var(--transition);
+  touch-action: manipulation;
+  position: relative;
+  min-height: 56px;
+  z-index: 0;
+}
+.nav-item::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  z-index: -1;
+}
+.nav-item svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  fill: none;
+  transition: var(--transition);
+}
+.nav-item.active { color: var(--gold); }
+.nav-item.active svg { transform: translateY(-2px); }
+.nav-item .badge {
+  position: absolute;
+  top: 4px;
+  right: 50%;
+  transform: translateX(calc(50% + 16px));
+  background: var(--gold);
+  color: var(--card-white);
+  font-size: .55rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--card-white);
+  min-width: 18px;
+  text-align: center;
+  display: none;
+}
+.nav-item .badge.show { display: block; }
+
+/* ===== TABS ===== */
+/* Opção A: crossfade rápido (~150ms), sem slide — evita faísca da aba anterior */
+.tab-pane {
+  display: none;
+  opacity: 1;
+  transform: none;
+}
+.tab-pane.active {
+  display: block;
+}
+.tab-pane.bp-tab-fade-out {
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  top: 0;
+  pointer-events: none;
+  z-index: 0;
+  animation: bpTabFadeOut 0.12s ease-out both;
+}
+.tab-pane.bp-tab-fade-in {
+  display: block;
+  position: relative;
+  z-index: 1;
+  animation: bpTabFadeIn 0.15s ease-out both;
+}
+@keyframes bpTabFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes bpTabFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tab-pane.bp-tab-fade-out,
+  .tab-pane.bp-tab-fade-in {
+    animation-duration: 0.01ms !important;
+  }
+}
+/* Header: prioridades estáveis logo → nome → ações */
+.app-header-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  width: 100%;
+  position: relative;
+}
+.app-header-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding-right: 4px;
+}
+.app-header-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.app-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 0; /* badge sob o nome, alinhado à esquerda da brand */
+}
+.app-header .logo .logo-mark,
+.app-header .logo img {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+.app-header .header-actions {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  display: flex;
+  align-items: flex-start; /* 3 barras mais em cima */
+  gap: 6px;
+  flex-shrink: 0;
+  padding-top: 0;
+  margin-top: -2px; /* sobe ligeiramente o menu */
+}
+#menu-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 4px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+#menu-btn svg {
+  display: block;
+}
+
+
+/* Saúde do serviço (latência Supabase) — header sync */
+.sync-status[data-service-health="degraded"] .sync-dot,
+.sync-status[data-state="pending"] .sync-dot {
+  background: var(--gold, #c9a227);
+}
+.sync-status[data-service-health="critical"] .sync-dot,
+.sync-status[data-state="error"] .sync-dot {
+  background: var(--red-500, #c0392b);
+}
+.sync-status[data-service-health="ok"] .sync-dot {
+  background: var(--green-500, #22a06b);
+}
+
+
+/* ET4.9b — Modo offline (banner) eliminado */
+.offline-banner,
+#offline-banner {
+  display: none !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+/* ===== Boot overlay + header alinhamento (Etapa 3) ===== */
+.bp-boot-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  background: rgba(28, 26, 24, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.bp-boot-overlay[hidden] { display: none !important; }
+/* Quando JS define display:flex, ganha ao [hidden] residual */
+.bp-boot-overlay.is-open,
+.bp-boot-overlay:not([hidden]) {
+  display: flex !important;
+}
+.bp-boot-card {
+  background: var(--card-white, #fff);
+  border-radius: 16px;
+  padding: 28px 22px 22px;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-floating); /* F6-02 */
+}
+.bp-boot-spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 16px;
+  border: 3px solid var(--border-soft, #e5e0d8);
+  border-top-color: var(--gold, #D4AF37);
+  border-radius: 50%;
+  animation: bp-boot-spin 0.75s linear infinite;
+}
+@keyframes bp-boot-spin { to { transform: rotate(360deg); } }
+.bp-boot-title {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary, #1c1a18);
+}
+.bp-boot-desc {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #5c574e);
+  line-height: 1.4;
+}
+.bp-boot-actions {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bp-boot-actions[hidden] { display: none !important; }
+.bp-boot-fail-msg {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #5c574e);
+  line-height: 1.45;
+  text-align: left;
+  margin: 0 0 4px;
+}
+/* Header brand — regras finais (ganham a blocos legados acima) */
+.app-header-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  width: 100%;
+  min-height: 0;
+}
+.app-header .logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: 0;
+  color: transparent;
+  gap: 0;
+  line-height: 1;
+}
+.app-header .logo span {
+  display: none !important;
+}
+.app-header .logo img,
+.app-header .logo .logo-mark {
+  height: 22px !important;
+  width: auto;
+  display: block;
+}
+.app-header .store-name {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600; /* Inter: 600/700 oficiais — evitar 650 */
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  text-transform: none;
+  max-width: min(52vw, 220px);
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+  cursor: pointer;
+}
+.app-header .sync-status {
+  max-width: 28vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.65rem;
+}
+.app-header .header-actions {
+  align-items: flex-start;
+  margin-top: -2px;
+}
+#menu-btn {
+  width: 36px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+
+/* ====================================================================
+   BP_TAB_HEADERS v5 — WORKING
+   Referência dimensional: CLIENTES
+     fs 1.0625rem · fw 700 · pad-y 10px · pad-x 20px · border-bottom
+   ==================================================================== */
+
+.app-container {
+  --bp-tab-h-bg: var(--bg-soft, #f3efe9);
+  --bp-tab-h-pad-y: 10px;
+  --bp-tab-h-pad-x: 20px;
+  --bp-tab-h-fs: 1.0625rem;   /* = Clientes */
+  --bp-tab-h-fs-equipa: 1.125rem; /* Equipa título: um pouco maior */
+  --bp-tab-h-fw: 700;
+  --bp-tab-h-z: 40;
+}
+
+/* —— Shell Resumo —— */
+.app-container:not(:has(#tab-dashboard.active)) > .app-header {
+  display: none !important;
+}
+.app-container:has(#tab-dashboard.active) > .app-header {
+  display: flex !important;
+}
+.app-container:not(:has(#tab-dashboard.active)) .venda-cta-bar {
+  display: none !important;
+}
+.app-header .store-name {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+.app-header .logo {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 0 !important;
+  color: transparent !important;
+  line-height: 1.15 !important;
+}
+.app-header .logo span { display: none !important; }
+.app-header .logo img,
+.app-header .logo .logo-mark {
+  height: 28px !important;
+  width: auto !important;
+  display: block !important;
+  flex-shrink: 0;
+  margin: 0 !important;
+}
+.app-header .logo::after {
+  content: 'BeautyPro';
+  font-family: var(--font-sans) !important;
+  font-size: var(--bp-tab-h-fs) !important;
+  font-weight: var(--bp-tab-h-fw) !important;
+  color: var(--text-primary) !important;
+  letter-spacing: -0.03em !important;
+  white-space: nowrap;
+}
+.app-header-inner > div:first-child {
+  padding-right: 8px !important;
+}
+
+/* Sticky partilhado */
+#tab-agenda.tab-pane.active .tab-inner > .bp-agenda-head,
+#tab-clientes.tab-pane.active .tab-inner > .bp-cli-head,
+#tab-caixa.tab-pane.active .tab-inner::before,
+#tab-equipa.tab-pane.active .tab-inner::before,
+
+/* ========== 1) CLIENTES (referência) ========== */
+#tab-clientes.tab-pane.active .tab-inner > .bp-cli-head {
+  margin-left: -20px;
+  margin-right: -20px;
+  margin-bottom: 0 !important;
+  padding: var(--bp-tab-h-pad-y) var(--bp-tab-h-pad-x) !important;
+  border-bottom: 1px solid var(--border-soft);
+}
+#tab-clientes.tab-pane.active .tab-inner > .bp-cli-head .bp-cli-title {
+  font-family: var(--font-sans) !important;
+  font-size: var(--bp-tab-h-fs) !important;
+  font-weight: var(--bp-tab-h-fw) !important;
+  color: var(--text-primary) !important;
+  letter-spacing: -0.02em;
+  line-height: 1.2 !important;
+}
+
+/* ========== 2) CAIXA (mesma leva que Clientes) ========== */
+#tab-caixa.tab-pane.active .tab-inner::before {
+  content: 'Caixa e movimentos';
+  display: block;
+  font-family: var(--font-sans);
+  font-size: var(--bp-tab-h-fs);
+  font-weight: var(--bp-tab-h-fw);
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: -16px -20px 12px;
+  padding: var(--bp-tab-h-pad-y) var(--bp-tab-h-pad-x);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+/* ========== 3) AGENDA ========== */
+/* F7-6: .bp-agenda-head é o first-child — sticky no próprio head, não static */
+#tab-agenda.tab-pane.active .tab-inner > div:first-child.bp-agenda-head {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: var(--bp-tab-h-z, 40) !important;
+  margin-left: -20px !important;
+  margin-right: -20px !important;
+  margin-bottom: 0 !important;
+  padding: var(--bp-tab-h-pad-y) var(--bp-tab-h-pad-x) !important;
+  border-bottom: 1px solid var(--border-soft) !important;
+  background: var(--bp-tab-h-bg, var(--bg-soft, #f3efe9)) !important;
+  box-sizing: border-box !important;
+}
+#tab-agenda.tab-pane.active .tab-inner > div:first-child.bp-agenda-head > span:first-of-type {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  /* título via ::after em .bp-agenda-title */
+}
+#tab-agenda.tab-pane.active .tab-inner > div:first-child > span:first-of-type::after {
+  content: none; /* não injectar segundo título */
+  font-family: var(--font-sans) !important;
+  font-size: var(--bp-tab-h-fs) !important;
+  font-weight: var(--bp-tab-h-fw) !important;
+  color: var(--text-primary) !important;
+  letter-spacing: -0.02em;
+  line-height: 1.2 !important;
+}
+/* Controlos abaixo do sticky */
+/* controlos NÃO são filhos do head — regra legada anulada */
+#tab-agenda.tab-pane.active .tab-inner > div:first-child > .bp-agenda-controls {
+  display: none !important; /* se algum residual */
+}
+#tab-agenda.tab-pane.active .tab-inner > .bp-agenda-controls {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  position: relative !important;
+  margin: 10px 0 8px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-sizing: border-box !important;
+}
+#tab-agenda.tab-pane.active .tab-inner > .bp-agenda-controls .bp-agenda-daynav {
+  margin-left: auto !important;
+}
+#tab-agenda.tab-pane.active #agenda-filter-icon {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  margin: 0 !important;
+  padding: 6px !important;
+  color: var(--text-muted) !important;
+  font-size: 0 !important; /* esconde texto residual */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  min-width: 32px;
+  min-height: 32px;
+}
+/* Sem a palavra "Filtrar" — só o ícone */
+#tab-agenda.tab-pane.active #agenda-filter-icon > span {
+  display: none !important;
+}
+/* F7-agenda: 3 barras (funil linear) — NÃO usar polígono funil */
+#tab-agenda.tab-pane.active #agenda-filter-icon > svg {
+  display: block !important;
+  width: 16px !important;
+  height: 16px !important;
+  flex-shrink: 0;
+  stroke: currentColor;
+}
+#tab-agenda.tab-pane.active #agenda-filter-icon::before {
+  content: none !important;
+  display: none !important;
+}
+/* Período mais pequeno */
+#tab-agenda.tab-pane.active #agenda-date-label {
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em;
+  color: var(--text-secondary) !important;
+}
+#tab-agenda.tab-pane.active #agenda-prev,
+#tab-agenda.tab-pane.active #agenda-next {
+  font-size: 0.85rem !important;
+  padding: 4px 6px !important;
+  color: var(--text-muted) !important;
+}
+#tab-agenda.tab-pane.active .tab-inner > div:first-child > div > div {
+  margin-left: auto;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+/* ========== 4) EQUIPA ========== */
+#tab-equipa.tab-pane.active .tab-inner::before {
+  content: 'Equipa e serviços';
+  display: block;
+  font-family: var(--font-sans);
+  font-size: var(--bp-tab-h-fs-equipa);
+  font-weight: var(--bp-tab-h-fw);
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-left: -20px;
+  margin-right: -20px;
+  margin-bottom: 10px;
+  padding: var(--bp-tab-h-pad-y) var(--bp-tab-h-pad-x);
+  border-bottom: 1px solid var(--border-soft);
+}
+#tab-equipa.tab-pane.active .tab-inner > div:first-child {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  position: static !important;
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+/* "Equipa" em cascata — mesma tipologia «Cliente» / «Caixa» */
+#tab-equipa.tab-pane.active .tab-inner > div:first-child > span:first-of-type {
+  font-family: var(--font-sans) !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  color: var(--text-secondary) !important;
+  letter-spacing: 0.01em;
+  text-transform: none !important;
+  line-height: 1.3 !important;
+}
+#tab-equipa.tab-pane.active .tab-inner > div:first-child > span:first-of-type::after {
+  content: none !important;
+}
+#tab-equipa.tab-pane.active .tab-inner > div:first-child::before {
+  content: none !important;
+  display: none !important;
+}
+/* superseded: + Novo discreto */
+
+/* ========== 5) IA — cabeçalho INTEIRO sticky: logo + Benza + Agente IA ========== */
+/* Linha topo: LOGO → textos (nunca esconder o logo) */
+/* Só o bloco de texto cresce — NÃO o .ia-header-conn (Ligado) */
+/* F1 — título no HTML (sem content: CSS) */
+/* Sem logo duplicado no corpo */
+/* .ia-status-line vive no cabeçalho como .ia-header-conn (contrato JS do bundle) */
+/* Evita estilos antigos de "linha completa" a esticar o sticky */
+/* Taglines abaixo do sticky (não no cabeçalho) */
+
+/* Scroll */
+.main-content {
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.tab-pane.active {
+  overflow: visible;
+}
+
+
+
+
+/* ====================================================================
+   F7-6 — Agenda filtro compacto + daynav à direita | Clientes tipografia
+   Cabeçalhos sticky unificados
+   ==================================================================== */
+
+/* —— AGENDA head sticky (título alinhado às outras abas) —— */
+.bp-agenda-head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 0;
+}
+.bp-agenda-title {
+  font-family: var(--font-sans) !important;
+  font-size: var(--bp-tab-h-fs, 1.0625rem) !important;
+  font-weight: var(--bp-tab-h-fw, 700) !important;
+  color: var(--text-primary) !important;
+  letter-spacing: -0.02em;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+.bp-agenda-title::after {
+  content: none !important; /* título real no HTML */
+}
+#tab-agenda.tab-pane.active .tab-inner > .bp-agenda-head {
+  margin-left: -20px;
+  margin-right: -20px;
+  padding: var(--bp-tab-h-pad-y, 10px) var(--bp-tab-h-pad-x, 20px);
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--bp-tab-h-bg, var(--bg-soft, #f3efe9));
+  position: sticky;
+  top: 0;
+  z-index: var(--bp-tab-h-z, 40);
+  box-sizing: border-box;
+}
+
+/* Controlos abaixo do cabeçalho: filtro esq. compacto | período canto direito */
+#tab-agenda.tab-pane.active .bp-agenda-controls {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 10px 0 8px !important;
+  padding: 0 !important;
+  gap: 12px !important;
+  position: relative !important;
+  background: transparent !important;
+  border: none !important;
+  box-sizing: border-box !important;
+}
+#tab-agenda.tab-pane.active .bp-agenda-filter-anchor {
+  position: relative !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+}
+/* Filtro mais pequeno */
+#tab-agenda.tab-pane.active #agenda-filter-icon {
+  position: static !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  width: 28px !important;
+  height: 28px !important;
+  padding: 4px !important;
+  font-size: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+#tab-agenda.tab-pane.active #agenda-filter-icon > span {
+  display: none !important;
+}
+#tab-agenda.tab-pane.active #agenda-filter-icon > svg {
+  display: block !important;
+  width: 14px !important;
+  height: 14px !important;
+}
+#tab-agenda.tab-pane.active #agenda-filter-icon::before {
+  content: none !important;
+  display: none !important;
+}
+/* Daynav no canto direito */
+#tab-agenda.tab-pane.active .bp-agenda-daynav {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  flex: 0 0 auto !important;
+  margin: 0 0 0 auto !important;
+  margin-left: auto !important;
+}
+#tab-agenda.tab-pane.active #agenda-date-label {
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  color: var(--text-secondary) !important;
+  white-space: nowrap;
+}
+#tab-agenda.tab-pane.active #agenda-prev,
+#tab-agenda.tab-pane.active #agenda-next {
+  font-size: 0.8rem !important;
+  padding: 2px 6px !important;
+  color: var(--text-muted) !important;
+}
+#tab-agenda.tab-pane.active #agenda-filter-popover {
+  top: calc(100% + 8px) !important;
+  bottom: auto !important;
+  left: 0 !important;
+  right: auto !important;
+  transform: none !important;
+}
+
+/* —— CLIENTES: sticky head + toolbar tipografia alinhada —— */
+#tab-clientes.tab-pane.active .tab-inner > .bp-cli-head {
+  margin-left: -20px;
+  margin-right: -20px;
+  padding: var(--bp-tab-h-pad-y, 10px) var(--bp-tab-h-pad-x, 20px) !important;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--bp-tab-h-bg, var(--bg-soft, #f3efe9));
+  position: sticky !important;
+  top: 0 !important;
+  z-index: var(--bp-tab-h-z, 40);
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+#tab-clientes.tab-pane.active .bp-cli-head .bp-cli-title {
+  font-family: var(--font-sans) !important;
+  font-size: var(--bp-tab-h-fs, 1.0625rem) !important;
+  font-weight: var(--bp-tab-h-fw, 700) !important;
+  color: var(--text-primary) !important;
+  letter-spacing: -0.02em;
+  margin: 0 !important;
+}
+#tab-clientes.tab-pane.active .bp-cli-toolbar[data-bp-lock="cli-toolbar-v1"] {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin: 10px 0 12px !important;
+  padding: 0 !important;
+  gap: 12px !important;
+  background: transparent !important;
+  border: none !important;
+  position: relative !important;
+  top: auto !important;
+}
+/* «Cliente» = mesma família/peso das labels secundárias (não serif, não título) */
+#tab-clientes.tab-pane.active .bp-cli-toolbar-label {
+  font-family: var(--font-sans) !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  color: var(--text-secondary) !important;
+  letter-spacing: 0.01em;
+  margin: 0 !important;
+  margin-right: auto !important;
+  text-align: left !important;
+  line-height: 1.3 !important;
+}
+/* superseded: + Novo discreto */
+/* superseded: + Novo discreto */
+
+/* —— Sticky reforço Caixa / Equipa / IA (background sólido) —— */
+#tab-caixa.tab-pane.active .tab-inner::before {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: var(--bp-tab-h-z, 40) !important;
+  background: var(--bp-tab-h-bg, var(--bg-soft, #f3efe9)) !important;
+}
+#tab-equipa.tab-pane.active .tab-inner::before {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: var(--bp-tab-h-z, 40) !important;
+  background: var(--bp-tab-h-bg, var(--bg-soft, #f3efe9)) !important;
+}
+
+
+/* ====================================================================
+   F7-PERF — otimizações seguras (sem mudar tipografia/cores)
+   ==================================================================== */
+
+/* Listas longas: o browser pode saltar layout de itens fora do ecrã */
+#clientes-list > *,
+#profissionais-list > *,
+#movimentos-list > *,
+#agenda-full-list > * {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 76px;
+}
+
+/* Isolar repaints de cartões e folhas de modal */
+.card,
+.modal-sheet,
+.list-item,
+.bp-ag-card {
+  contain: layout style;
+}
+
+/* Tabs inactivas: já display:none; reforço de contenção */
+.tab-pane:not(.active) {
+  content-visibility: hidden;
+  contain: strict;
+}
+
+/* Menos trabalho de animação quando o utilizador pede */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Sticky headers: promove camada só onde necessário (mobile scroll) */
+.bp-agenda-head,
+.bp-cli-head,
+#tab-caixa.tab-pane.active .tab-inner::before,
+#tab-equipa.tab-pane.active .tab-inner::before {
+  backface-visibility: hidden;
+}
+
+
+/* F7-7 — Agenda título visível + sticky garantido; lista mais perto do filtro */
+#tab-agenda.tab-pane.active .tab-inner > .bp-agenda-head,
+#tab-agenda.tab-pane.active .tab-inner > div.bp-agenda-head {
+  display: flex !important;
+  align-items: center !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 50 !important;
+  margin-left: -20px !important;
+  margin-right: -20px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding: var(--bp-tab-h-pad-y, 10px) var(--bp-tab-h-pad-x, 20px) !important;
+  border-bottom: 1px solid var(--border-soft) !important;
+  background: var(--bp-tab-h-bg, var(--bg-soft, #f3efe9)) !important;
+  box-sizing: border-box !important;
+  min-height: 44px !important;
+}
+#tab-agenda.tab-pane.active .bp-agenda-title {
+  font-size: var(--bp-tab-h-fs, 1.0625rem) !important;
+  font-weight: var(--bp-tab-h-fw, 700) !important;
+  line-height: 1.2 !important;
+  color: var(--text-primary) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+/* Menos espaço filtro → lista */
+#tab-agenda.tab-pane.active .bp-agenda-controls {
+  margin-top: 6px !important;
+  margin-bottom: 4px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+#tab-agenda.tab-pane.active #agenda-full-list {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+#tab-agenda.tab-pane.active #agenda-full-list > :first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+/* Grupos de data (ex. 23/07) mais juntos */
+#tab-agenda.tab-pane.active #agenda-full-list .timeline-date,
+#tab-agenda.tab-pane.active #agenda-full-list .bp-ag-date,
+#tab-agenda.tab-pane.active #agenda-full-list > div {
+  margin-top: 6px !important;
+}
+#tab-agenda.tab-pane.active #agenda-full-list > :first-child {
+  margin-top: 2px !important;
+}
+
+/* IA sticky: só o bloco .ia-header (ver secção 5) */
+
+/* F7-10 — Ligado extremo direito: .ia-header-text flex; .ia-header-conn order 99 + ml auto */
+
+/* BP-HEADER-SALAO — nome na linha do plano */
+.app-header .bp-header-plano-row .store-name,
+.app-header #store-name-display {
+  display: inline-block !important;
+  max-width: min(42vw, 170px) !important;
+  font-size: 0.6875rem !important;
+  font-weight: 500 !important;
+  color: var(--text-muted, #8c8980) !important;
+  letter-spacing: 0.01em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  line-height: 1.25 !important;
+  width: auto !important;
+  height: auto !important;
+  visibility: visible !important;
+}
+
+
+/* + Novo (Clientes / Equipa / Serviços) — discreto, não CTA dourado */
+#add-cliente-btn,
+#add-prof-btn,
+#add-servico-btn {
+  background: transparent !important;
+  color: var(--text-secondary, #6b6560) !important;
+  border: 1px solid var(--border-soft, #e8e4df) !important;
+  box-shadow: none !important;
+  font-weight: 600 !important;
+  font-size: 0.75rem !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  padding: 0 12px !important;
+  border-radius: var(--radius-md, 8px) !important;
+}
+#add-cliente-btn:active,
+#add-prof-btn:active,
+#add-servico-btn:active,
+#add-cliente-btn:hover,
+#add-prof-btn:hover,
+#add-servico-btn:hover {
+  background: var(--bg-soft, #f5f2ec) !important;
+  color: var(--text-primary, #1c1a18) !important;
+  border-color: var(--border-soft, #e8e4df) !important;
+}
+
+
+/* título Caixa: ::before existente com --bp-tab-h-fs/fw (mesma cascata Clientes) */
+
+
+/* Caixa — label sob o cabeçalho = mesma cascata «Cliente» */
+#tab-caixa.tab-pane.active .bp-caixa-toolbar {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin: 10px 0 12px !important;
+  padding: 0 !important;
+  gap: 12px !important;
+  background: transparent !important;
+  border: none !important;
+}
+#tab-caixa.tab-pane.active .bp-caixa-toolbar-label {
+  font-family: var(--font-sans) !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  color: var(--text-secondary) !important;
+  letter-spacing: 0.01em;
+  margin: 0 !important;
+  text-align: left !important;
+  line-height: 1.3 !important;
+}
+
+
+/* BP-IA-ROLE-CASCADE */
+
+
+/* BP-IA-TITLE-OUT — título já não vive no header sticky */
+
+
+/* BP-IA-EDGE-PAD */
+
+
+/* BP-IA-PAGE-HEAD-STICKY — Benza fixo como .bp-cli-head */
+
+
+/* BP-IA-RESTORE-HEADER — não esconder logo/título */
+
+
+/* Indicador de sincronização — spinner contínuo quando há trabalho activo */
+@keyframes bp-sync-spin {
+  to { transform: rotate(360deg); }
+}
+.sync-spin {
+  display: none;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--gold, #C9A227);
+  align-items: center;
+  justify-content: center;
+}
+.sync-spin-svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+  transform-origin: 50% 50%;
+}
+.sync-status.is-visible {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sync-status[data-state="pending"] .sync-spin,
+.sync-status.is-syncing .sync-spin {
+  display: inline-flex;
+}
+.sync-status.is-syncing .sync-spin-svg {
+  animation: bp-sync-spin 0.75s linear infinite;
+}
+.sync-status[data-state="offline"] .sync-spin {
+  display: none;
+}
+.sync-status[data-state="error"] {
+  color: var(--red, #c0392b);
+}
+.sync-status[data-state="pending"] {
+  color: var(--gold-dark, #8a7019);
+}

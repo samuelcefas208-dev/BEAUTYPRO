@@ -1,0 +1,229 @@
+/* ====================================================================
+   plano-filtros-grafico.css — extraído do style.css (Fase C da modularização)
+   Conteúdo: Cartão de plano, filtros de clientes, aviso de plano e gráfico
+   Linhas originais: 1540-1591
+   ==================================================================== */
+
+/* ===== PLANO CARD ===== */
+.plano-card {
+  border: 2px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  transition: var(--transition);
+  cursor: default;
+  background: var(--card-white);
+  margin-bottom: 12px;
+}
+.plano-card.destaque { border-color: var(--gold); background: var(--gold-light); }
+.plano-card .preco {
+  font-family: var(--font-sans);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--gold-dark);
+}
+
+/* ===== FILTROS CLIENTES (P2) — texto; activo = peso + gold-dark (bundle: is-active) ===== */
+.filtro-frequencia {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  height: auto;
+  padding: 6px 10px;
+  font-family: var(--font-sans);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.15s ease, font-weight 0.15s ease;
+  touch-action: manipulation;
+}
+.filtro-frequencia.active,
+.filtro-frequencia.is-active {
+  background: transparent;
+  color: var(--gold-dark);
+  font-weight: 700;
+  border: none;
+}
+
+/* ===== AVISO PLANO ===== */
+#plano-aviso {
+  background: var(--gold-light);
+  border: 1px solid var(--gold);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  margin-bottom: 12px;
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--gold-dark);
+}
+
+/* ===== GRÁFICO ===== */
+.chart-tooltip {
+  position: fixed;
+  background: var(--card-white, #fff);
+  color: var(--text-primary);
+  padding: 4px 8px;
+  border-radius: var(--radius-md);
+  font-size: .65rem;
+  font-weight: 600;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s;
+  z-index: 400;
+}
+
+/* ===== FILTRO DO DASHBOARD ===== */
+#dash-filter-icon {
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+#dash-filter-icon:active {
+  color: var(--gold);
+}
+#dash-filter-icon svg {
+  stroke: currentColor;
+}
+
+/* ===== POPOVER FLUTUANTE (substitui o bottom sheet) ===== */
+#modal-periodo-dashboard.modal-overlay {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  pointer-events: none;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2000;
+  display: none; /* controlado por JS com classe .open */
+}
+#modal-periodo-dashboard.modal-overlay.open {
+  display: flex !important;
+}
+
+#modal-periodo-dashboard .modal-sheet {
+  position: fixed; /* ancorado ao ícone via JS (top/left) */
+  top: 64px;
+  left: 12px;
+  width: 260px;
+  max-width: 90vw;
+  max-height: min(340px, 70vh);
+  margin: 0;
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,.15);
+  background: var(--card-white);
+  padding: 12px 12px 10px;
+  pointer-events: auto;
+  animation: none !important;
+  transform: none !important;
+  overflow-y: auto;
+  z-index: 1200;
+}
+
+#modal-periodo-dashboard .modal-sheet .handle {
+  display: none;
+}
+
+#modal-periodo-dashboard .modal-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+/* Opções em 2 colunas */
+.dash-periodo-opcoes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.dash-periodo-opcao {
+  padding: 5px 6px;
+  font-size: .68rem;
+  font-weight: 600;
+  border: var(--border-default);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  background: var(--card-white);
+  color: var(--text-secondary);
+  cursor: pointer;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+.dash-periodo-opcao:active {
+  transform: scale(0.97);
+}
+.dash-periodo-opcao.active {
+  background: var(--gold);
+  color: var(--card-white);
+  border-color: var(--gold);
+  font-weight: 600;
+}
+.dash-periodo-opcao:last-of-type {
+  border-bottom: none;
+}
+
+/* Personalizado */
+.dash-periodo-custom {
+  grid-column: span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-soft);
+}
+.dash-periodo-custom .input-group {
+  margin-bottom: 0;
+}
+.dash-periodo-custom .input-field {
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  min-height: 28px;
+  height: 28px;
+  box-sizing: border-box;
+}
+.dash-periodo-custom .input-label {
+  font-size: 0.62rem;
+  margin-bottom: 2px;
+}
+
+/* Botão "Aplicar" – compacto */
+#dash-custom-aplicar {
+  padding: 4px 14px;
+  font-size: 0.68rem;
+  min-height: 28px;
+  height: 28px;
+  line-height: 1;
+  border-radius: var(--radius-full) !important;
+  width: auto;
+  align-self: flex-end;
+  background: var(--gold);
+  color: var(--card-white);
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
+}
+#dash-custom-aplicar:active {
+  opacity: 0.8;
+  transform: scale(0.96);
+}

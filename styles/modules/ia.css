@@ -1,0 +1,2312 @@
+/*! BelezaPro — styles/modules/ia.css · 20260912-id-vis7 · visão ampla organizada · bolha gold-50
+ * REGRA: 1 selector = 1 bloco. Editar na seccao certa. Nunca duplicar.
+ * REGRA: Sem excesso de input. Sem regra a competir.
+ * REGRA: Modo ampliado isolado (selectores ia-focus-mode / ia-chat-focus).
+ */
+
+
+/* ========== 1) TOKENS / ROOT ========== */
+
+#tab-ia {
+  --ia-font: var(--font-sans, system-ui, sans-serif);
+  --ia-ink: var(--text-primary, #17140F);
+  --ia-muted: var(--text-muted, #6B6560);
+  --ia-secondary: var(--text-secondary, #5C564E);
+  --ia-border: var(--border-soft, #DCD5C9);
+  /* Borda do workspace: um passo mais presente que border-soft */
+  --ia-border-frame: var(--neutral-200, #C7BDAF);
+  --ia-card: var(--card-white, #FFFFFF);
+  --ia-soft: var(--bg-soft, #F3F2EF);
+  /* Fundo profundo da área de mensagens */
+  --ia-chat-depth: var(--neutral-75, #ECE9E4);
+  --ia-bubble: var(--card-white, #FFFFFF);
+  --ia-gold: var(--gold, #D4AF37);
+  --ia-gold-dark: var(--gold-dark, #A7872B);
+  --ia-chrome-muted: var(--text-muted, #6B6560);
+  --ia-chrome-muted-soft: var(--text-secondary, #5C564E);
+  --ia-scroll-thumb: var(--neutral-200, #C7BDAF);
+  --ia-radius: var(--radius-lg, 12px);
+  --ia-radius-sm: var(--radius-sm, 4px);
+  background: var(--bp-tab-h-bg, var(--bg-soft, #F3F2EF));
+  color: var(--ia-ink);
+  font-family: var(--ia-font);
+  position: relative;
+}
+
+
+/* ========== 11) EXTRA ========== */
+
+#tab-ia.tab-pane.active .tab-inner {
+  padding: 0 16px 160px;
+  box-sizing: border-box;
+}
+
+
+/* ========== 2) CABECALHO ========== */
+
+#tab-ia .ia-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--bp-tab-h-z, 40);
+  margin: 0 0 12px;
+  padding: var(--bp-tab-h-pad-y, 10px) 0;
+  background: var(--bp-tab-h-bg, var(--bg-soft, #f3efe9));
+  border-bottom: 1px solid var(--border-soft, var(--ia-border));
+}
+
+#tab-ia .ia-header-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+}
+
+#tab-ia .ia-header-mark {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+#tab-ia .ia-header-text {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#tab-ia .ia-header-title {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: var(--bp-tab-h-fs, 1.0625rem);
+  font-weight: var(--bp-tab-h-fw, 700);
+  color: var(--text-primary, var(--ia-ink));
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+#tab-ia .ia-header-role {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ia-gold-dark);
+}
+
+#tab-ia .ia-header-conn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font-family: var(--font-sans, var(--ia-font));
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #3d3a36;
+}
+
+#tab-ia .ia-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ia-muted);
+}
+
+#tab-ia .ia-status-dot[data-state="ok"] { background: #2e9b57; }
+
+#tab-ia .ia-status-dot[data-state="offline"] { background: #c45c26; }
+
+#tab-ia #ia-renomear-btn { display: none; }
+
+
+/* ========== 3) KPI DESKTOP ========== */
+
+#tab-ia .ia-resumo-grid[data-bp-desktop-only="1"] { display: none; }
+
+
+/* ========== 4) CARD + SHELL MENSAGENS ========== */
+
+#tab-ia .ia-chat-card {
+  margin: 0 0 14px;
+  padding: 8px;
+  border-radius: var(--radius-xl, 16px);
+  border: 1.5px solid var(--ia-border-frame);
+  background: var(--ia-soft);
+  box-shadow: none;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+#tab-ia #ia-chat-container,
+#tab-ia .ia-chat-shell {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 120px;
+  max-height: min(48vh, 400px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px;
+  margin: 0;
+  border: 1px solid var(--ia-border);
+  border-radius: var(--ia-radius);
+  background: var(--ia-chat-depth);
+  box-sizing: border-box;
+}
+
+#tab-ia #ia-chat {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  max-height: none;
+  overflow: visible;
+  padding: 0;
+}
+
+#tab-ia #ia-chat-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+  padding: 20px 16px 16px;
+  box-sizing: border-box;
+}
+#tab-ia .ia-empty-art {
+  display: block;
+  line-height: 0;
+}
+#tab-ia .ia-empty-duo {
+  display: block;
+  width: min(280px, 72vw);
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  margin: 0 auto;
+}
+#tab-ia .ia-chat-empty-title {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ia-ink, #1c1a18);
+  margin: 4px 0 0;
+}
+#tab-ia .ia-chat-empty-sub {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--ia-muted, #9a968c);
+  max-width: 28ch;
+  margin: 0;
+  line-height: 1.4;
+}
+
+#tab-ia .ia-chat-shell.has-messages #ia-chat-empty { display: none !important; }
+
+
+/* ========== 5) BOLHAS ========== */
+
+#tab-ia .ia-msg-user-row {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+
+/* ========== 4) CARD + SHELL MENSAGENS ========== */
+
+#tab-ia #ia-chat > .ia-msg-user,
+#tab-ia .ia-msg-user,
+#tab-ia.ia-focus-mode #ia-chat > .ia-msg-user,
+#tab-ia.ia-focus-mode .ia-msg-user {
+  align-self: flex-end;
+  max-width: min(78%, 22rem);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: 0;
+  background: #ffffff;
+  border: 1px solid rgba(28, 26, 24, 0.08);
+  border-radius: 18px;
+  padding: 8px 14px;
+  font-family: var(--ia-font);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  font-weight: 400;
+  color: var(--ia-ink, #17140F);
+  box-sizing: border-box;
+  box-shadow: none;
+}
+
+
+/* ========== 5) BOLHAS ========== */
+
+#tab-ia .ia-msg-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+#tab-ia .ia-msg-bot,
+#tab-ia.ia-focus-mode .ia-msg-bot {
+  max-width: 100%;
+  width: 100%;
+  min-width: 0;
+  /* Ref. web: creme gold-50, caixa única limpa */
+  background: var(--gold-50, #FBF6E9);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-radius: 16px;
+  padding: 14px 16px;
+  font-family: var(--ia-font);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--ia-ink, #17140F);
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  box-shadow: none;
+}
+
+#tab-ia .ia-msg-bot-header {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  flex-wrap: nowrap;
+  gap: 4px;
+  margin: 0 0 10px;
+  width: 100%;
+}
+
+#tab-ia .ia-msg-bot-nome {
+  font-family: var(--ia-font);
+  font-size: var(--text-2xs, 0.65rem);
+  font-weight: 600;
+  color: var(--gold-dark, #A7872B);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+
+#tab-ia .ia-msg-bot-role {
+  font-family: var(--ia-font);
+  font-size: var(--text-2xs, 0.65rem);
+  font-weight: 600;
+  color: var(--gold-dark, #A7872B);
+  white-space: nowrap;
+}
+
+
+#tab-ia .ia-msg-bot-tempo {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.5625rem;
+  font-weight: 400;
+  color: #9a968c;
+  margin-left: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+
+#tab-ia .ia-msg-bot-fonte {
+  font-size: 0.6875rem;
+  color: #8a857c;
+  margin-left: 4px;
+}
+
+#tab-ia .ia-msg-bot-corpo {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ia-ink, #17140F);
+  font-weight: 400;
+}
+
+#tab-ia .ia-msg-bot-corpo p {
+  margin: 0 0 0.55em;
+}
+
+#tab-ia .ia-msg-bot-corpo p:last-child { margin-bottom: 0; }
+
+#tab-ia .ia-msg-bot-corpo strong {
+  font-weight: 700;
+  color: #1c1a18;
+}
+
+#tab-ia .ia-msg-bot-corpo ol,
+#tab-ia .ia-msg-bot-corpo ul {
+  margin: 0.35em 0 0.5em;
+  padding: 0 0 0 1.25em;
+  list-style-position: outside;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+#tab-ia .ia-msg-bot-corpo ol { list-style-type: decimal; }
+#tab-ia .ia-msg-bot-corpo ul { list-style-type: disc; }
+
+
+
+
+
+
+
+
+#tab-ia .ia-msg-bot-corpo li {
+  margin: 0.25em 0;
+  padding-left: 0.15em;
+  line-height: 1.45;
+}
+
+#tab-ia .ia-msg-bot-corpo table {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+  margin: 0.4em 0;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#tab-ia .ia-msg-bot-corpo td,
+#tab-ia .ia-msg-bot-corpo th {
+  border-bottom: 1px solid var(--ia-border);
+  padding: 8px 6px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+#tab-ia .ia-msg-toolbar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: -2px 0 0;
+  padding: 0;
+  width: 100%;
+}
+
+
+
+
+/* ========== 6) TOOLBAR + FOLLOW-UPS ========== */
+
+#tab-ia .ia-tool-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #8a857c;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  opacity: 1;
+  border-radius: 8px;
+  transition: color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+
+
+#tab-ia .ia-tool-btn:hover {
+  color: #1c1a18;
+  background: rgba(28, 26, 24, 0.05);
+}
+
+#tab-ia .ia-tool-btn:active {
+  transform: scale(0.92);
+  color: #A7872B;
+}
+
+#tab-ia .ia-tool-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+
+#tab-ia .ia-followup-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  margin: 0;
+}
+
+#tab-ia .ia-followup-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  padding: 3px 0;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.35;
+  color: #6b6560;
+  cursor: pointer;
+  text-align: left;
+  letter-spacing: 0;
+  font-style: normal;
+  transition: color 0.12s ease;
+}
+
+
+
+
+#tab-ia .ia-followup-chip:hover {
+  color: #4a4642;
+}
+
+#tab-ia .ia-followup-chip:active {
+  opacity: 0.75;
+}
+
+#tab-ia .ia-followup-arrow {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  fill: none;
+  opacity: 0.85;
+}
+
+
+/* Viewport: seta fixa no ecrã do chat (NÃO dentro do overflow) */
+#tab-ia .ia-chat-viewport {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 120px;
+  max-height: min(48vh, 400px);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  box-sizing: border-box;
+}
+#tab-ia .ia-chat-viewport > #ia-chat-container,
+#tab-ia .ia-chat-viewport > .ia-chat-shell {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  height: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ia-scroll-thumb, #c9c4ba) transparent;
+}
+/* Indicador de scroll: estreito, cantos quadrados, cascata suave */
+#tab-ia .ia-chat-viewport > #ia-chat-container::-webkit-scrollbar,
+#tab-ia .ia-chat-viewport > .ia-chat-shell::-webkit-scrollbar {
+  width: 2px;
+}
+#tab-ia .ia-chat-viewport > #ia-chat-container::-webkit-scrollbar-thumb,
+#tab-ia .ia-chat-viewport > .ia-chat-shell::-webkit-scrollbar-thumb {
+  background: var(--ia-scroll-thumb, #c9c4ba);
+  border-radius: 0;
+}
+#tab-ia .ia-chat-viewport > #ia-chat-container::-webkit-scrollbar-track,
+#tab-ia .ia-chat-viewport > .ia-chat-shell::-webkit-scrollbar-track {
+  background: transparent;
+}
+/* Seta rolar: cascata suave (mesma família que expand + thumb) */
+#tab-ia .ia-scroll-latest {
+  position: absolute;
+  right: 14px;
+  bottom: 20px;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ia-chrome-muted, #8a857c);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  cursor: pointer;
+  box-shadow: none;
+  opacity: 0.9;
+  -webkit-tap-highlight-color: transparent;
+}
+#tab-ia .ia-scroll-latest:hover,
+#tab-ia .ia-scroll-latest:active,
+#tab-ia .ia-scroll-latest:focus {
+  background: transparent;
+  color: #8a857c;
+  opacity: 1;
+  outline: none;
+  box-shadow: none;
+}
+#tab-ia .ia-scroll-latest svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  pointer-events: none;
+}
+#tab-ia .ia-scroll-latest[hidden] { display: none !important; }
+#tab-ia.ia-focus-mode .ia-chat-viewport {
+  flex: 1 1 auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  height: auto !important;
+}
+#tab-ia.ia-focus-mode .ia-chat-viewport > #ia-chat-container,
+#tab-ia.ia-focus-mode .ia-chat-viewport > .ia-chat-shell {
+  max-height: none !important;
+}
+
+
+/* ========== 7) COMPOSER ========== */
+
+#tab-ia .ia-composer-panel {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 8px 10px 6px;
+  border-radius: 12px;
+  border: 1px solid var(--ia-border-frame);
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+}
+
+#tab-ia .ia-hab-float-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 28px;
+}
+
+#tab-ia .ia-hab-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 26px;
+  min-height: 26px;
+  padding: 0 9px;
+  border-radius: 999px;
+  border: 1px solid var(--ia-border);
+  background: #fff;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #1c1a18;
+  cursor: pointer;
+  transition: none;
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#tab-ia .ia-hab-chip:hover {
+  border-color: var(--ia-border);
+  box-shadow: none;
+  background: #fff;
+}
+
+#tab-ia .ia-hab-chip:active {
+  background: #fff;
+  border-color: var(--ia-border);
+  box-shadow: none;
+  transform: none;
+}
+
+#tab-ia .ia-hab-chip::after {
+  content: "";
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  border-left: 3.5px solid transparent;
+  border-right: 3.5px solid transparent;
+  border-top: 4px solid #6b6560;
+  flex-shrink: 0;
+}
+
+#tab-ia .ia-expand-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  padding: 0;
+  border: none;
+  background: transparent !important;
+  color: var(--ia-chrome-muted, #9a968c) !important;
+  cursor: pointer;
+  flex-shrink: 0;
+  border-radius: 0;
+  transition: none !important;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  box-shadow: none !important;
+}
+
+#tab-ia .ia-expand-btn:hover,
+#tab-ia .ia-expand-btn:active,
+#tab-ia .ia-expand-btn:focus,
+#tab-ia .ia-expand-btn.is-expanded,
+body.ia-chat-focus #tab-ia .ia-expand-btn {
+  background: transparent !important;
+  color: #8a857c !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+#tab-ia .ia-expand-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--ia-chrome-muted, #9a968c);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+/* Normal: 2 setas (expandir). Ampliado: 4 setas (comprimir) */
+#tab-ia .ia-expand-btn .ia-expand-icon-out { display: block; }
+#tab-ia .ia-expand-btn .ia-expand-icon-in { display: none; }
+body.ia-chat-focus #tab-ia .ia-expand-btn .ia-expand-icon-out,
+#tab-ia.ia-focus-mode .ia-expand-btn .ia-expand-icon-out,
+#tab-ia .ia-expand-btn.is-expanded .ia-expand-icon-out { display: none; }
+body.ia-chat-focus #tab-ia .ia-expand-btn .ia-expand-icon-in,
+#tab-ia.ia-focus-mode .ia-expand-btn .ia-expand-icon-in,
+#tab-ia .ia-expand-btn.is-expanded .ia-expand-icon-in { display: block; }
+
+#tab-ia .ia-composer-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 8px;
+  width: 100%;
+}
+
+#tab-ia .ia-input-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  min-height: 36px;
+  height: auto;
+}
+
+#tab-ia #ia-input {
+  display: block;
+  width: 100%;
+  min-height: 36px;
+  max-height: 120px;
+  height: 36px;
+  margin: 0;
+  padding: 8px 14px;
+  border: 1px solid var(--ia-border);
+  border-radius: 18px;
+  background: #fff;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: #1c1a18;
+  box-sizing: border-box;
+  resize: none;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  outline: none;
+}
+#tab-ia #ia-input::placeholder {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  line-height: 1.35;
+  color: #9a968c;
+  opacity: 1;
+}
+#tab-ia #ia-input:placeholder-shown {
+  white-space: nowrap;
+  overflow: hidden;
+  height: 36px !important;
+  max-height: 36px;
+  line-height: 20px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+#tab-ia .ia-send-btn {
+  flex: 0 0 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border: none;
+  border-radius: 50%;
+  background: var(--ia-gold, #c9a227);
+  color: #1c1a18;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease, background 0.18s ease;
+  box-shadow: 0 2px 8px rgba(201, 162, 39, 0.35);
+}
+
+#tab-ia .ia-send-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(201, 162, 39, 0.45);
+}
+
+#tab-ia .ia-send-btn:active {
+  transform: scale(0.94);
+}
+
+#tab-ia .ia-send-btn.is-idle { opacity: 0.7; }
+
+#tab-ia .ia-send-btn svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+#tab-ia .ia-composer-meta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #6b6560;
+  text-align: center;
+}
+
+#tab-ia .ia-limite {
+  margin: 0;
+  text-align: center;
+  color: #6b6560;
+}
+
+#tab-ia .ia-input-exemplo { display: none; }
+
+
+/* ========== 8) SUGESTOES RAPIDAS ========== */
+
+#tab-ia .ia-sugestoes-label {
+  display: block;
+  margin: 16px 0 8px;
+  font-family: var(--ia-font);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 600;
+  color: var(--ia-secondary);
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+#tab-ia .ia-sugestoes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+#tab-ia .ia-sugestao-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  height: auto;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: var(--ia-radius-sm, 8px);
+  border: 1px solid var(--ia-border);
+  background: var(--ia-card);
+  font-family: var(--ia-font);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--ia-ink);
+  text-align: left;
+  cursor: pointer;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+  box-shadow: none;
+  transition: none;
+}
+
+#tab-ia .ia-sugestao-card:hover {
+  background: var(--ia-soft);
+  border-color: var(--ia-border-frame);
+}
+
+#tab-ia .ia-sugestao-card:active {
+  transform: none;
+  background: #fff;
+}
+
+#tab-ia .ia-sugestao-card svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+#tab-ia .ia-sugestao-icone {
+  color: var(--ia-muted);
+  opacity: 1;
+  flex-shrink: 0;
+}
+
+#tab-ia .ia-sugestao-icone svg { width: 14px; height: 14px; }
+
+
+
+/* ========== SUGESTÕES RÁPIDAS — DESLIGADAS (até segunda ordem) ==========
+ * Motivo: reduzir poluição visual; priorizar conversa + Benza visão ampla.
+ * Para reactivar: remover este bloco (ou display) e o comentário no index.html.
+ * Nós #ia-sugestoes-label / #ia-sugestoes-grid mantidos no DOM (JS não quebra).
+ * ====================================================================== */
+#tab-ia .ia-sugestoes-label,
+#tab-ia #ia-sugestoes-label,
+#tab-ia .ia-sugestoes-grid,
+#tab-ia #ia-sugestoes-grid {
+  display: none !important;
+}
+
+/* ========== 9) BENZA VISAO AMPLA ========== */
+/* Card operacional BeautyPro: mesma família tipográfica das abas; ícones alinhados ao texto */
+
+#tab-ia .ia-insights-card {
+  margin: 0 0 14px;
+  padding: 0;
+  border-radius: var(--ia-radius, 12px);
+  border: 1.5px solid var(--ia-border-frame, var(--ia-border));
+  background: var(--ia-card);
+  box-shadow: var(--shadow-rest, 0 1px 3px rgba(23, 20, 15, 0.06));
+  overflow: hidden;
+}
+
+/* Colapsado: barra profissional (não “amadora”) — mesmo cartão, altura estável */
+#tab-ia .ia-insights-card.is-collapsed {
+  background: var(--ia-card);
+  border-color: var(--ia-border-frame, var(--ia-border));
+}
+#tab-ia .ia-insights-card.is-collapsed .ia-insights-head {
+  background: var(--ia-card);
+  min-height: 44px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 0;
+  border-bottom: none;
+  font-size: var(--text-sm, 0.85rem);
+}
+
+#tab-ia .ia-insights-card:not(.is-collapsed) {
+  background: var(--ia-card);
+  border-color: var(--ia-border-frame, var(--ia-border));
+}
+#tab-ia .ia-insights-card:not(.is-collapsed) .ia-insights-head {
+  background: var(--ia-soft);
+  border-bottom: 1px solid var(--ia-border);
+  border-radius: 0;
+  min-height: 44px;
+  padding: 0 14px;
+}
+
+#tab-ia .ia-insights-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  height: auto;
+  padding: 0 14px;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: var(--ia-card);
+  font-family: var(--font-sans, var(--ia-font));
+  font-size: var(--text-sm, 0.85rem);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ia-ink);
+  letter-spacing: -0.01em;
+  text-align: left;
+  cursor: pointer;
+  pointer-events: auto;
+  box-sizing: border-box;
+}
+
+#tab-ia .ia-insights-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: var(--ia-radius-sm, 4px);
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--ia-muted);
+  flex-shrink: 0;
+  pointer-events: none;
+  transition: transform 0.2s ease;
+}
+#tab-ia .ia-insights-chevron svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+  stroke: currentColor;
+}
+
+#tab-ia .ia-insights-list {
+  padding: 4px 14px 12px;
+  background: var(--ia-card);
+}
+
+#tab-ia .ia-insights-list[hidden] {
+  display: none;
+}
+
+#tab-ia .ia-insights-card:not(.is-collapsed) .ia-insights-chevron {
+  transform: rotate(180deg);
+}
+#tab-ia .ia-insights-card.is-collapsed .ia-insights-chevron {
+  transform: rotate(0deg);
+}
+#tab-ia .ia-insights-head:active {
+  background: var(--ia-soft);
+}
+
+#tab-ia #ia-insights-titulo {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#tab-ia .ia-insight-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--ia-border);
+  font-family: var(--font-sans, var(--ia-font));
+  font-size: var(--text-sm, 0.85rem);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ia-ink);
+}
+#tab-ia .ia-insight-row:last-child {
+  border-bottom: none;
+  padding-bottom: 8px;
+}
+
+#tab-ia .ia-insight-row strong {
+  font-weight: 600;
+  color: var(--ia-ink);
+}
+
+/* Ícone SVG: coluna fixa, alinhada à 1.ª linha do texto */
+#tab-ia .ia-insight-icone {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ia-gold-dark, var(--gold-dark, #A7872B));
+  opacity: 0.9;
+}
+#tab-ia .ia-insight-icone svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  stroke: currentColor;
+  fill: none;
+}
+
+/* ========== 10) MODAL HABILIDADE ========== */
+/* Prefixo #modal-ia-habilidade = máxima especificidade (evita label+desc colados) */
+
+#modal-ia-habilidade.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: block;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  pointer-events: auto;
+  overflow: visible;
+}
+
+#modal-ia-habilidade[hidden] {
+  display: none !important;
+}
+
+#modal-ia-habilidade .ia-hab-sheet {
+  pointer-events: auto;
+  position: fixed;
+  left: 12px;
+  width: clamp(188px, 52vw, 234px);
+  max-width: 56vw;
+  min-width: 188px;
+  margin: 0;
+  padding: 8px 8px 6px;
+  border-radius: 12px;
+  background: #ffffff !important;
+  border: none !important;
+  box-shadow:
+    0 2px 4px rgba(28, 26, 24, 0.04),
+    0 10px 28px rgba(28, 26, 24, 0.14);
+  box-sizing: border-box;
+  overflow: visible !important;
+  max-height: none !important;
+  height: auto !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+#modal-ia-habilidade .ia-hab-sheet-title {
+  display: block !important;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #1c1a18;
+  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+#modal-ia-habilidade .ia-hab-opcoes {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  overflow: visible !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+#modal-ia-habilidade .ia-hab-opcao {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  width: 100% !important;
+  padding: 6px 8px !important;
+  border: none !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  text-align: left !important;
+  cursor: pointer;
+  box-sizing: border-box;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  white-space: normal !important;
+}
+
+#modal-ia-habilidade .ia-hab-opcao:hover {
+  background: #f7f4ef !important;
+}
+
+#modal-ia-habilidade .ia-hab-opcao:active {
+  transform: scale(0.98);
+}
+
+#modal-ia-habilidade .ia-hab-opcao.is-on {
+  background: #efeae3 !important;
+}
+
+#modal-ia-habilidade .ia-hab-opcao-ic {
+  flex-shrink: 0 !important;
+  width: 22px !important;
+  height: 22px !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  color: #6b6560;
+  margin-top: 2px;
+  background: transparent !important;
+}
+
+#modal-ia-habilidade .ia-hab-opcao-ic svg {
+  width: 18px !important;
+  height: 18px !important;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  pointer-events: none;
+}
+
+/* Coluna título + descrição — crítico */
+#modal-ia-habilidade .ia-hab-opcao-text {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 1px !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+#modal-ia-habilidade .ia-hab-opcao-lab {
+  display: block !important;
+  width: 100% !important;
+  font-size: 0.8125rem !important;
+  font-weight: 700 !important;
+  color: #1c1a18 !important;
+  line-height: 1.25 !important;
+  margin: 0 !important;
+}
+
+#modal-ia-habilidade .ia-hab-opcao-desc {
+  display: block !important;
+  width: 100% !important;
+  font-size: 0.625rem !important;
+  font-weight: 400 !important;
+  color: #6b6560 !important;
+  line-height: 1.3 !important;
+  margin: 0 !important;
+  white-space: normal !important;
+}
+
+#modal-ia-habilidade .ia-hab-opcao-check {
+  flex-shrink: 0 !important;
+  width: 8px !important;
+  height: 8px !important;
+  margin-top: 6px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: #2e9b57 !important;
+  font-size: 0;
+  color: transparent;
+}
+
+/* remove regras soltas .ia-hab-* sem prefixo que competiam */
+/* ========== 11) EXTRA ========== */
+
+#tab-ia .ia-loop-card {
+  border: 1px solid var(--ia-border);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--ia-card);
+  margin-top: 8px;
+}
+
+#tab-ia .ia-pdf-row {
+  display: flex;
+  margin: 10px 0 4px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+#tab-ia .ia-pdf-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 340px;
+  min-height: 56px;
+  padding: 8px 8px 8px 8px;
+  border: 1px solid #e8e4de;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(28, 26, 24, 0.04);
+  box-sizing: border-box;
+}
+#tab-ia .ia-pdf-file {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+#tab-ia .ia-pdf-meta {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+#tab-ia .ia-pdf-title {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #3d3a36;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.01em;
+  max-width: 100%;
+}
+#tab-ia .ia-pdf-fname {
+  display: none;
+}
+#tab-ia .ia-pdf-actions {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+#tab-ia .ia-pdf-act {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #6b6560;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#tab-ia .ia-pdf-act:active {
+  background: #f0ece6;
+}
+/* PDF: ✓ só .is-done; spinner no busy */
+#tab-ia .ia-pdf-dl { position: relative; }
+#tab-ia .ia-pdf-dl .ia-pdf-dl-icon { display: block; }
+#tab-ia .ia-pdf-dl .ia-pdf-dl-check {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  color: #1c1a18;
+}
+#tab-ia .ia-pdf-dl .ia-pdf-spin {
+  display: none !important;
+  box-sizing: border-box;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #d4cfc6;
+  border-top-color: #5c5852;
+  border-right-color: #5c5852;
+  background: transparent;
+}
+#tab-ia .ia-pdf-dl.is-busy .ia-pdf-dl-icon,
+#tab-ia .ia-pdf-dl.is-busy .ia-pdf-dl-check {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+}
+#tab-ia .ia-pdf-dl.is-busy .ia-pdf-spin {
+  display: block !important;
+  position: static;
+  width: 18px !important;
+  height: 18px !important;
+  opacity: 1 !important;
+  animation: ia-pdf-spin 0.65s linear infinite;
+}
+#tab-ia .ia-pdf-dl.is-done .ia-pdf-dl-icon,
+#tab-ia .ia-pdf-dl.is-done .ia-pdf-spin {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+}
+#tab-ia .ia-pdf-dl.is-done .ia-pdf-dl-check {
+  display: block !important;
+  width: 20px !important;
+  height: 20px !important;
+  position: static !important;
+  opacity: 1 !important;
+  overflow: visible !important;
+  pointer-events: none !important;
+  color: #1c1a18;
+}
+@keyframes ia-pdf-spin {
+  to { transform: rotate(360deg); }
+}
+
+
+
+/* ========== 5) BOLHAS ========== */
+
+#tab-ia .ia-msg-bot-corpo.ia-msg-reveal {
+  animation: ia-msg-reveal 0.28s ease-out both;
+}
+@keyframes ia-msg-reveal {
+  from { opacity: 0.35; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #tab-ia .ia-msg-bot-corpo.ia-msg-reveal { animation: none; opacity: 1; }
+}
+#tab-ia .ia-msg-enter {
+  animation: ia-msg-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+#tab-ia .ia-msg-block.ia-msg-enter {
+  animation: ia-msg-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+#tab-ia .ia-msg-thinking .ia-think-body {
+  animation: ia-think-pulse 1.1s ease-in-out infinite;
+}
+
+#tab-ia .ia-think-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#tab-ia .ia-think-spin {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #d4cfc6;
+  border-top-color: #8a857c;
+  animation: ia-think-spin 0.7s linear infinite;
+}
+@keyframes ia-think-spin {
+  to { transform: rotate(360deg); }
+}
+#tab-ia .ia-think-label {
+  font-size: 0.8125rem;
+  color: #6b6560;
+}
+
+
+
+/* ========== 12) MODO AMPLIADO (unico sitio) ========== */
+
+body.ia-chat-focus {
+  overflow: hidden !important;
+}
+
+body.ia-chat-focus .bottom-nav,
+body.ia-chat-focus .nav-bottom,
+body.ia-chat-focus #bottom-nav,
+body.ia-chat-focus nav.bottom-nav {
+  display: none !important;
+  height: 0 !important;
+  visibility: hidden !important;
+}
+
+#tab-ia.ia-focus-mode {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 100;
+  width: 100% !important;
+  max-width: none !important;
+  background: var(--bg-soft, #f3efe9);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+#tab-ia.ia-focus-mode .tab-inner {
+  position: absolute !important;
+  inset: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  box-sizing: border-box;
+  background: var(--bg-soft, #f3efe9);
+}
+
+#tab-ia.ia-focus-mode .ia-header {
+  flex: 0 0 auto !important;
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 10px 14px !important;
+  background: var(--bp-tab-h-bg, var(--bg-soft, #f3efe9)) !important;
+  border-bottom: 1px solid var(--border-soft, #e8e4de);
+  border-radius: 0 !important;
+  box-sizing: border-box;
+  text-align: left !important;
+}
+
+#tab-ia.ia-focus-mode .ia-header-top {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  width: 100% !important;
+  min-height: 36px;
+  text-align: left !important;
+}
+
+#tab-ia.ia-focus-mode .ia-header-mark {
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  order: 0 !important;
+}
+
+#tab-ia.ia-focus-mode .ia-header-text {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: baseline !important;
+  justify-content: flex-start !important;
+  flex: 0 1 auto !important;
+  min-width: 0;
+  margin: 0 !important;
+  text-align: left !important;
+}
+
+#tab-ia.ia-focus-mode .ia-header-title,
+#tab-ia.ia-focus-mode .ia-header-role {
+  text-align: left !important;
+}
+
+#tab-ia.ia-focus-mode .ia-header-conn {
+  margin-left: auto !important;
+  flex-shrink: 0 !important;
+}
+
+#tab-ia.ia-focus-mode .ia-chat-card {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+#tab-ia.ia-focus-mode #ia-chat-container,
+#tab-ia.ia-focus-mode .ia-chat-shell {
+  flex: 1 1 auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 12px 14px 16px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+#tab-ia.ia-focus-mode .ia-msg-bot {
+  align-self: flex-start !important;
+  margin-right: auto !important;
+  margin-left: 0 !important;
+  max-width: 92% !important;
+}
+
+#tab-ia.ia-focus-mode .ia-msg-block {
+  align-items: flex-start !important;
+  width: 100% !important;
+}
+
+#tab-ia.ia-focus-mode .ia-msg-user,
+#tab-ia.ia-focus-mode #ia-chat > .ia-msg-user {
+  align-self: flex-end !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  max-width: 88% !important;
+}
+
+#tab-ia.ia-focus-mode .ia-composer-panel {
+  flex: 0 0 auto !important;
+  position: relative !important;
+  margin: 0 12px calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+  padding: 8px 10px 6px !important;
+  border: 1px solid #d4cdc2 !important;
+  border-radius: 12px !important;
+  border-top: 1px solid #d4cdc2 !important;
+  width: auto !important;
+  max-width: none !important;
+  background: #fff !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+  z-index: 5;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+}
+
+#tab-ia.ia-focus-mode .ia-hab-float-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+}
+
+#tab-ia.ia-focus-mode .ia-composer-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+#tab-ia.ia-focus-mode .ia-composer-meta {
+  display: flex !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  text-align: left !important;
+}
+
+#tab-ia.ia-focus-mode .ia-sugestoes-wrap,
+#tab-ia.ia-focus-mode .ia-insights-card,
+#tab-ia.ia-focus-mode #ia-sugestoes-label,
+#tab-ia.ia-focus-mode #ia-sugestoes-grid {
+  display: none !important;
+}
+
+
+/* ========== 14) KEYFRAMES (uma vez) ========== */
+
+@keyframes ia-msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ia-sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ia-dot-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(46, 155, 87, 0.45); }
+  70% { box-shadow: 0 0 0 6px rgba(46, 155, 87, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(46, 155, 87, 0); }
+}
+
+@keyframes ia-think-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
+@keyframes ia-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+
+/* ========== 15) prefers-reduced-motion ========== */
+
+@media (prefers-reduced-motion: reduce) {
+  #tab-ia .ia-msg-enter,
+  #tab-ia .ia-msg-block.ia-msg-enter,
+  .ia-hab-sheet,
+  #tab-ia .ia-status-dot[data-state="ok"],
+  .ia-hab-opcao-check,
+  #tab-ia .ia-msg-thinking .ia-think-body {
+    animation: none !important;
+  }
+  #tab-ia .ia-tool-btn,
+  #tab-ia .ia-send-btn,
+  #tab-ia .ia-expand-btn,
+  #tab-ia .ia-hab-chip,
+  .ia-hab-opcao,
+  #tab-ia .ia-sugestao-card {
+    transition: none !important;
+  }
+}
+
+
+
+/* LOCK chrome IA — mesma família expand / scroll / thumb */
+#tab-ia .ia-expand-btn,
+#tab-ia .ia-expand-btn:hover,
+#tab-ia .ia-expand-btn:active,
+#tab-ia .ia-expand-btn:focus {
+  color: var(--ia-chrome-muted, #8a857c) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+#tab-ia .ia-expand-btn svg {
+  stroke: var(--ia-chrome-muted, #8a857c) !important;
+}
+#tab-ia .ia-scroll-latest {
+  right: 14px !important;
+  bottom: 20px !important;
+  color: var(--ia-chrome-muted, #8a857c) !important;
+  opacity: 0.9;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+#tab-ia .ia-chat-viewport > #ia-chat-container::-webkit-scrollbar,
+#tab-ia .ia-chat-viewport > .ia-chat-shell::-webkit-scrollbar,
+#tab-ia #ia-chat-container::-webkit-scrollbar,
+#tab-ia .ia-chat-shell::-webkit-scrollbar {
+  width: 2px !important;
+}
+#tab-ia .ia-chat-viewport > #ia-chat-container::-webkit-scrollbar-thumb,
+#tab-ia .ia-chat-viewport > .ia-chat-shell::-webkit-scrollbar-thumb,
+#tab-ia #ia-chat-container::-webkit-scrollbar-thumb,
+#tab-ia .ia-chat-shell::-webkit-scrollbar-thumb {
+  background: var(--ia-scroll-thumb, #a39e94) !important;
+  border-radius: 0 !important;
+}
+#tab-ia .ia-insight-icone,
+#tab-ia .ia-insight-icone svg {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: var(--ia-chrome-muted, #8a857c) !important;
+  stroke: var(--ia-chrome-muted, #8a857c) !important;
+}
+
+
+#tab-ia .ia-sugestoes-grid.is-offline .ia-sugestao-card {
+  opacity: 0.92;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* PDF no modo ampliado */
+#tab-ia.ia-focus-mode .ia-pdf-card,
+body.ia-chat-focus #tab-ia .ia-pdf-card {
+  background: #faf9f7;
+  border-color: #e0dcd4;
+  box-shadow: none;
+}
+#tab-ia.ia-focus-mode .ia-pdf-title,
+body.ia-chat-focus #tab-ia .ia-pdf-title {
+  color: #1c1a18;
+}
+#tab-ia.ia-focus-mode .ia-pdf-act,
+body.ia-chat-focus #tab-ia .ia-pdf-act {
+  color: #6b6560;
+}
+
+
+/* ========== 5b) BOLHAS + WORKSPACE (única fonte — sem duplicar no fim) ========== */
+
+/* Workspace normal: branco */
+#tab-ia .ia-chat-card {
+  background: #ffffff;
+  border: 1px solid var(--ia-border, var(--border-soft, #e8e4de));
+  border-radius: 14px;
+  box-shadow: none;
+}
+#tab-ia #ia-chat-container,
+#tab-ia .ia-chat-shell {
+  background: #ffffff;
+  border: 1px solid var(--ia-border, var(--border-soft, #e8e4de));
+  border-radius: var(--ia-radius, 12px);
+  padding: 8px 8px 10px;
+}
+#tab-ia #ia-chat {
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Workspace ampliado: cinza */
+#tab-ia.ia-focus-mode,
+body.ia-chat-focus #tab-ia.ia-focus-mode {
+  background: var(--bg-soft, #f3efe9) !important;
+}
+#tab-ia.ia-focus-mode .tab-inner {
+  background: var(--bg-soft, #f3efe9) !important;
+}
+#tab-ia.ia-focus-mode .ia-chat-card,
+#tab-ia.ia-focus-mode #ia-chat-container,
+#tab-ia.ia-focus-mode .ia-chat-shell {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+#tab-ia.ia-focus-mode #ia-chat-container,
+#tab-ia.ia-focus-mode .ia-chat-shell {
+  padding: 12px 10px 16px !important;
+}
+
+/* User */
+#tab-ia #ia-chat > .ia-msg-user,
+#tab-ia .ia-msg-user,
+#tab-ia.ia-focus-mode #ia-chat > .ia-msg-user,
+#tab-ia.ia-focus-mode .ia-msg-user {
+  align-self: flex-end !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  max-width: 88%;
+  width: fit-content;
+  background: #ffffff;
+  border: 1px solid var(--border-soft, #e8e4de);
+  border-radius: 10px 10px 4px 10px;
+  padding: 6px 12px;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  font-weight: 400;
+  color: var(--text-primary, #17140F);
+  box-sizing: border-box;
+  box-shadow: none;
+}
+
+/* Bolha IA — extrema esquerda + tom ref. */
+#tab-ia .ia-msg-block,
+#ia-chat .ia-msg-block,
+#tab-ia.ia-focus-mode .ia-msg-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start !important;
+  gap: 6px;
+  width: 100% !important;
+  max-width: 100%;
+  margin: 0 0 12px;
+  padding: 0 !important;
+  margin-left: 0 !important;
+  box-sizing: border-box;
+}
+
+#tab-ia .ia-msg-bot,
+#ia-chat .ia-msg-bot,
+#tab-ia.ia-focus-mode .ia-msg-bot {
+  align-self: flex-start !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+  margin-top: 2px;
+  margin-bottom: 6px;
+  max-width: 100% !important;
+  width: 100% !important;
+  min-width: 0;
+  background: #f7f5f1 !important;
+  border: 1px solid var(--border-soft, #e8e4de) !important;
+  border-radius: 12px 12px 12px 4px;
+  padding: 10px 12px;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  font-weight: 400;
+  color: var(--text-primary, #17140F);
+  box-sizing: border-box !important;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  box-shadow: none !important;
+}
+
+#tab-ia .ia-msg-bot-header {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  flex-wrap: nowrap;
+  gap: 6px;
+  margin: 0 0 6px;
+  width: 100%;
+}
+
+/* Benza · papel = Agente ia */
+#tab-ia .ia-msg-bot-nome,
+#ia-chat .ia-msg-bot-nome,
+#tab-ia .ia-msg-bot-role,
+#ia-chat .ia-msg-bot-role {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ia-gold-dark, var(--gold-dark, #A7872B));
+  letter-spacing: 0;
+  white-space: nowrap;
+  opacity: 1;
+}
+
+#tab-ia .ia-msg-bot-tempo {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.5625rem;
+  font-weight: 400;
+  color: var(--text-muted, #fff);
+  margin-left: 6px;
+  white-space: nowrap;
+}
+
+#tab-ia .ia-msg-bot-corpo,
+#ia-chat .ia-msg-bot-corpo {
+  display: block;
+  width: 100%;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  font-weight: 400;
+  color: var(--text-primary, #ffF);
+}
+#tab-ia .ia-msg-bot-corpo p { margin: 0 0 0.45em; }
+#tab-ia .ia-msg-bot-corpo p:last-child { margin-bottom: 0; }
+#tab-ia .ia-msg-bot-corpo strong {
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+}
+
+/* Scroll ↓ */
+#ia-chat-container .ia-scroll-latest,
+button.ia-scroll-latest {
+  position: absolute !important;
+  right: 10px !important;
+  bottom: 10px !important;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  border-radius: 50% !important;
+  border: 1px solid var(--border-soft, #ffffff) !important;
+  background: var(--bg-soft, #ffffff) !important;
+  color: var(--text-secondary, #fff) !important;
+  box-shadow: 0 1px 3px rgba(28, 26, 24, 0.08) !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  padding: 0 !important;
+}
+#ia-chat-container .ia-scroll-latest svg {
+  width: 15px !important;
+  height: 15px !important;
+}
+#ia-chat-container .ia-scroll-latest[hidden] {
+  display: none !important;
+}
+
+/* Composer unificado (normal + tipografia estável) */
+#tab-ia .ia-composer-panel {
+  margin-top: 8px;
+  padding: 8px 10px 6px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, var(--bg-soft, #ffffff) 0%, var(--card-white, #ffffff) 100%);
+  border: 1px solid var(--border-soft, #ffffff);
+}
+#tab-ia .ia-composer-panel .ia-hab-float-row {
+  margin: 0 0 6px 0;
+}
+#tab-ia .ia-composer-panel .ia-hab-chip {
+  color: var(--text-secondary) !important;
+  border-color: var(--border-soft, #ffffff) !important;
+  background: transparent !important;
+  font-size: 0.625rem !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  letter-spacing: 0.01em !important;
+  max-width: none;
+}
+#tab-ia .ia-composer-panel .ia-hab-chip::after {
+  border-top-color: var(--text-secondary, #ffffff) !important;
+}
+
+
+/* ========== 5c) Bolhas vs scroll↓ + scroll até ao fim ========== */
+#tab-ia #ia-chat {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-bottom: 40px !important; /* fim da última mensagem visível */
+  box-sizing: border-box;
+}
+
+/* Shell: esq. mínimo; dir. livre — bolha IA reserva espaço do ↓ */
+#tab-ia #ia-chat-container,
+#tab-ia .ia-chat-shell {
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+}
+
+#tab-ia .ia-msg-block {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  width: 100% !important;
+  align-items: flex-start !important;
+}
+
+/* IA: extrema esquerda; direita ANTES do ícone ↓ (36px + gap) */
+#tab-ia .ia-msg-bot,
+#ia-chat .ia-msg-bot,
+#tab-ia.ia-focus-mode .ia-msg-bot {
+  align-self: flex-start !important;
+  margin-left: 0 !important;
+  margin-right: 52px !important;
+  max-width: calc(100% - 52px) !important;
+  width: calc(100% - 52px) !important;
+  box-sizing: border-box !important;
+}
+
+/* User: máxima direita */
+#tab-ia .ia-msg-user,
+#tab-ia #ia-chat > .ia-msg-user,
+#tab-ia.ia-focus-mode .ia-msg-user {
+  align-self: flex-end !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  max-width: min(94%, 28rem) !important;
+}
+
+/* Ícone ↓ fixo no canto — bolha não invade */
+#ia-chat-container .ia-scroll-latest,
+#tab-ia .ia-scroll-latest,
+button.ia-scroll-latest {
+  right: 8px !important;
+  bottom: 10px !important;
+  z-index: 6 !important;
+}
+
+
+/* ========== 5d) Composer + menu habilidade — branco; check ✓ sem ponto verde ========== */
+
+/* Caixa composer (enviar / ampliar / chip) — branco sólido */
+#tab-ia .ia-composer-panel,
+#tab-ia.ia-focus-mode .ia-composer-panel,
+body.ia-chat-focus #tab-ia .ia-composer-panel {
+  background: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid var(--border-soft, #ffffff) !important;
+  box-shadow: none !important;
+}
+
+/* Menu Habilidade — folha branca */
+#modal-ia-habilidade .ia-hab-sheet {
+  background: #ffffff !important;
+  border: 1px solid var(--border-soft, #e8e4de) !important;
+}
+
+/* Opção activa: fundo branco (sem bege); hover discreto */
+#modal-ia-habilidade .ia-hab-opcao.is-on {
+  background: #ffffff !important;
+}
+#modal-ia-habilidade .ia-hab-opcao:hover {
+  background: #f7f5f1 !important;
+}
+
+/* Elimina ponto verde → ✓ */
+#modal-ia-habilidade .ia-hab-opcao-check {
+  flex-shrink: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 1.1em !important;
+  min-height: 0 !important;
+  margin-top: 2px !important;
+  margin-left: auto !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  color: var(--text-primary, #1c1a18) !important;
+  font-family: var(--font-sans, system-ui, sans-serif) !important;
+}
+#modal-ia-habilidade .ia-hab-opcao-check::before {
+  content: "✓";
+  display: inline-block;
+  color: var(--text-primary, #1c1a18);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+}
+/* Modal habilidade 50% / sem fosco pesado */
+#modal-ia-habilidade.ia-hab-overlay {
+  background: transparent !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  padding: 0 0 72px 12px !important;
+}
+#modal-ia-habilidade .ia-hab-sheet {
+  width: 50% !important;
+  max-width: 280px !important;
+  min-width: 200px !important;
+  margin: 0 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 8px 28px rgba(28, 26, 24, 0.14) !important;
+  border: 1px solid var(--border-soft, #e8e4de);
+  padding: 10px 8px 12px !important;
+}
+#modal-ia-habilidade .ia-hab-opcao {
+  align-items: flex-start !important;
+  padding: 10px 10px !important;
+}
+#modal-ia-habilidade .ia-hab-opcao-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+#modal-ia-habilidade .ia-hab-opcao-desc {
+  font-size: 0.6875rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+#modal-ia-habilidade .ia-hab-opcao.is-on {
+  background: var(--bg-soft, #f5f3ef) !important;
+}
+
+/* Sugestões limpas */
+#tab-ia .ia-sugestao-card {
+  border: 1px solid var(--border-soft, #e8e4de);
+  background: var(--card-white, #fff);
+  box-shadow: none;
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+#tab-ia .ia-sugestao-icone {
+  background: transparent !important;
+  width: 18px !important;
+  height: 18px !important;
+  padding: 0 !important;
+  color: var(--text-secondary) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+#tab-ia .ia-sugestao-icone svg {
+  width: 15px !important;
+  height: 15px !important;
+  stroke: currentColor;
+}
+/* ==========================================================================
+   VISÃO SECTORIAL — relatório de produto (aba IA)
+   ========================================================================== */
+#tab-ia .ia-visao-card {
+  margin-top: 12px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--bp-border, rgba(31, 41, 55, 0.14));
+  background: var(--bp-surface, #fff);
+}
+#tab-ia .ia-visao-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+#tab-ia .ia-visao-head:active {
+  opacity: 0.92;
+}
+#tab-ia .ia-visao-title {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--bp-text, #1f2937);
+  letter-spacing: 0.01em;
+}
+#tab-ia .ia-visao-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.75rem;
+  color: rgba(31, 41, 55, 0.55);
+}
+#tab-ia .ia-visao-chevron {
+  flex-shrink: 0;
+  color: var(--bp-accent, #b7791f);
+  opacity: 0.9;
+}
+
+.ia-visao-modal[hidden] {
+  display: none !important;
+}
+.ia-visao-modal:not([hidden]) {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.ia-visao-sheet {
+  max-height: min(92vh, 900px);
+  width: min(100%, 560px);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0));
+}
+.ia-visao-modal-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 4px 8px;
+  flex-shrink: 0;
+}
+.ia-visao-modal-bar .modal-title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.ia-visao-close {
+  border: 0;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  padding: 4px 10px;
+  cursor: pointer;
+  color: var(--bp-text, #1f2937);
+  opacity: 0.7;
+}
+.ia-visao-body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 4px 24px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--bp-text, #1f2937);
+}
+.ia-visao-slogan {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--bp-accent, #b7791f);
+  background: rgba(183, 121, 31, 0.08);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--bp-text, #1f2937);
+}
+.ia-visao-lead {
+  margin: 0 0 16px;
+  line-height: 1.55;
+}
+.ia-visao-h {
+  margin: 20px 0 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--bp-text, #1f2937);
+}
+.ia-visao-h4 {
+  margin: 14px 0 6px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--bp-accent, #b7791f);
+}
+.ia-visao-kicker {
+  margin: 10px 0 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.ia-visao-note {
+  margin: 8px 0 12px;
+  font-size: 0.82rem;
+  color: rgba(31, 41, 55, 0.7);
+}
+.ia-visao-ol,
+.ia-visao-ul {
+  margin: 8px 0 12px;
+  padding-left: 1.25rem;
+}
+.ia-visao-ol li,
+.ia-visao-ul li {
+  margin-bottom: 6px;
+}
+.ia-visao-table-wrap {
+  overflow-x: auto;
+  margin: 10px 0 14px;
+  border: 1px solid var(--bp-border, rgba(31, 41, 55, 0.14));
+  border-radius: 10px;
+}
+.ia-visao-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+.ia-visao-table th,
+.ia-visao-table td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--bp-border-soft, rgba(31, 41, 55, 0.08));
+  vertical-align: top;
+}
+.ia-visao-table th {
+  background: rgba(31, 41, 55, 0.04);
+  font-weight: 600;
+}
+.ia-visao-table tr:last-child td {
+  border-bottom: 0;
+}

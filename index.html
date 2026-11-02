@@ -1,0 +1,1873 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+
+  <!-- CRITICAL: gate ANTES de CSS/CDN -->
+  <script>
+  (function () {
+    try {
+      if (localStorage.getItem('bp_logged_out') === '1') return;
+      var ok = localStorage.getItem('bp_session_active') === '1' && !!localStorage.getItem('bp_salao_id_cache');
+      if (!ok) {
+        try {
+          var raw = localStorage.getItem('bp_session_meta') || sessionStorage.getItem('bp_session_meta_ss');
+          if (raw) {
+            var m = JSON.parse(raw);
+            if (m && m.salaoId) {
+              localStorage.setItem('bp_salao_id_cache', String(m.salaoId));
+              localStorage.setItem('bp_session_active', '1');
+              ok = true;
+            }
+          }
+        } catch (e2) {}
+      }
+      if (ok) {
+        document.documentElement.classList.add('bp-has-session', 'bp-booting');
+      }
+    } catch (e) {}
+  })();
+  </script>
+  <style id="bp-session-gate-css">
+    html.bp-has-session #login-view,
+    html.bp-has-session #login-view.view,
+    html.bp-has-session #login-view.view.active {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
+      position: fixed !important;
+      left: -9999px !important;
+      width: 0 !important;
+      height: 0 !important;
+      overflow: hidden !important;
+    }
+    html.bp-booting #bp-boot-overlay,
+    html.bp-booting #bp-boot-overlay[hidden] {
+      display: flex !important;
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 10001 !important;
+      align-items: center !important;
+      justify-content: center !important;
+      background: rgba(20, 17, 15, 0.28) !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+    html:not(.bp-booting) #bp-boot-overlay {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+  </style>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#D4AF37">
+  <title>BeautyPro</title>
+
+  <!-- CSP -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://js-de.sentry-cdn.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://xbudnftutemakjbgxayf.supabase.co; connect-src 'self' https://xbudnftutemakjbgxayf.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://*.sentry.io;">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/img/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/img/icon-192.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BeautyPro">
+
+  <!-- Sentry -->
+  <script src="https://js-de.sentry-cdn.com/3036c354ac820ced1c3ea8a8c8737481.min.js" defer crossorigin="anonymous"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:wght@600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles/foundation/base-variaveis.css?v=20260828-org">
+  <link rel="stylesheet" href="styles/components/components.css?v=20260905-cta4">
+  <link rel="stylesheet" href="styles/layout/layout-nav-tabs.css?v=20261023-lock">
+  <link rel="stylesheet" href="styles/modules/kpis.css?v=20260830-e6">
+  <link rel="stylesheet" href="styles/modules/caixa.css?v=20260831-ico1">
+  <link rel="stylesheet" href="styles/components/list-items.css?v=20260830-e6">
+  <link rel="stylesheet" href="styles/modules/equipa.css?v=20260830-e6">
+  <link rel="stylesheet" href="styles/modules/dashboard.css?v=20260905-res12l">
+  <link rel="stylesheet" href="styles/modules/menus-agenda.css?v=20260824-f7-9r">
+  <link rel="stylesheet" href="styles/components/modais-toast-fab.css?v=20260901-boot2">
+  <link rel="stylesheet" href="styles/components/ops-shell.css?v=20261021-opstab" />
+  <link rel="stylesheet" href="styles/modules/login.css?v=20261024-f5">
+  <link rel="stylesheet" href="styles/modules/venda-carrinho.css?v=20260905-cta4">
+  <!-- Etapa 6: historico-fecho-equipa partido → caixa.css + equipa.css -->
+  <link rel="stylesheet" href="styles/modules/ia.css?v=20261021-visao">
+  <link rel="stylesheet" href="styles/modules/plano-filtros-grafico.css?v=20260828-org">
+  <link rel="stylesheet" href="styles/themes/impressao-acessibilidade.css?v=20260828-org">
+  <link rel="stylesheet" href="styles/foundation/tokens.css?v=20260828-org">
+  <link rel="stylesheet" href="styles/foundation/design-system.css?v=20260901-boot2">
+  <link rel="stylesheet" href="styles/themes/dark-mode.css?v=20260828-org">
+  <link rel="stylesheet" href="styles/modules/splash-sparkline.css?v=20260828-org">
+  <link rel="stylesheet" href="styles/modules/premium-panels.css?v=20261023-lock">
+  <link rel="stylesheet" href="styles/foundation/desktop-responsive.css?v=20260828-org">
+  <link rel="stylesheet" href="styles/modules/acessos.css?v=20261024-f6">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <!-- ===== SPLASH ===== -->
+  <div id="splash-screen" hidden aria-hidden="true" style="display:none!important;opacity:0;visibility:hidden;pointer-events:none;position:fixed;inset:0;z-index:-1;">
+    <div style="font-family:var(--font-serif);font-size:2.8rem;color:#fff;letter-spacing:-0.02em;opacity:0;animation:splashLogo 0.9s cubic-bezier(0.34,1.56,0.64,1) forwards, splashGlow 1.6s ease-in-out 0.9s infinite;">
+      Beauty<span style="font-weight:800;">Pro</span>
+    </div>
+    <div style="color:rgba(255,255,255,0.75);font-size:0.8rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;margin-top:12px;opacity:0;transform:translateY(6px);animation:splashTagline 0.6s 0.35s cubic-bezier(0.16,1,0.3,1) forwards;">
+    </div>
+    <div style="position:absolute;bottom:24px;color:rgba(255,255,255,0.3);font-size:0.6rem;font-weight:600;letter-spacing:0.04em;">v2.0</div>
+  </div>
+
+  <!-- ===== ONBOARDING ===== -->
+  <div id="onboarding-screen" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg-soft);flex-direction:column;align-items:center;justify-content:center;padding:32px;">
+    <div id="onboarding-slides" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;max-width:400px;width:100%;">
+      <div class="onboarding-slide active" style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+        <svg width="180" height="180" viewBox="0 0 180 180" fill="none" stroke="var(--gold)" stroke-width="2"><rect x="40" y="40" width="100" height="100" rx="16"/><rect x="70" y="70" width="20" height="20" rx="4" fill="var(--gold)"/><rect x="100" y="70" width="20" height="20" rx="4" fill="var(--gold)"/><rect x="70" y="100" width="50" height="20" rx="4" fill="var(--gold-light)"/></svg>
+        <h2 style="font-family:var(--font-serif);font-size:1.6rem;font-weight:600;">Controle o seu negócio</h2>
+        <p style="font-size:0.95rem;color:var(--text-secondary);max-width:280px;">Veja o faturamento, agendamentos e clientes num só lugar, mesmo sem internet.</p>
+      </div>
+      <div class="onboarding-slide" style="display:none;flex-direction:column;align-items:center;gap:16px;">
+        <svg width="180" height="180" viewBox="0 0 180 180" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="90" cy="90" r="50"/><path d="M70 90 L85 105 L110 75" stroke="var(--gold-dark)" stroke-width="6" stroke-linecap="round"/><rect x="40" y="120" width="100" height="8" rx="4" fill="var(--gold-100)"/></svg>
+        <h2 style="font-family:var(--font-serif);font-size:1.6rem;font-weight:600;">Vendas em segundos</h2>
+        <p style="font-size:0.95rem;color:var(--text-secondary);max-width:280px;">Registe vendas rapidamente. Selecione o serviço, o cliente e confirme.</p>
+      </div>
+      <div class="onboarding-slide" style="display:none;flex-direction:column;align-items:center;gap:16px;">
+        <svg width="180" height="180" viewBox="0 0 180 180" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="90" cy="90" r="60" fill="var(--gold-100)" stroke="var(--gold)"/><path d="M70 90 L85 105 L110 75" stroke="var(--gold-dark)" stroke-width="8" stroke-linecap="round"/></svg>
+        <h2 style="font-family:var(--font-serif);font-size:1.6rem;font-weight:600;">Pronto para começar</h2>
+        <p style="font-size:0.95rem;color:var(--text-secondary);max-width:280px;">O seu salão, profissional. Dados seguros no telemóvel.</p>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin:24px 0;">
+      <span class="onboarding-dot active" style="width:24px;height:6px;border-radius:999px;background:var(--gold);display:inline-block;transition:0.3s;"></span>
+      <span class="onboarding-dot" style="width:6px;height:6px;border-radius:999px;background:var(--border-soft);display:inline-block;transition:0.3s;"></span>
+      <span class="onboarding-dot" style="width:6px;height:6px;border-radius:999px;background:var(--border-soft);display:inline-block;transition:0.3s;"></span>
+    </div>
+    <div style="display:flex;justify-content:space-between;width:100%;max-width:320px;gap:12px;">
+      <button id="onboarding-skip" class="btn btn-secondary" style="flex:1;">Saltar</button>
+      <button id="onboarding-next" class="btn btn-primary" style="flex:2;">Próximo</button>
+    </div>
+  </div>
+
+  <!-- ===== LOGIN VIEW ===== -->
+  <div id="login-view" class="view active">
+    <div class="login-brand">
+      <div class="logo" style="display:flex;align-items:center;justify-content:center;gap:8px;">
+        <img src="assets/img/logo.png" alt="BeautyPro" style="height:60px;width:auto;">
+        Beauty<span>Pro</span>
+      </div>
+      <p class="login-tagline">Gestão do seu salão, com controlo e clareza</p>
+    </div>
+    <div class="card login-card" id="login-card-main">
+      <h1 class="login-title">Iniciar sessão</h1>
+
+      <div class="input-group">
+        <label class="input-label" for="login-email">Email</label>
+        <input type="email" id="login-email" class="input-field" placeholder="exemplo@salao.com" autocomplete="username" inputmode="email" enterkeyhint="next">
+      </div>
+      <div class="input-group">
+        <label class="input-label" for="login-password">Palavra-passe</label>
+        <div class="login-pass-wrap">
+          <input type="password" id="login-password" class="input-field" placeholder="••••••••" autocomplete="current-password" enterkeyhint="go">
+          <button type="button" class="login-pass-toggle" id="login-pass-toggle" aria-label="Mostrar palavra-passe" title="Mostrar palavra-passe">
+            <svg class="login-pass-icon login-pass-icon-show" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="login-pass-icon login-pass-icon-hide" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" hidden aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="login-row-links">
+        <button type="button" class="login-text-btn" id="login-forgot-btn">Recuperar palavra-passe</button>
+      </div>
+
+      <p class="login-error" id="login-error" role="alert" hidden></p>
+
+      <button type="button" class="btn btn-primary btn-block" id="login-btn">Entrar</button>
+
+      <div class="login-divider" aria-hidden="true"><span>ou</span></div>
+
+      <button type="button" class="btn btn-block login-btn-google" id="login-google-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continuar com Google
+      </button>
+
+      <p class="login-footer-line">
+        Não tem conta? <button type="button" class="login-text-btn login-text-btn-accent" id="signup-link">Criar conta</button>
+      </p>
+    </div>
+
+    <!-- F2: redefinir palavra-passe (link do email Supabase) -->
+    <div class="card login-card" id="login-recovery-card" hidden>
+      <h1 class="login-title">Nova palavra-passe</h1>
+      <p class="login-recovery-lead">Defina uma palavra-passe forte para a sua conta. Este passo só funciona a partir do link enviado por email.</p>
+      <div class="input-group">
+        <label class="input-label" for="recovery-password">Nova palavra-passe</label>
+        <div class="login-pass-wrap">
+          <input type="password" id="recovery-password" class="input-field" placeholder="Mínimo 8 caracteres" autocomplete="new-password" minlength="8">
+          <button type="button" class="login-pass-toggle" id="recovery-pass-toggle" aria-label="Mostrar palavra-passe" data-target="recovery-password">
+            <svg class="login-pass-icon login-pass-icon-show" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="login-pass-icon login-pass-icon-hide" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" hidden aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="input-group">
+        <label class="input-label" for="recovery-password-2">Confirmar palavra-passe</label>
+        <input type="password" id="recovery-password-2" class="input-field" placeholder="Repita a palavra-passe" autocomplete="new-password" minlength="8">
+      </div>
+      <p class="login-error" id="recovery-error" role="alert" hidden></p>
+      <button type="button" class="btn btn-primary btn-block" id="recovery-submit-btn">Guardar palavra-passe</button>
+      <p class="login-footer-line">
+        <button type="button" class="login-text-btn" id="recovery-back-login">Voltar ao início de sessão</button>
+      </p>
+    </div>
+
+    <!-- F4: criar conta (email) — provisionamento do salão = F5 (servidor) -->
+    <!-- F5: onboarding empresa (só com sessão Auth e sem profile) -->
+    <div class="card login-card" id="login-onboarding-card" hidden>
+      <h1 class="login-title">A sua organização</h1>
+      <p class="login-recovery-lead" id="onboarding-lead">Para aceder à BeautyPro, indique os dados da empresa. Será criado o espaço de trabalho com a sua conta como proprietário.</p>
+      <div class="input-group">
+        <label class="input-label" for="onboarding-empresa">Empresa ou organização</label>
+        <input type="text" id="onboarding-empresa" class="input-field" placeholder="Nome da empresa" autocomplete="organization">
+      </div>
+      <div class="input-group">
+        <label class="input-label" for="onboarding-nif">NIF ou BI <span class="login-optional">(opcional)</span></label>
+        <input type="text" id="onboarding-nif" class="input-field" placeholder="NIF ou BI" autocomplete="off">
+      </div>
+      <p class="login-error" id="onboarding-error" role="alert" hidden></p>
+      <button type="button" class="btn btn-primary btn-block" id="onboarding-submit-btn">Criar espaço de trabalho</button>
+      <p class="login-footer-line">
+        <button type="button" class="login-text-btn" id="onboarding-logout-btn">Sair desta conta</button>
+      </p>
+    </div>
+
+    <div class="card login-card" id="login-signup-card" hidden>
+
+      <h1 class="login-title">Criar conta</h1>
+      <div class="input-group">
+        <label class="input-label" for="signup-empresa">Empresa ou organização</label>
+        <input type="text" id="signup-empresa" class="input-field" placeholder="Nome da empresa" autocomplete="organization" required>
+      </div>
+      <div class="input-group">
+        <label class="input-label" for="signup-nif">NIF ou BI <span class="login-optional">(opcional)</span></label>
+        <input type="text" id="signup-nif" class="input-field" placeholder="NIF ou BI" autocomplete="off" inputmode="numeric">
+      </div>
+      <div class="input-group">
+        <label class="input-label" for="signup-email">Email</label>
+        <input type="email" id="signup-email" class="input-field" placeholder="email@exemplo.com" autocomplete="email">
+      </div>
+      <div class="input-group">
+        <label class="input-label" for="signup-password">Palavra-passe</label>
+        <div class="login-pass-wrap">
+          <input type="password" id="signup-password" class="input-field" placeholder="Mínimo 8 caracteres" autocomplete="new-password" minlength="8">
+          <button type="button" class="login-pass-toggle" id="signup-pass-toggle" aria-label="Mostrar palavra-passe" data-target="signup-password">
+            <svg class="login-pass-icon login-pass-icon-show" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="login-pass-icon login-pass-icon-hide" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" hidden aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="input-group">
+        <label class="input-label" for="signup-password-2">Confirmar palavra-passe</label>
+        <input type="password" id="signup-password-2" class="input-field" placeholder="Repita a palavra-passe" autocomplete="new-password" minlength="8">
+      </div>
+      <p class="login-error" id="signup-error" role="alert" hidden></p>
+      <p class="login-recovery-lead" id="signup-success" hidden></p>
+      <button type="button" class="btn btn-primary btn-block" id="signup-submit-btn">Criar conta</button>
+      <p class="login-footer-line">
+        Já tem conta? <button type="button" class="login-text-btn login-text-btn-accent" id="signup-back-login">Iniciar sessão</button>
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== APP VIEW ===== -->
+  
+  <!-- Boot sync overlay (tipo Multicaixa) — bloqueia UI até dados/timeout 15s -->
+  <div id="bp-boot-overlay" class="bp-boot-overlay" hidden aria-hidden="true" role="alertdialog" aria-labelledby="bp-boot-title" aria-describedby="bp-boot-desc">
+    <div class="bp-boot-card">
+      <div class="bp-boot-spinner" aria-hidden="true"></div>
+      <p id="bp-boot-title" class="bp-boot-title">A sincronizar</p>
+      <p id="bp-boot-desc" class="bp-boot-desc">A actualizar os dados do salão…</p>
+      <div id="bp-boot-actions" class="bp-boot-actions" hidden>
+        <p class="bp-boot-fail-msg">Não foi possível actualizar os dados nem sincronizar. Verifique a ligação à internet. Pode usar a plataforma offline; quando a rede estiver estável a sincronização será automática.</p>
+        <button type="button" class="btn btn-primary" id="bp-boot-retry">Tentar novamente</button>
+        <button type="button" class="btn btn-secondary" id="bp-boot-offline">Continuar offline</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="app-view" class="view" style="display:none;">
+    <div class="app-container">
+
+      <!-- HEADER -->
+      <header class="app-header">
+        <div class="app-header-inner">
+          <div style="display:flex;flex-direction:column;gap:3px;padding-right:44px;">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <div class="logo" style="flex-shrink:0;display:flex;align-items:center;gap:8px;">
+                <img src="assets/img/logo.png" alt="BeautyPro" style="height:27px;width:auto;">
+                Beauty<span>Pro</span>
+              </div>
+            </div>
+            <div class="bp-header-plano-row" style="display:flex;align-items:center;gap:8px;min-width:0;">
+              <span class="plano-badge" id="plano-badge" style="flex-shrink:0;visibility:hidden;" data-bp-plano-ready="0" aria-hidden="true">—</span>
+              <span class="store-name" id="store-name-display" title="Nome do salão" style="min-width:0;">&nbsp;</span>
+              <span class="trial-countdown" id="trial-countdown" style="display:none;flex-shrink:0;"></span>
+            </div>
+          </div>
+          <div class="header-actions">
+            <div id="sync-status-container" class="sync-status" title="Estado de sincronização" role="status" aria-live="polite">
+              <span id="sync-dot" class="sync-dot" aria-hidden="true"></span>
+              <span id="sync-text">…</span>
+            </div>
+            <div style="position:relative;">
+              <button id="menu-btn" title="Menu" aria-label="Menu" aria-haspopup="true" aria-expanded="true" style="width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;background:transparent;border:none;border-radius:6px;color:var(--text-secondary);cursor:pointer;transition:background .15s ease;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+              </button>
+              <div id="menu-dropdown" style="display:none">
+                <button type="button" id="logout-btn">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                  <span>Sair</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="offline-banner" id="offline-banner" role="status" style="display:none!important" hidden aria-hidden="true"><span class="offline-banner-dot" aria-hidden="true"></span><span id="offline-banner-text">Sem ligação · Os dados continuam guardados neste dispositivo</span></div>
+
+
+
+      <!-- ===== MAIN CONTENT ===== -->
+      <main class="main-content">
+
+        <!-- DASHBOARD -->
+        <div id="tab-dashboard" class="tab-pane active">
+          <div class="tab-inner">
+            <p id="greeting" class="dash-period-greeting" hidden aria-hidden="true"></p>
+
+            <!-- Hero Resumo: clone estrutural do card Caixa (não altera #tab-caixa) -->
+            <section class="card card-highlight mb-3 resumo-hero" aria-label="Indicadores do período">
+              <div class="resumo-hero-top">
+                <div class="resumo-hero-title-row">
+                  <span class="resumo-hero-eyebrow">Faturamento</span>
+                  <span id="today-date" class="dash-period-label resumo-hero-period">Hoje</span>
+                </div>
+                <!-- IDs do filtro preservados; só ícone funil (texto do período ao lado de Faturamento) -->
+                <button type="button" id="dash-filter-icon" class="resumo-hero-filter" aria-label="Filtrar período" title="Filtrar período">
+                  <svg class="bp-icon bp-icon-funnel" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <line x1="4" y1="7" x2="20" y2="7"/>
+                    <line x1="7" y1="12" x2="17" y2="12"/>
+                    <line x1="10" y1="17" x2="14" y2="17"/>
+                  </svg>
+                </button>
+              </div>
+              <!-- Área de clique do detalhe faturamento (ID exigido pelo bundle) — valor + meta -->
+              <div class="resumo-hero-main" id="kpi-revenue-card" data-role="admin,gerente" role="button" tabindex="0" aria-label="Detalhe do faturamento">
+                <span id="kpi-revenue" class="resumo-hero-value">0 Kz</span>
+                <div class="resumo-hero-side" aria-hidden="true"></div>
+              </div>
+              <div class="resumo-hero-actions" role="group" aria-label="Indicadores">
+                <button type="button" class="caixa-acao resumo-kpi-acao" id="kpi-clientes-card" aria-label="Clientes">
+                  <span class="resumo-kpi-num" id="kpi-clientes-view">0</span>
+                  <span class="resumo-kpi-lbl">Clientes</span>
+                </button>
+                <button type="button" class="caixa-acao resumo-kpi-acao" id="kpi-agenda-card" aria-label="Agenda">
+                  <span class="resumo-kpi-num" id="kpi-agendamentos">0</span>
+                  <span class="resumo-kpi-lbl">Agenda</span>
+                </button>
+                <button type="button" class="caixa-acao resumo-kpi-acao" id="kpi-ticket-card" aria-label="Serviços">
+                  <span class="resumo-kpi-num" id="kpi-servicos-view">0</span>
+                  <span class="resumo-kpi-lbl">Serviços</span>
+                </button>
+              </div>
+              <!-- Fontes do bundle (fora dos botões; IDs contractuais) -->
+              <div id="resumo-kpi-sources" class="resumo-kpi-sources" aria-hidden="true">
+                <span id="kpi-clientes-status">0</span>
+                <span id="kpi-clientes">0</span>
+                <span id="kpi-agendamentos-status">0</span>
+                <span id="kpi-revenue-count">0</span>
+                <span id="kpi-ticket">0</span>
+                <span id="kpi-ticket-sub">0</span>
+              </div>
+            </section>
+
+            
+            <!-- Meta + caixa hoje (admin) -->
+            <div id="dash-meta-wrap" class="dash-meta-wrap" hidden>
+              <div class="dash-meta-head">
+                <span class="dash-meta-title">Meta do mês</span>
+                <span id="dash-meta-label" class="dash-meta-label">—</span>
+              </div>
+              <div class="dash-meta-track" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                <div id="dash-meta-fill" class="dash-meta-fill" style="width:0%"></div>
+              </div>
+            </div>
+<!-- Próximos atendimentos -->
+            <div class="dash-section-head">
+              <h2 class="dash-section-title">Próximos atendimentos</h2>
+              <span class="dash-section-meta" id="agenda-count">0 pendentes</span>
+            </div>
+            <div id="agenda-today-list"></div>
+
+            <!-- GRÁFICO -->
+            <div class="card mt-3 dash-chart-card" data-role="admin,gerente">
+              <!-- Linha: seta + período + export + menu -->
+              <div class="dash-chart-topbar">
+                <span class="dash-chart-nudge" id="chart-filter-nudge" aria-hidden="true">
+                  <svg class="dash-chart-nudge-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+                </span>
+                <div class="dash-chart-period-wrap">
+                  <button type="button" class="dash-chart-period-btn" id="chart-filter-toggle" aria-expanded="false" aria-controls="modal-periodo-dashboard" aria-label="Filtrar período" title="Filtrar período">
+                    <svg class="bp-icon bp-icon-funnel" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                      <line x1="4" y1="7" x2="20" y2="7"/>
+                      <line x1="7" y1="12" x2="17" y2="12"/>
+                      <line x1="10" y1="17" x2="14" y2="17"/>
+                    </svg>
+                    <span class="dash-chart-period-v" id="chart-period-label">Esta semana</span>
+                  </button>
+                </div>
+                <div class="dash-chart-top-actions">
+                  <div class="dash-chart-export-wrap">
+                    <button type="button" class="dash-chart-ghost-btn" id="chart-export-toggle" aria-expanded="false" aria-haspopup="true" aria-label="Exportar" title="Exportar">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    </button>
+                    <div class="dash-chart-export-menu" id="chart-export-menu" hidden role="menu">
+                      <button type="button" class="dash-chart-export-item" id="chart-export-csv" role="menuitem">CSV</button>
+                      <button type="button" class="dash-chart-export-item" id="chart-export-pdf" role="menuitem">PDF</button>
+                    </div>
+                  </div>
+                  <div class="dash-chart-more-wrap">
+                    <button type="button" class="dash-chart-ghost-btn" id="chart-more-toggle" aria-expanded="false" aria-haspopup="true" title="Mais opções">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+                    </button>
+                    <div class="dash-chart-more-menu" id="chart-more-menu" hidden role="menu">
+                      <button type="button" class="dash-chart-more-item" data-chart-more="media" role="menuitem">Média no gráfico</button>
+                      <button type="button" class="dash-chart-more-item" data-chart-more="comparar" role="menuitem">Comparar período</button>
+                      <button type="button" class="dash-chart-more-item" data-chart-more="insights" role="menuitem">Sinais do período</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Saúde (discreta) -->
+              <div class="dash-chart-health-line" id="dash-chart-health" data-level="" aria-label="Estado do período">
+                <strong class="dash-chart-health-value" id="dash-chart-health-value">—</strong>
+                <span class="dash-chart-health-status" id="dash-chart-status"></span>
+              </div>
+
+
+              <!-- IDs legados ocultos (não regredir JS) -->
+              <div class="dash-chart-legacy-controls" hidden aria-hidden="true">
+                <div class="dash-chart-seg">
+                  <button type="button" class="chart-filter" data-periodo="dia">Dia</button>
+                  <button type="button" class="chart-filter is-active" data-periodo="semana">Semana</button>
+                  <button type="button" class="chart-filter" data-periodo="mes">Mês</button>
+                  <button type="button" class="chart-filter" data-periodo="hora">Hora</button>
+                </div>
+                <button type="button" id="chart-prev" aria-label="Anterior"></button>
+                <button type="button" id="chart-next" aria-label="Seguinte"></button>
+              </div>
+
+              <!-- Canvas + olho + tipo -->
+              <div class="dash-chart-canvas-wrap" id="dash-chart-canvas-wrap">
+                <button type="button" class="dash-chart-eye dash-chart-eye--canvas" id="chart-eye-toggle" aria-label="Camadas do gráfico" title="Camadas">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+                <div class="dash-chart-view-toggle dash-chart-view-toggle--canvas" role="group" aria-label="Tipo de gráfico">
+                  <button type="button" class="dash-chart-view-btn is-active" data-chart-view="barras" aria-pressed="true">Barras</button>
+                  <button type="button" class="dash-chart-view-btn" data-chart-view="linha" aria-pressed="false">Linha</button>
+                  <button type="button" class="dash-chart-view-btn" data-chart-view="area" aria-pressed="false">Área</button>
+                </div>
+                <div id="dash-chart-skeleton" class="dash-chart-skeleton" hidden aria-hidden="true">
+                  <div class="dash-chart-skel-bar"></div>
+                  <div class="dash-chart-skel-bar"></div>
+                  <div class="dash-chart-skel-bar"></div>
+                  <div class="dash-chart-skel-bar"></div>
+                  <div class="dash-chart-skel-bar"></div>
+                </div>
+                <canvas id="dash-chart-yaxis" class="dash-chart-yaxis" width="40" height="220" aria-hidden="true"></canvas>
+                <div class="dash-chart-scroll" id="dash-chart-scroll">
+                  <canvas id="weekly-chart" width="400" height="220" style="width:100%;height:220px;display:block;touch-action:pan-x;"></canvas>
+                </div>
+                <div id="dash-chart-empty" class="dash-chart-empty" hidden>
+                  <strong class="dash-chart-empty-title">Sem vendas neste período</strong>
+                  <span class="dash-chart-empty-sub">Mude o filtro do gráfico ou registe uma venda.</span>
+                </div>
+              </div>
+
+              <div class="dash-chart-legend" id="dash-chart-legend" hidden>
+                <span class="dash-chart-leg-media">Média <strong id="dash-chart-leg-media-val">—</strong></span>
+                <span class="dash-chart-leg-cmp" id="dash-chart-leg-cmp" hidden></span>
+              </div>
+              <ul class="dash-chart-insights" id="dash-chart-insights" hidden></ul>
+</div>
+          </div>
+        </div>
+
+       <!-- AGENDA -->
+<div id="tab-agenda" class="tab-pane">
+  <div class="tab-inner">
+    <div class="bp-agenda-head">
+      <span class="bp-agenda-title">Agendamentos</span>
+    </div>
+    <div class="bp-agenda-controls">
+        <div class="bp-agenda-filter-anchor">
+        <button id="agenda-filter-icon" style="background:none;border:none;padding:6px;cursor:pointer;color:var(--text-muted);display:inline-flex;align-items:center;justify-content:center;" aria-label="Filtrar agenda">
+          <span style="font-size:.55rem;font-weight:500;letter-spacing:0.03em;text-transform:uppercase;color:var(--text-muted);">Filtrar</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="2" y1="3" x2="14" y2="3"/>
+            <line x1="3.5" y1="8" x2="12.5" y2="8"/>
+            <line x1="5" y1="13" x2="11" y2="13"/>
+          </svg>
+        </button>
+<!-- POPOVER do filtro (com Dia Exato integrado) -->
+<div id="agenda-filter-popover" class="agenda-filter-popover">
+  <!-- 2×2 períodos + Dia exacto (largura total). Todos NÃO fica aqui. -->
+  <div class="agenda-periodo-grid">
+    <button type="button" class="agenda-periodo-filter active" data-periodo="hoje">Hoje</button>
+    <button type="button" class="agenda-periodo-filter" data-periodo="semana">Semana</button>
+    <button type="button" class="agenda-periodo-filter" data-periodo="mes">Mês</button>
+    <button type="button" class="agenda-periodo-filter" data-periodo="90dias">90 dias</button>
+    <button type="button" class="agenda-periodo-filter agenda-periodo-filter--dia" data-periodo="dia">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <rect x="2" y="3" width="12" height="11" rx="1"/>
+        <line x1="2" y1="6" x2="14" y2="6"/>
+        <line x1="5" y1="2" x2="5" y2="4"/>
+        <line x1="11" y1="2" x2="11" y2="4"/>
+      </svg>
+      <span>Dia exacto</span>
+    </button>
+  </div>
+  <div class="agenda-periodo-separador"></div>
+  <div class="agenda-periodo-grid agenda-periodo-grid--status">
+    <button type="button" class="agenda-periodo-filter agenda-periodo-filter--status agenda-periodo-filter--pendentes agenda-periodo-filter--full" data-periodo="pendentes" id="agenda-filter-pendentes">
+      <span class="bp-ag-pulse-dot" aria-hidden="true"></span>
+      Pendentes
+    </button>
+    <button type="button" class="agenda-periodo-filter agenda-periodo-filter--status" data-periodo="todos">Todos</button>
+    <button type="button" class="agenda-periodo-filter agenda-periodo-filter--status" data-periodo="cancelados">Cancelados</button>
+    <button type="button" class="agenda-periodo-filter agenda-periodo-filter--status" data-periodo="realizados">Realizados</button>
+    <button type="button" class="agenda-periodo-filter agenda-periodo-filter--status" data-periodo="nao_realizado">Não realizados</button>
+  </div>
+  <input type="date" id="agenda-data-exata" class="input-field" style="display:none;width:100%;margin-top:8px;font-size:16px;" aria-label="Escolher dia exacto">
+</div>
+        </div>
+        <div class="bp-agenda-daynav" style="display:flex;gap:8px;align-items:center;">
+          <button id="agenda-prev" style="background:none;border:none;font-size:1.2rem;color:var(--text-muted);cursor:pointer;padding:4px 8px;transition:color 0.15s ease;">◀</button>
+          <span style="font-weight:600;font-size:.85rem;color:var(--text-primary);" id="agenda-date-label">Hoje</span>
+          <button id="agenda-next" style="background:none;border:none;font-size:1.2rem;color:var(--text-muted);cursor:pointer;padding:4px 8px;transition:color 0.15s ease;">▶</button>
+        </div>
+      </div>
+    <div id="agenda-full-list"></div>
+  </div>
+</div>
+
+        <!-- CLIENTES -->
+        <div id="tab-clientes" class="tab-pane">
+          <div class="tab-inner">
+            <div class="bp-cli-head">
+              <span class="bp-cli-title">Clientes</span>
+            </div>
+            <div class="bp-cli-toolbar" data-bp-lock="cli-toolbar-v1">
+              <span class="bp-cli-toolbar-label">Cliente</span>
+              <button type="button" class="btn btn-sm btn-primary" id="add-cliente-btn">+ Novo</button>
+            </div>
+            <div class="input-group bp-cli-search-wrap">
+              <input type="text" id="search-cliente" class="input-field bp-placeholder-rotating bp-cli-search" placeholder="Nome ou telefone..." data-ph-set="clientes" autocomplete="off">
+            </div>
+            <div class="bp-cli-freq-row" role="tablist" aria-label="Filtro de frequência">
+              <button type="button" class="filtro-frequencia is-active" data-filtro="todos">Todos</button>
+              <button type="button" class="filtro-frequencia" data-filtro="mais">Mais frequentes</button>
+              <button type="button" class="filtro-frequencia" data-filtro="menos">Menos frequentes</button>
+            </div>
+            <div id="clientes-list"></div>
+          </div>
+        </div>
+           <!-- CAIXA -->
+        <div id="tab-caixa" class="tab-pane">
+          <div class="tab-inner">
+            <div class="bp-cli-toolbar bp-caixa-toolbar" data-bp-lock="caixa-toolbar-v1">
+              <span class="bp-cli-toolbar-label bp-caixa-toolbar-label">Caixa do dia</span>
+            </div>
+            <div class="card card-highlight mb-3">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <span style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary);">Saldo Disponível</span>
+                <span style="font-size:.6rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                  Fundo: <span id="caixa-fundo" style="font-weight:700;color:var(--gold-dark);">0 Kz</span>
+                </span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:flex-end;margin:4px 0 12px;">
+                <span id="caixa-saldo">0 Kz</span>
+                <div style="text-align:right;">
+                  <div id="caixa-variacao">↑ 0%</div>
+                  <div class="caixa-variacao-sub">Comparado com ontem</div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                <button class="caixa-acao" id="add-despesa-btn" data-role="admin,gerente" data-role-mode="disable">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  <span>Despesa</span>
+                </button>
+                <button class="caixa-acao" id="ajustar-fundo-btn">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                  <span>Fundo</span>
+                </button>
+                <button class="caixa-acao" id="fecho-caixa-btn" data-role="admin" data-role-mode="disable">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  <span>Fecho</span>
+                </button>
+              </div>
+            </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px;position:relative;">
+              <span class="bp-caixa-hist-titulo" id="hist-titulo">Movimentos de Hoje</span>
+              <button id="caixa-filter-icon" type="button" style="background:none;border:none;padding:2px 6px;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;gap:4px;font-size:.7rem;" aria-label="Filtrar movimentos">
+                <span style="font-size:.55rem;font-weight:500;letter-spacing:0.03em;text-transform:uppercase;color:var(--text-muted);">Filtrar</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="3" x2="14" y2="3"/><line x1="3.5" y1="8" x2="12.5" y2="8"/><line x1="5" y1="13" x2="11" y2="13"/></svg>
+              </button>
+              <div id="caixa-filter-popover" class="agenda-filter-popover" style="right:0;top:calc(100% + 6px);">
+                <div class="agenda-periodo-grid">
+                  <button type="button" class="agenda-periodo-filter caixa-periodo-filter active" data-periodo="hoje">Hoje</button>
+                  <button type="button" class="agenda-periodo-filter caixa-periodo-filter" data-periodo="ontem">Ontem</button>
+                  <button type="button" class="agenda-periodo-filter caixa-periodo-filter" data-periodo="semana">Esta semana</button>
+                  <button type="button" class="agenda-periodo-filter caixa-periodo-filter" data-periodo="7dias">Últimos 7 dias</button>
+                  <button type="button" class="agenda-periodo-filter caixa-periodo-filter" data-periodo="mes">Este mês</button>
+                  <button type="button" class="agenda-periodo-filter caixa-periodo-filter" data-periodo="30dias">Últimos 30 dias</button>
+                  <button type="button" class="agenda-periodo-filter caixa-periodo-filter" data-periodo="90dias">Últimos 90 dias</button>
+                  <button type="button" class="agenda-periodo-filter caixa-periodo-filter" data-periodo="ano">Este ano</button>
+                  <button type="button" class="agenda-periodo-filter caixa-periodo-filter" data-periodo="dia">Dia exacto</button>
+                </div>
+                <input type="date" id="caixa-data-exata" class="input-field bp-caixa-data-exata" aria-label="Dia exacto" />
+              </div>
+            </div>
+            <div style="margin-bottom:12px;position:relative;">
+              <button type="button" id="caixa-localizar-btn" class="bp-caixa-loc-trigger" aria-expanded="false" aria-controls="caixa-localizar-popover">
+                <span class="bp-caixa-loc-main">
+                  <svg class="bp-caixa-loc-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <span class="bp-caixa-loc-label" id="caixa-loc-label-ph">Localizar cliente no histórico</span>
+                </span>
+              </button>
+              <div id="caixa-localizar-popover" class="agenda-filter-popover" style="left:0;right:0;top:calc(100% + 6px);min-width:100%;">
+                <div class="bp-caixa-loc-hint">Seleccione o período e depois o cliente</div>
+                <div class="agenda-periodo-grid" id="caixa-localizar-periodos">
+                  <button type="button" class="agenda-periodo-filter caixa-loc-periodo" data-periodo="hoje">Hoje</button>
+                  <button type="button" class="agenda-periodo-filter caixa-loc-periodo" data-periodo="ontem">Ontem</button>
+                  <button type="button" class="agenda-periodo-filter caixa-loc-periodo" data-periodo="7dias">Últimos 7 dias</button>
+                  <button type="button" class="agenda-periodo-filter caixa-loc-periodo" data-periodo="30dias">Últimos 30 dias</button>
+                  <button type="button" class="agenda-periodo-filter caixa-loc-periodo" data-periodo="90dias">Últimos 90 dias</button>
+                  <button type="button" class="agenda-periodo-filter caixa-loc-periodo" data-periodo="mes">Este mês</button>
+                  <button type="button" class="agenda-periodo-filter caixa-loc-periodo" data-periodo="ano">Este ano</button>
+                  <button type="button" class="agenda-periodo-filter caixa-loc-periodo" data-periodo="dia">Dia exacto</button>
+                </div>
+                <input type="date" id="caixa-loc-data-exata" class="input-field" style="display:none;width:100%;margin-top:8px;font-size:16px;" aria-label="Dia exacto para localizar">
+                <div id="caixa-localizar-busca" style="display:none;margin-top:10px;">
+                  <input type="text" id="caixa-localizar-input" class="input-field bp-placeholder-rotating" placeholder="Nome do cliente..." data-ph-set="historico" style="margin-bottom:8px;" />
+                  <button type="button" id="caixa-localizar-go" class="btn btn-primary btn-block btn-sm">Procurar</button>
+                </div>
+              </div>
+            </div>
+            <div id="movimentos-list"></div>
+          </div>
+        </div>
+
+        <!-- EQUIPA -->
+        <div id="tab-equipa" class="tab-pane" data-role="admin,gerente">
+          <div class="tab-inner">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <span style="font-family:var(--font-serif);font-size:1.05rem;font-weight:600;">Equipa</span>
+              <button class="btn btn-sm btn-primary" id="add-prof-btn" data-role="admin">+ Novo</button>
+            </div>
+            <div id="plano-aviso" style="display:none;background:var(--gold-light);border:1px solid var(--gold);border-radius:var(--radius-sm);padding:8px 14px;margin-bottom:12px;font-size:.75rem;font-weight:600;color:var(--gold-dark);">
+              Anotações não disponíveis neste plano
+            </div>
+            <div id="profissionais-list"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 12px;">
+              <span style="font-family:var(--font-serif);font-size:1.05rem;font-weight:600;">Serviços</span>
+              <button class="btn btn-sm btn-primary" id="add-servico-btn" data-role="admin">+ Novo</button>
+            </div>
+            <div id="servicos-list"></div>
+          </div>
+        </div>
+
+        <!-- IA -->
+        <div id="tab-ia" class="tab-pane" data-role="admin,gerente">
+          <div class="tab-inner">
+            <div class="ia-header ia-header-bar" id="ia-header-bar">
+              <div class="ia-header-top">
+                <img src="assets/img/logo.png" alt="" aria-hidden="true" class="ia-header-mark" width="28" height="28">
+                
+                <div class="ia-header-text">
+                  <div class="ia-header-title">Benza</div>
+                  <div class="ia-header-role">Agente ia</div>
+                </div>
+                <div class="ia-header-conn ia-status-line" data-ia-conn="neutral" aria-live="polite">
+                  <span class="ia-status-dot" data-state="neutral" aria-hidden="true"></span>
+                  <span id="ia-status-line-label">—</span>
+                </div>
+              </div>
+              <button id="ia-renomear-btn" style="display:none;"></button>
+            </div>
+<div class="ia-resumo-grid" data-bp-desktop-only="1" aria-hidden="true">
+              <div class="ia-resumo-card">
+                <div class="ia-resumo-header">
+                  <div class="ia-resumo-icone" style="color:var(--gold-dark);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="1 18 8.5 10.5 13.5 15.5 23 6"/>
+                      <polyline points="17 6 23 6 23 12"/>
+                    </svg>
+                  </div>
+                  <div class="ia-resumo-label">Faturado/hoje</div>
+                </div>
+                <div class="ia-resumo-valor" id="ia-resumo-fat">0 Kz</div>
+                <div class="ia-resumo-sub" id="ia-resumo-fat-trend">—</div>
+              </div>
+
+              <div class="ia-resumo-card">
+                <div class="ia-resumo-header">
+                  <div class="ia-resumo-icone" style="color:var(--gold-dark);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                      <circle cx="9" cy="7" r="4"/>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                  </div>
+                  <div class="ia-resumo-label">Clientes</div>
+                </div>
+                <div class="ia-resumo-valor" id="ia-resumo-clientes">0</div>
+                <div class="ia-resumo-sub" id="ia-resumo-clientes-sub">—</div>
+              </div>
+
+              <div class="ia-resumo-card">
+                <div class="ia-resumo-header">
+                  <div class="ia-resumo-icone" style="color:var(--gold-dark);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                  </div>
+                  <div class="ia-resumo-label">Agendamentos</div>
+                </div>
+                <div class="ia-resumo-valor" id="ia-resumo-ag">0</div>
+                <div class="ia-resumo-sub" id="ia-resumo-ag-sub">—</div>
+              </div>
+            </div>
+
+            <div class="card ia-chat-card" id="ia-chat-card">
+              <div id="ia-onboarding" style="display:none;text-align:center;padding:8px 4px 4px;">
+                <div style="font-size:1.8rem;margin-bottom:8px;"></div>
+                <div style="font-family:var(--font-serif);font-size:1rem;font-weight:600;margin-bottom:4px;">Antes de começar</div>
+                <p style="font-size:.8rem;color:var(--text-secondary);margin-bottom:14px;">Isto é só uma vez — deixa a conversa mais pessoal.</p>
+                <input type="text" id="ia-onb-nome-user" class="input-field" placeholder="Como te chamas?" style="margin-bottom:8px;text-align:center;">
+                <input type="text" id="ia-onb-nome-ia" class="input-field" placeholder="Como queres chamar o teu assistente? (ex: Bela)" style="margin-bottom:12px;text-align:center;">
+                <button class="btn btn-primary btn-block" id="ia-onb-comecar">Começar</button>
+              </div>
+              <div class="ia-chat-viewport" id="ia-chat-viewport">
+              <div id="ia-chat-container" class="ia-chat-shell">
+                
+                <div id="ia-chat-empty">
+                  <div class="ia-empty-art" aria-hidden="true">
+                    <img src="assets/img/ia-empty-duo.png" alt="" class="ia-empty-duo" width="280" height="180" decoding="async">
+                  </div>
+                  <div class="ia-chat-empty-title">O que quer descobrir?</div>
+                  <div class="ia-chat-empty-sub">Eu analiso os dados do seu salão e mostro o que merece a sua atenção.</div>
+                </div>
+                <div class="ia-chat" id="ia-chat"></div>
+              </div>
+              </div>
+              <div class="ia-composer ia-composer-panel">
+                <div class="ia-hab-float-row">
+                  <button type="button" class="ia-hab-chip" id="ia-habilidade-btn" data-hab="consultor" aria-haspopup="dialog">Consultor</button>
+                  <button type="button" class="ia-expand-btn" id="ia-expand-btn" aria-label="Ampliar conversa" title="Ampliar"><svg class="ia-expand-icon-out" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+                    <svg class="ia-expand-icon-in" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5"/><path d="M16 3h5v5"/><path d="M8 21H3v-5"/><path d="M16 21h5v-5"/><path d="M3 3l6 6"/><path d="M21 3l-6 6"/><path d="M3 21l6-6"/><path d="M21 21l-6-6"/></svg>
+                  </button>
+                </div>
+                <div class="ia-composer-row">
+                  <div class="ia-input-wrap">
+                    <textarea id="ia-input" class="input-field ia-input-area" rows="1" placeholder="" autocomplete="off" enterkeyhint="send" aria-label="Pergunta ao agente"></textarea>
+                  </div>
+                  <button type="button" class="ia-send-btn is-idle" id="ia-enviar" aria-label="Enviar">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+                  </button>
+                </div>
+                <div class="ia-composer-meta">
+                  <span class="ia-limite">Perguntas: <span id="ia-contador">0</span></span>
+                </div>
+              </div>
+              <div class="ia-input-exemplo" style="display:none">Ex.: Qual foi o meu lucro esta semana?
+              </div>
+            </div>
+            <!-- SUGESTÕES RÁPIDAS — DESLIGADAS até segunda ordem (CSS: display none). DOM mantido. -->
+            <p class="ia-sugestoes-label" id="ia-sugestoes-label" hidden aria-hidden="true">Sugestões rápidas</p>
+            <div class="ia-sugestoes-grid" id="ia-sugestoes-grid" hidden aria-hidden="true"></div>
+            <div class="card mt-3 ia-insights-card" id="ia-insights-card">
+              <button type="button" class="ia-insights-head" id="ia-insights-toggle" aria-expanded="true" aria-controls="ia-insights-list">
+                <span id="ia-insights-titulo">Benza visão ampla</span>
+                <span class="ia-insights-chevron" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </button>
+              <div id="ia-insights-list" class="ia-insights-list">
+                <div class="ia-insight-row">
+                  <span class="ia-insight-icone">…</span>
+                  <span>A preparar o que merece atenção…</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- VISÃO SECTORIAL — documento de produto (persistente na aba IA) -->
+            <div class="card mt-3 ia-visao-card" id="ia-visao-card">
+              <button type="button" class="ia-visao-head" id="ia-visao-open" aria-haspopup="dialog" aria-controls="ia-visao-modal">
+                <span class="ia-visao-head-text">
+                  <span class="ia-visao-title">Visão sectorial</span>
+                  <span class="ia-visao-sub">Ecossistema · sete soluções</span>
+                </span>
+                <span class="ia-visao-chevron" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </span>
+              </button>
+            </div>
+</div>
+        </div>
+
+      
+        <!-- OPS — Central / Gestão como aba (não modal por cima) -->
+        <div id="tab-ops" class="tab-pane" data-bp-ops-tab="1">
+          <div class="tab-inner bp-ops-tab-inner">
+            <div class="bp-ops-tab-bar">
+              <button type="button" class="bp-ops-back" id="bp-ops-tab-back" aria-label="Voltar">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <div class="bp-ops-tab-heading">
+                <div class="bp-ops-tab-eyebrow" id="bp-ops-tab-eyebrow">Gestão</div>
+                <h1 class="bp-ops-tab-title" id="bp-ops-tab-title">Operações</h1>
+              </div>
+            </div>
+            <div id="bp-ops-mount" class="bp-ops-mount"></div>
+          </div>
+        </div>
+
+      </main>
+
+      <button type="button" class="fab fab-venda" id="nova-venda-hero-btn" aria-label="Registar serviço">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M6 6h15l-1.5 9h-12z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+          <path d="M6 6L5 3H2" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="9" cy="20" r="1.25" fill="currentColor"/>
+          <circle cx="18" cy="20" r="1.25" fill="currentColor"/>
+        </svg>
+      </button>
+      <button class="fab" id="fab-agendar" aria-label="Novo agendamento">+</button>
+
+      <!-- ===== BOTTOM NAV ===== -->
+      
+        <button type="button" class="btn btn-sm btn-secondary" id="bp-acessos-btn" data-role="admin" title="Acessos da equipa" style="display:none">Acessos</button>
+
+      <nav class="bottom-nav" role="tablist">
+        <button class="nav-item active" data-tab="dashboard" role="tab" aria-selected="true" aria-controls="tab-dashboard">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Resumo</span>
+        </button>
+        <button class="nav-item" data-tab="agenda" role="tab" aria-selected="false" aria-controls="tab-agenda">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+          <span>Agenda</span>
+          <span class="badge" id="agenda-badge">0</span>
+        </button>
+        <button class="nav-item" data-tab="clientes" role="tab" aria-selected="false" aria-controls="tab-clientes">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5.3 18.3C6.8 16.5 9.2 15 12 15s5.2 1.5 6.7 3.3"/></svg>
+          <span>Clientes</span>
+        </button>
+        <button class="nav-item" data-tab="caixa" role="tab" aria-selected="false" aria-controls="tab-caixa">
+          <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="7" cy="14" r="1" fill="currentColor"/><circle cx="17" cy="14" r="1" fill="currentColor"/></svg>
+          <span>Caixa</span>
+        </button>
+        <button class="nav-item" data-tab="equipa" data-role="admin,gerente" role="tab" aria-selected="false" aria-controls="tab-equipa">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="8" r="2.5"/><path d="M3 19c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M19 19c0-2.2-1.3-4-3-5"/></svg>
+          <span>Equipa</span>
+        </button>
+        <button class="nav-item" data-tab="ia" data-role="admin,gerente" role="tab" aria-selected="false" aria-controls="tab-ia">
+          <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1.27A7 7 0 0 1 14 23h-4a7 7 0 0 1-6.73-4H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z" fill="currentColor"/></svg>
+          <span>IA</span>
+        </button>
+      </nav>
+
+    </div>
+  </div>
+
+  <!-- ===== MODAIS ===== -->
+
+  <!-- MODAL PERÍODO DASHBOARD (Bottom Sheet) -->
+  <div id="modal-periodo-dashboard" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="periodo-dashboard-title">
+    <div class="modal-sheet" style="max-height:50vh;border-radius:var(--radius-md) var(--radius-md) 0 0;">
+      <div class="handle"></div>
+      <div id="periodo-dashboard-title" class="modal-title">Período</div>
+      <div class="dash-periodo-opcoes" id="dash-periodo-opcoes">
+        <button class="dash-periodo-opcao" type="button" data-periodo="dia" data-offset="0">Hoje</button>
+        <button class="dash-periodo-opcao" type="button" data-periodo="dia" data-offset="1">Ontem</button>
+        <button class="dash-periodo-opcao" type="button" data-periodo="semana" data-offset="0">Esta semana</button>
+        <button class="dash-periodo-opcao" type="button" data-periodo="7dias" data-offset="0">Últimos 7 dias</button>
+        <button class="dash-periodo-opcao" type="button" data-periodo="mes" data-offset="0">Este mês</button>
+        <button class="dash-periodo-opcao" type="button" data-periodo="30dias" data-offset="0">Últimos 30 dias</button>
+        <button class="dash-periodo-opcao" type="button" data-periodo="90dias" data-offset="0">Últimos 90 dias</button>
+        <button class="dash-periodo-opcao" type="button" data-periodo="ano" data-offset="0">Este ano</button>
+        <button class="dash-periodo-opcao" type="button" data-periodo="custom">Personalizado</button>
+      </div>
+      <div class="dash-periodo-custom" id="dash-periodo-custom" style="display:none;">
+        <div class="input-group">
+          <label class="input-label">De</label>
+          <input type="date" class="input-field" id="dash-custom-inicio">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Até</label>
+          <input type="date" class="input-field" id="dash-custom-fim">
+        </div>
+        <button class="btn btn-primary" id="dash-custom-aplicar" type="button" style="width:100%;">Aplicar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AGENDAMENTO -->
+  <div id="modal-agenda" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="agenda-title">
+    <div class="modal-sheet">
+      <div class="handle"></div>
+      <div id="agenda-title" class="modal-title">Novo Agendamento</div>
+      <input type="hidden" id="agenda-edit-id" value="">
+      <div class="input-group">
+        <label class="input-label">Serviço</label>
+        <select id="agenda-servico" class="input-field"></select>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Cliente</label>
+        <select id="agenda-cliente" class="input-field"><option value="">Selecionar cliente</option></select>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Profissional</label>
+        <select id="agenda-profissional" class="input-field"></select>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Data e Hora</label>
+        <input type="datetime-local" id="agenda-datetime" class="input-field" value="">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Preço (Kz)</label>
+        <input type="number" id="agenda-preco" class="input-field" placeholder="0" value="5000" min="0" step="500">
+      </div>
+      <div class="modal-actions modal-actions--compact">
+        <button type="button" class="btn btn-secondary" id="modal-agenda-cancel">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="modal-agenda-save">Agendar</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- VISÃO SECTORIAL — relatório de produto (aba IA) -->
+  <div id="ia-visao-modal" class="modal-overlay ia-visao-modal" role="dialog" aria-modal="true" aria-labelledby="ia-visao-modal-title" hidden>
+    <div class="modal-sheet ia-visao-sheet">
+      <div class="handle"></div>
+      <div class="ia-visao-modal-bar">
+        <div id="ia-visao-modal-title" class="modal-title">Visão sectorial</div>
+        <button type="button" class="ia-visao-close" id="ia-visao-close" aria-label="Fechar">×</button>
+      </div>
+      <div class="ia-visao-body" id="ia-visao-body">
+        <p class="ia-visao-slogan">Um ecossistema tecnológico de gestão empresarial, com até sete grandes soluções sectoriais, partilhando uma infraestrutura central, mas resolvendo problemas diferentes.</p>
+
+        <p class="ia-visao-lead">A BeautyPro é a primeira solução comercial deste ecossistema — não o limite da empresa. A expansão não se reduz ao universo da beleza e bem-estar: trata-se de uma família de produtos especializados assente num núcleo tecnológico comum.</p>
+
+        <h3 class="ia-visao-h">1. Visão do ecossistema</h3>
+        <p>Em vez de um ERP genérico para todas as empresas, o caminho é uma família de produtos especializados com infraestrutura partilhada.</p>
+        <p class="ia-visao-kicker">Uma infraestrutura. Sete soluções especializadas.</p>
+
+        <h4 class="ia-visao-h4">Core tecnológico</h4>
+        <p>Infraestrutura que sustenta todos os produtos: identidade e acesso; gestão de empresas; financeiro operacional; clientes e parceiros; inventário e recursos; automação e IA; offline e sincronização; relatórios e auditoria.</p>
+
+        <ol class="ia-visao-ol">
+          <li><strong>BeautyPro</strong> — Beleza e serviços</li>
+          <li><strong>Business</strong> — Gestão empresarial</li>
+          <li><strong>Commerce</strong> — Comércio e mercadorias</li>
+          <li><strong>Logistics</strong> — Logística e distribuição</li>
+          <li><strong>People</strong> — Pessoas e equipas</li>
+          <li><strong>Operations</strong> — Operações e recursos</li>
+          <li><strong>Services</strong> — Empresas de serviços</li>
+        </ol>
+        <p class="ia-visao-note">Os nomes são identificadores conceptuais, não marcas definitivas. Cada solução terá proposta de valor, público, processos, indicadores e experiência próprios — não sete menus dentro da BeautyPro.</p>
+
+        <h3 class="ia-visao-h">2. As sete soluções</h3>
+        <div class="ia-visao-table-wrap">
+          <table class="ia-visao-table">
+            <thead>
+              <tr><th>Solução</th><th>Mercado</th><th>Problema que resolve</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>01. BeautyPro</td><td>Beleza e bem-estar</td><td>Desorganização da operação diária</td></tr>
+              <tr><td>02. Business</td><td>PME e empresas emergentes</td><td>Falta de controlo empresarial centralizado</td></tr>
+              <tr><td>03. Commerce</td><td>Lojas, distribuidores e comércio</td><td>Perdas, stock e controlo de mercadorias</td></tr>
+              <tr><td>04. Logistics</td><td>Transportadoras e distribuição</td><td>Falta de rastreabilidade das operações</td></tr>
+              <tr><td>05. People</td><td>Empresas com equipas operacionais</td><td>Gestão de pessoas, escalas e produtividade</td></tr>
+              <tr><td>06. Operations</td><td>Empresas com activos e operações complexas</td><td>Controlo de recursos, tarefas e manutenção</td></tr>
+              <tr><td>07. Services</td><td>Prestadores de serviços profissionais</td><td>Ciclo completo de prestação de serviços</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4 class="ia-visao-h4">01 — BeautyPro</h4>
+        <p>Primeira solução comercial. Agenda, clientes, equipa, caixa, vendas, indicadores, fidelização e inteligência operacional. Valida o motor de gestão, autenticação, sincronização, permissões e operações reais antes de expandir. A consolidação da BeautyPro não deve ser interrompida para lançar os outros produtos em simultâneo.</p>
+
+        <h4 class="ia-visao-h4">02 — Business</h4>
+        <p>Centro de controlo para PME. Estrutura e departamentos; despesas, receitas e obrigações; contas a pagar e receber; orçamentos e centros de custo; fornecedores; aprovações; indicadores e relatórios de gestão. A primeira versão orienta-se ao controlo operacional, sem pretender substituir de imediato sistemas de contabilidade certificados.</p>
+
+        <h4 class="ia-visao-h4">03 — Commerce</h4>
+        <p>Mercadorias e inventário: produtos e variantes; entradas e saídas; compras e fornecedores; vendas e devoluções; stock por armazém; transferências; inventário físico; lotes e validade; margens; alertas de reposição. O stock deve resultar de movimentos rastreáveis, não de alterações livres de um número isolado.</p>
+
+        <h4 class="ia-visao-h4">04 — Logistics</h4>
+        <p>Ciclo de entrega: pedidos de transporte; rotas; motoristas e veículos; despacho; estados de entrega; comprovativos; ocorrências; custos; desempenho por rota; histórico. Não começar por GPS em tempo real ou optimização avançada sem validar os processos básicos.</p>
+
+        <h4 class="ia-visao-h4">05 — People</h4>
+        <p>Colaboradores, departamentos e funções; escalas e turnos; presenças; férias e ausências; responsabilidades; desempenho; documentação; produtividade. Folha salarial e obrigações laborais exigem validação jurídica e fiscal por país.</p>
+
+        <h4 class="ia-visao-h4">06 — Operations</h4>
+        <p>Activos, ordens de trabalho, manutenção preventiva, inspeções, ocorrências, tarefas, custos e histórico. People organiza colaboradores; Operations gere o trabalho e os recursos utilizados.</p>
+
+        <h4 class="ia-visao-h4">07 — Services</h4>
+        <p>Circuito: pedido → orçamento → aprovação → atribuição → execução → confirmação → cobrança → acompanhamento. Services gere o compromisso comercial e a entrega ao cliente; Operations gere a capacidade interna de execução.</p>
+
+        <h3 class="ia-visao-h">3. Decisão arquitectónica</h3>
+        <p>Não sete sistemas isolados, nem um monólito com dezenas de funções irrelevantes. Separar capacidades tecnológicas de produtos comerciais: por exemplo, gestão de clientes pode servir BeautyPro, Business, Commerce e Services, com campos e regras definidos por cada produto.</p>
+        <p>Arquitectura-alvo (não reestruturação imediata do código actual): <strong>PLATFORM</strong> com <em>core</em> (identity, organizations, permissions, subscriptions, audit, sync), <em>capabilities</em> (crm, finance, inventory, scheduling, workforce, workflows, reporting, intelligence) e <em>products</em> (beautypro, business, commerce, logistics, people, operations, services).</p>
+        <p>O núcleo comum cresce quando necessidades partilhadas estiverem comprovadas — não antecipar infraestrutura complexa para produtos ainda não validados.</p>
+
+        <h3 class="ia-visao-h">4. Imersão progressiva</h3>
+        <p>O utilizador entra no ambiente do produto contratado, não num painel com sete módulos e dezenas de menus.</p>
+        <ul class="ia-visao-ul">
+          <li><strong>Inicial</strong> — configuração, operações essenciais e visão geral</li>
+          <li><strong>Operacional</strong> — processos completos, equipa, controlo e relatórios</li>
+          <li><strong>Avançado</strong> — automações, análises, integrações e IA</li>
+        </ul>
+        <p>Organizar a experiência para que seja possível trabalhar sem compreender todo o sistema de uma vez.</p>
+
+        <h3 class="ia-visao-h">5. Expansão sem perder credibilidade</h3>
+        <ol class="ia-visao-ol">
+          <li><strong>BeautyPro</strong> — prioridade actual: consolidar, corrigir e validar uso real</li>
+          <li><strong>Commerce</strong> — inventário, mercadorias, compras e vendas</li>
+          <li><strong>Business</strong> — visão empresarial mais ampla</li>
+          <li><strong>Services</strong> — ciclo de prestadores de serviços</li>
+          <li><strong>People</strong> — especialização de equipas</li>
+          <li><strong>Logistics</strong> — distribuição e entregas</li>
+          <li><strong>Operations</strong> — activos e manutenção complexa</li>
+        </ol>
+        <p>A ordem deve ser revista com dados de pilotos, custo, retenção e procura — não é um calendário rígido.</p>
+
+        <h3 class="ia-visao-h">6. Inteligência artificial</h3>
+        <p>Um motor central de inteligência, com competências por produto — não sete chatbots com nomes diferentes. Conclusões baseadas em dados reais; acções que alteram informação empresarial exigem autorização e verificação de permissões.</p>
+        <ul class="ia-visao-ul">
+          <li><strong>BeautyPro</strong> — desempenho e comportamento dos atendimentos</li>
+          <li><strong>Business</strong> — desvios financeiros e obrigações pendentes</li>
+          <li><strong>Commerce</strong> — risco de ruptura de stock</li>
+          <li><strong>Logistics</strong> — atrasos e ocorrências</li>
+          <li><strong>People</strong> — conflitos de escalas</li>
+          <li><strong>Operations</strong> — manutenção pendente</li>
+          <li><strong>Services</strong> — serviços atrasados e compromissos com clientes</li>
+        </ul>
+
+        <h3 class="ia-visao-h">7. Identidade empresarial</h3>
+        <p>BeautyPro permanece produto do sector da beleza. A marca-mãe do ecossistema deve ser independente, para não limitar a percepção em logística, comércio ou gestão geral. A escolha dessa marca corporativa pode esperar; o essencial é não comprometer a expansão futura.</p>
+
+        <h3 class="ia-visao-h">8. Diferencial competitivo</h3>
+        <p>Não competir de imediato com plataformas globais pela quantidade de funções. Resolver de forma profunda operações ainda fragmentadas, com simplicidade de adopção, conectividade realista e controlo operacional.</p>
+        <p class="ia-visao-kicker">Tecnologia empresarial que transforma operações dispersas em processos organizados, rastreáveis e inteligentes.</p>
+        <ul class="ia-visao-ul">
+          <li>Fiabilidade, incluindo offline quando aplicável</li>
+          <li>Controlo e rastreabilidade das operações</li>
+          <li>Automação útil, sem complexidade desnecessária</li>
+          <li>Adaptação à maturidade de cada empresa</li>
+        </ul>
+        <p>A ambição não é transformar a BeautyPro num software para sete nichos. É construir uma empresa tecnológica com sete produtos especializados, começando pela BeautyPro como primeiro produto e laboratório do núcleo tecnológico.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENTE RÁPIDO -->
+  <div id="modal-cliente-rapido" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cliente-rapido-title">
+    <div class="modal-sheet">
+      <div class="handle"></div>
+      <div id="cliente-rapido-title" class="modal-title">Novo Cliente</div>
+      <div class="input-group">
+        <label class="input-label">Nome</label>
+        <input type="text" id="cliente-rapido-nome" class="input-field" placeholder="Nome do cliente">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Telefone (opcional)</label>
+        <input type="tel" id="cliente-rapido-telefone" class="input-field" placeholder="Ex: 923 456 789">
+      </div>
+      <div style="display:flex;gap:12px;margin-top:12px;">
+        <button class="btn btn-secondary" style="flex:1;" id="modal-cliente-rapido-cancel">Cancelar</button>
+        <button class="btn btn-primary" style="flex:2;" id="modal-cliente-rapido-save">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENTE -->
+  <div id="modal-cliente" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cliente-modal-title" data-mode="edit">
+    <div class="modal-sheet" id="modal-cliente-sheet">
+      <div class="handle"></div>
+      <div id="cliente-modal-title" class="modal-title">Cliente</div>
+
+      <!-- MODO VISUALIZAR -->
+      <div id="cliente-view-panel" class="bp-view-panel" hidden>
+        <div id="cliente-perfil-stats" class="cliente-perfil-stats bp-view-stats" hidden></div>
+        <div id="cliente-view-body" class="bp-view-body"></div>
+        <div class="modal-actions modal-actions--primary-emphasis">
+          <button type="button" class="btn btn-secondary" id="cliente-view-fechar">Fechar</button>
+          <button type="button" class="btn btn-primary" id="cliente-view-editar">Editar</button>
+        </div>
+      </div>
+
+      <!-- MODO EDITAR / CRIAR -->
+      <div id="cliente-form-panel" class="bp-form-panel">
+        <div class="input-group">
+          <label class="input-label" for="cliente-nome">Nome</label>
+          <input type="text" id="cliente-nome" class="input-field" placeholder="Nome do cliente" autocomplete="name">
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="cliente-telefone">Celular</label>
+          <input type="tel" id="cliente-telefone" class="input-field" placeholder="9 dígitos · Ex: 923456789" inputmode="numeric" maxlength="9">
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="cliente-notas">Preferências</label>
+          <input type="text" id="cliente-notas" class="input-field" placeholder="Ex: Gosta de cores quentes">
+        </div>
+        <input type="hidden" id="cliente-id">
+        <div class="modal-actions modal-actions--primary-emphasis">
+          <button type="button" class="btn btn-secondary" id="modal-cliente-cancel">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="modal-cliente-save">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESPESA -->
+  <div id="modal-despesa" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="despesa-title">
+    <div class="modal-sheet">
+      <div class="handle"></div>
+      <div id="despesa-title" class="modal-title">Despesa</div>
+      <p class="venda-modal-sub">Saída de caixa do dia</p>
+      <div class="input-group">
+        <label class="input-label" for="desp-desc">Descrição</label>
+        <input type="text" id="desp-desc" class="input-field" placeholder="Ex: Compra de produtos" autocomplete="off">
+      </div>
+      <div class="prof-form-row">
+        <div class="input-group">
+          <label class="input-label" for="desp-valor">Valor (Kz)</label>
+          <input type="number" id="desp-valor" class="input-field" placeholder="0" min="0" step="100" inputmode="numeric">
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="desp-categoria">Categoria</label>
+          <select id="desp-categoria" class="input-field">
+            <option value="operacional">Operacional</option>
+            <option value="produtos">Produtos</option>
+            <option value="salarios">Salários</option>
+            <option value="renda">Renda / aluguer</option>
+            <option value="utilidades">Água / luz / net</option>
+            <option value="marketing">Marketing</option>
+            <option value="manutencao">Manutenção</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions modal-actions--compact">
+        <button type="button" class="btn btn-secondary" id="modal-despesa-cancel">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="modal-despesa-save">Registar despesa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VENDA -->
+  <div id="modal-venda" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="venda-title">
+    <div class="modal-sheet modal-sheet--venda">
+      <div class="handle"></div>
+      <header class="venda-modal-head">
+        <div id="venda-title" class="modal-title">Registar venda</div>
+        <p class="venda-modal-sub" id="venda-modal-sub" hidden></p>
+        <p class="venda-flow-hint" id="venda-flow-hint" aria-live="polite" hidden></p>
+      </header>
+
+      <section class="venda-section" id="venda-sec-cliente" data-venda-step="cliente" aria-label="Cliente">
+        <div class="venda-section-label">Cliente</div>
+        <div class="input-group venda-field-tight">
+          <select id="venda-cliente" class="input-field venda-select-field" aria-label="Cliente da venda"><option value="">Seleccionar cliente</option></select>
+        </div>
+        <button type="button" class="btn btn-sm btn-secondary btn-block" id="venda-add-cliente-rapido">+ Novo cliente</button>
+      </section>
+
+            <section class="venda-section venda-section--add" id="venda-sec-servico" data-venda-step="servico" aria-label="Adicionar item">
+        <div class="venda-section-label">Adicionar serviço</div>
+        <div class="venda-add-grid">
+          <div class="input-group venda-field-tight">
+            <label class="input-label" for="ci-servico-sel">Serviço</label>
+            <select id="ci-servico-sel" class="input-field venda-select-field">
+              <option value="">Escolher…</option>
+            </select>
+          </div>
+          <div class="input-group venda-field-tight">
+            <label class="input-label" for="ci-valor">Valor (Kz)</label>
+            <div class="venda-valor-wrap">
+              <input type="number" id="ci-valor" class="input-field" placeholder="0" min="0" step="500" inputmode="numeric">
+              <span class="venda-valor-sufixo">Kz</span>
+            </div>
+          </div>
+          <div class="input-group venda-field-tight venda-add-grid-full">
+            <label class="input-label" for="venda-profissional">Profissional</label>
+            <select id="venda-profissional" class="input-field venda-select-field">
+              <option value="">Seleccionar profissional</option>
+            </select>
+          </div>
+        </div>
+        <button type="button" class="btn btn-block" id="btn-add-item">Adicionar à venda</button>
+      </section>
+
+
+      <section class="venda-section" id="venda-sec-carrinho" data-venda-step="carrinho" aria-label="Itens da venda">
+        <div class="venda-section-label">Carrinho</div>
+        <div id="cart-items-list" class="venda-cart-list"></div>
+        <div id="cart-total-area" class="venda-cart-total" hidden></div>
+      </section>
+
+      <section class="venda-section" id="venda-sec-pagamento" data-venda-step="pagamento" aria-label="Pagamento">
+        <div class="venda-section-label">Pagamento</div>
+        <div class="input-group venda-field-tight">
+          <select id="venda-pagamento" class="input-field venda-select-field" aria-label="Forma de pagamento"><option value="">Seleccionar método</option>
+              <option value="Numerário">Numerário</option>
+              <option value="Multicaixa Express">Multicaixa Express</option>
+              <option value="Transferência">Transferência</option>
+              <option value="Cartão">Cartão</option>
+              <option value="__split__">Split</option>
+            </select>
+        </div>
+      </section>
+
+      <div class="modal-actions modal-actions--primary-emphasis venda-modal-footer">
+        <button type="button" class="btn btn-secondary" id="modal-venda-cancel">Fechar</button>
+        <button type="button" class="btn btn-primary" id="modal-venda-save" disabled>Cobrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FUNDO -->
+  <div id="modal-fundo" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="fundo-title">
+    <div class="modal-sheet">
+      <div class="handle"></div>
+      <div id="fundo-title" class="modal-title">Fundo de maneio</div>
+      <p class="venda-modal-sub" id="fundo-modal-sub">Valor de abertura do caixa (não é uma despesa).</p>
+      <div class="input-group">
+        <label class="input-label" for="fundo-valor">Fundo actual (Kz)</label>
+        <input type="number" id="fundo-valor" class="input-field" placeholder="0" min="0" step="1000" inputmode="numeric">
+      </div>
+      <div class="modal-actions modal-actions--compact">
+        <button type="button" class="btn btn-secondary" id="modal-fundo-cancel">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="modal-fundo-save">Guardar fundo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETALHE VENDA -->
+  <div id="modal-detalhe-venda" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="detalhe-venda-titulo">
+    <div class="modal-sheet modal-sheet--view">
+      <div class="handle"></div>
+      <div class="bp-view-kicker">Venda registada</div>
+      <div id="detalhe-venda-titulo" class="modal-title bp-view-title">Detalhe da venda</div>
+      <div id="detalhe-venda-conteudo" class="bp-view-body"></div>
+      <div class="modal-actions modal-actions--primary-emphasis" style="flex-wrap:wrap;gap:8px;">
+        <button type="button" class="btn btn-secondary" id="modal-detalhe-fechar">Fechar</button>
+        <button type="button" class="btn btn-secondary" id="btn-imprimir-recibo">Imprimir recibo</button>
+        <button type="button" class="btn btn-danger" id="btn-cancelar-venda" style="display:none;">Cancelar venda</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FECHO CAIXA -->
+  <div id="modal-fecho" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="fecho-title">
+    <div class="modal-sheet bp-fecho-sheet">
+      <div class="handle"></div>
+      <div id="fecho-title" class="modal-title bp-fecho-title">Fecho de caixa</div>
+      <p class="bp-fecho-sub">Resumo do dia · valores em Kz</p>
+      <div id="fecho-conteudo" class="bp-fecho-conteudo"></div>
+      <div class="bp-fecho-actions">
+        <button type="button" class="btn btn-secondary btn-sm" id="modal-fecho-fechar">Voltar</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-imprimir-fecho">Imprimir</button>
+        <button type="button" class="btn btn-primary btn-sm" id="confirmar-fecho-btn">Fechar caixa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFISSIONAL -->
+  <div id="modal-prof" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="prof-modal-title" data-mode="edit">
+    <div class="modal-sheet" id="modal-prof-sheet">
+      <div class="handle"></div>
+      <div id="prof-modal-title" class="modal-title">Profissional</div>
+
+      <!-- MODO VISUALIZAR -->
+      <div id="prof-view-panel" class="bp-view-panel" hidden>
+        <div id="prof-view-body" class="bp-view-body"></div>
+        <div class="modal-actions modal-actions--primary-emphasis">
+          <button type="button" class="btn btn-secondary" id="prof-view-fechar">Fechar</button>
+          <button type="button" class="btn btn-primary" id="prof-view-editar" data-role="admin">Editar</button>
+        </div>
+      </div>
+
+      <!-- MODO EDITAR / CRIAR -->
+      <div id="prof-form-panel" class="bp-form-panel">
+        <div class="input-group">
+          <label class="input-label" for="prof-nome">Nome *</label>
+          <input type="text" id="prof-nome" class="input-field" placeholder="Ex: Maria" autocomplete="name">
+        </div>
+        <div class="prof-form-row">
+          <div class="input-group">
+            <label class="input-label" for="prof-idade">Idade *</label>
+            <input type="number" id="prof-idade" class="input-field" placeholder="Ex: 28" min="16" max="99">
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="prof-data-contratual">Data contratual *</label>
+            <input type="text" id="prof-data-contratual" class="input-field" placeholder="AAAA-MM-DD ou DD/MM/AAAA" inputmode="numeric" autocomplete="off">
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="prof-esp">Especialidade (serviço) *</label>
+          <select id="prof-esp" class="input-field">
+            <option value="">Seleccionar serviço / especialidade</option>
+            <option value="__criar">Criar seu serviço</option>
+          </select>
+          <div id="prof-criar-servico-box" style="display:none;margin-top:10px;padding:12px;background:var(--bg-soft);border-radius:var(--radius-md);border:1px solid var(--border-soft);">
+            <div class="input-group" style="margin-bottom:8px;">
+              <label class="input-label" for="prof-novo-servico-nome">Nome do novo serviço *</label>
+              <input type="text" id="prof-novo-servico-nome" class="input-field" placeholder="Ex: Hidratação Capilar">
+            </div>
+            <div class="input-group" style="margin-bottom:8px;">
+              <label class="input-label" for="prof-novo-servico-preco">Preço (Kz) *</label>
+              <input type="number" id="prof-novo-servico-preco" class="input-field" placeholder="Ex: 5000" min="1">
+            </div>
+            <button type="button" id="prof-criar-servico-btn" class="btn btn-secondary btn-sm btn-block">Criar serviço</button>
+          </div>
+        </div>
+        <div class="prof-form-separador">Dados de contacto e identificação</div>
+        <div class="input-group">
+          <label class="input-label" for="prof-bi">Número do BI</label>
+          <input type="text" id="prof-bi" class="input-field" placeholder="Ex: 006543210LA045" maxlength="20">
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="prof-morada">Morada *</label>
+          <input type="text" id="prof-morada" class="input-field" placeholder="Ex: Talatona, Luanda">
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="prof-contacto">Contacto (9 dígitos) *</label>
+          <input type="tel" id="prof-contacto" class="input-field" placeholder="Ex: 923456789" maxlength="9" inputmode="numeric">
+        </div>
+        <div class="prof-form-separador">Comissões e metas</div>
+        <div class="prof-form-row">
+          <div class="input-group">
+            <label class="input-label" for="prof-taxa">Taxa de comissão (%) *</label>
+            <input type="number" id="prof-taxa" class="input-field" min="0" max="100" step="0.5" placeholder="ex: 30" inputmode="decimal">
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="prof-meta">Meta (Kz) *</label>
+            <input type="number" id="prof-meta" class="input-field" min="1" step="1000" placeholder="ex: 200000" inputmode="numeric" required>
+          </div>
+        </div>
+        <input type="hidden" id="prof-id">
+        <div class="modal-actions modal-actions--primary-emphasis">
+          <button type="button" class="btn btn-secondary" id="modal-prof-cancel">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="modal-prof-save">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINALIZAR ATENDIMENTO -->
+  <div id="modal-finalizar" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="finalizar-title">
+    <div class="modal-sheet">
+      <div class="handle"></div>
+      <div id="finalizar-title" class="modal-title">Finalizar Atendimento</div>
+      <div id="finalizar-info" style="background:var(--bg-soft);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;font-size:.88rem;"></div>
+      <div class="input-group">
+        <label class="input-label">Forma de Pagamento</label>
+        <select id="finalizar-pagamento" class="input-field">
+          <option value="">Seleccionar método</option>
+          <option value="Numerário">Numerário</option>
+          <option value="Multicaixa Express">Multicaixa Express</option>
+          <option value="Transferência">Transferência</option>
+          <option value="Cartão">Cartão</option>
+          <option value="__split__">Split</option>
+        </select>
+      </div>
+      <input type="hidden" id="finalizar-ag-id">
+      <div class="modal-actions modal-actions--primary-emphasis">
+        <button type="button" class="btn btn-secondary" id="modal-finalizar-cancel">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="modal-finalizar-save">Confirmar e Registar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPGRADE -->
+  <div id="modal-upgrade" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="upgrade-title">
+    <div class="modal-sheet">
+      <div class="handle"></div>
+      <div id="upgrade-title" class="modal-title">Upgrade do Plano</div>
+      <div id="upgrade-mensagem" style="margin-bottom:16px;color:var(--text-secondary);font-size:.9rem;">
+        Atingiu o limite do seu plano actual. Escolha um plano para continuar.
+      </div>
+      <div style="display:grid;gap:12px;">
+        <div class="plano-card destaque">
+          <div class="flex-between">
+            <span style="font-weight:700;">Pro</span>
+            <span class="preco">12.500 Kz/mês</span>
+          </div>
+          <div style="font-size:.8rem;color:var(--text-secondary);">Ilimitado + 5 perguntas IA/dia</div>
+          <button type="button" class="btn btn-primary btn-block mt-2 btn-sm" data-upgrade-plano="pro" data-role="admin" data-role-mode="disable">Assinar Pro</button>
+        </div>
+        <div class="plano-card">
+          <div class="flex-between">
+            <span style="font-weight:700;">Premium</span>
+            <span class="preco">25.000 Kz/mês</span>
+          </div>
+          <div style="font-size:.8rem;color:var(--text-secondary);">IA Ilimitada + Suporte prioritário</div>
+          <button type="button" class="btn btn-primary btn-block mt-2 btn-sm" data-upgrade-plano="premium" data-role="admin" data-role-mode="disable">Assinar Premium</button>
+        </div>
+        <div class="plano-card" style="border-color:var(--border-soft);">
+          <div class="flex-between">
+            <span style="font-weight:700;">Starter</span>
+            <span class="preco" style="color:var(--text-secondary);">5.000 Kz/mês</span>
+          </div>
+          <div style="font-size:.8rem;color:var(--text-secondary);">200 agendamentos, 150 clientes, 2 profissionais</div>
+          <button type="button" class="btn btn-secondary btn-block mt-2 btn-sm" data-upgrade-plano="starter" data-role="admin" data-role-mode="disable">Assinar Starter</button>
+        </div>
+      </div>
+      <button type="button" class="btn btn-secondary btn-block mt-3" id="modal-upgrade-contato" data-role="admin" data-role-mode="disable">Contactar via WhatsApp</button>
+    </div>
+  </div>
+
+  <!-- SERVIÇO -->
+  <div id="modal-servico" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="servico-modal-title" data-mode="edit">
+    <div class="modal-sheet" id="modal-servico-sheet">
+      <div class="handle"></div>
+      <div id="servico-modal-title" class="modal-title">Novo serviço</div>
+
+      <div id="servico-view-panel" class="bp-view-panel" hidden>
+        <div id="servico-view-body" class="bp-view-body"></div>
+        <div class="modal-actions modal-actions--primary-emphasis">
+          <button type="button" class="btn btn-secondary" id="servico-view-fechar">Fechar</button>
+          <button type="button" class="btn btn-primary" id="servico-view-editar" data-role="admin">Editar</button>
+        </div>
+      </div>
+
+      <div id="servico-form-panel" class="bp-form-panel">
+        <div class="input-group">
+          <label class="input-label" for="servico-nome">Nome</label>
+          <input type="text" id="servico-nome" class="input-field" placeholder="Ex: Corte de Cabelo" autocomplete="off">
+        </div>
+        <div class="prof-form-row">
+          <div class="input-group">
+            <label class="input-label" for="servico-preco">Preço base (Kz)</label>
+            <input type="number" id="servico-preco" class="input-field" placeholder="0" min="0" step="100" inputmode="numeric">
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="servico-duracao">Duração (min)</label>
+            <input type="number" id="servico-duracao" class="input-field" placeholder="60" min="5" max="480" step="5" inputmode="numeric" value="60">
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Profissionais</label>
+          <p class="venda-modal-sub" style="margin-bottom:8px;">Vazio = disponível para toda a equipa.</p>
+          <div id="servico-profissionais-container" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
+        </div>
+        <input type="hidden" id="servico-id">
+        <div class="modal-actions modal-actions--primary-emphasis">
+          <button type="button" class="btn btn-secondary" id="modal-servico-cancel">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="modal-servico-save">Guardar serviço</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETALHE FATURAMENTO -->
+  <div id="modal-revenue-detail" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="revenue-title">
+    <div class="modal-sheet">
+      <div class="handle"></div>
+      <div id="revenue-title" class="modal-title">Detalhe do Faturamento</div>
+      <div id="revenue-detail-totals" class="bp-rev-detail-totals">
+        <span class="bp-rev-detail-totals-label">Total</span>
+        <strong id="revenue-detail-total" class="bp-rev-detail-totals-val">0 Kz</strong>
+      </div>
+      <div id="revenue-detail-list" class="bp-revenue-detail-list"></div>
+      <button class="btn btn-secondary btn-block mt-3" id="modal-revenue-close">Fechar</button>
+    </div>
+  </div>
+
+  <!-- DETALHE AGENDAMENTOS -->
+  <div id="modal-agenda-detail" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="agenda-detail-title">
+    <div class="modal-sheet">
+      <div class="handle"></div>
+      <div id="agenda-detail-title" class="modal-title"> Agendamentos de Hoje</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button class="btn btn-sm btn-secondary" id="agenda-detail-pendentes" style="flex:1;">Pendentes</button>
+        <button class="btn btn-sm btn-secondary" id="agenda-detail-realizados" style="flex:1;">Realizados</button>
+      </div>
+      <div id="agenda-detail-totals" class="bp-ag-detail-totals" hidden></div>
+      <div id="agenda-detail-list" style="max-height:350px;overflow-y:auto;"></div>
+      <button class="btn btn-secondary btn-block mt-3" id="modal-agenda-close">Fechar</button>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMAÇÃO (LOGOUT) -->
+  <div id="modal-confirm" class="modal-overlay modal-overlay--center" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div class="modal-confirm-sheet">
+      <h2 id="confirm-title" class="confirm-title">Confirmar</h2>
+      <p id="confirm-message" class="confirm-message">Tem a certeza?</p>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-secondary" id="confirm-cancel-btn">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirm-ok-btn">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ERRO -->
+  <div id="modal-erro" class="modal-overlay modal-overlay--center" role="dialog" aria-modal="true" aria-labelledby="erro-title">
+    <div class="modal-confirm-sheet modal-info-sheet">
+      <h2 id="erro-title" class="confirm-title">Não foi possível concluir</h2>
+      <p id="erro-message" class="confirm-message">Algo impediu esta operação. Podes tentar de novo; se o problema continuar, verifica a ligação ou tenta mais tarde.</p>
+      <div class="confirm-actions confirm-actions--end">
+        <button type="button" class="btn btn-secondary" id="erro-cancelar-btn">Fechar</button>
+        <button type="button" class="btn btn-primary" id="erro-tentar-btn">Tentar novamente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL SUCESSO VENDA -->
+  <div id="modal-venda-sucesso" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="sucesso-title">
+    <div class="modal-sheet modal-sheet--recibo" style="max-width:420px; padding:0; background:var(--card-white); border-radius:var(--radius-md); box-shadow:var(--shadow-strong); overflow:hidden;">
+      <div style="height:4px; background:linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light), var(--gold), var(--gold-dark));"></div>
+      <div style="padding:22px 20px 20px;">
+        <div style="text-align:center; margin-bottom:16px;">
+          <div class="recibo-logo" style="font-family:'Playfair Display',var(--font-serif); font-size:1.4rem; font-weight:700; letter-spacing:-0.02em;">
+            <span class="recibo-logo-gold">Beauty</span><span style="color:var(--text-primary);">Pro</span>
+          </div>
+          <div style="width:44px; height:1.5px; margin:6px auto 0; background:linear-gradient(90deg, transparent, var(--gold), transparent);"></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px; background:var(--gold-light); padding:12px 14px; border-radius:var(--radius-sm); border-left:3px solid var(--gold);">
+          <div style="width:34px;height:34px;flex-shrink:0;border-radius:50%;background:var(--card-white);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(212,175,55,.25);">
+            <svg viewBox="0 0 34 34" style="width:22px;height:22px;">
+              <circle cx="17" cy="17" r="14" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="88" stroke-dashoffset="88" id="success-circle"/>
+              <polyline points="10,17.5 14.5,22 24,12" fill="none" stroke="var(--gold-dark)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="17" stroke-dashoffset="17" id="success-check"/>
+            </svg>
+          </div>
+          <div style="flex:1;">
+            <div id="sucesso-title" style="font-weight:600; font-size:0.85rem; color:var(--text-primary);">Venda concluída</div>
+            <div style="font-size:0.72rem; color:var(--text-secondary);">O valor foi adicionado ao caixa</div>
+          </div>
+          <div style="font-family:'Playfair Display',var(--font-serif); font-size:1.3rem; font-weight:700; color:var(--gold-dark); font-variant-numeric:tabular-nums;" id="sucesso-valor">0 Kz</div>
+        </div>
+        <div style="background:var(--bg-soft); padding:16px 14px; border-radius:var(--radius-sm); margin-bottom:16px; border:1px solid var(--border-soft); font-size:0.75rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid var(--border-soft); padding-bottom:8px;">
+            <span style="font-weight:600; font-size:0.7rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em;">Recibo de Venda</span>
+            <span style="font-weight:700; font-family:var(--font-mono); font-size:0.75rem; color:var(--gold-dark);" id="detalhe-venda-id">#----</span>
+          </div>
+          <div style="display:grid; grid-template-columns:80px 1fr; gap:4px 12px; margin-bottom:10px; font-size:0.7rem;">
+            <span style="font-weight:600; color:var(--text-secondary);">Cliente</span>
+            <span style="font-weight:500; color:var(--text-primary);" id="detalhe-venda-cliente">Anónimo</span>
+            <span style="font-weight:600; color:var(--text-secondary);">Profissional</span>
+            <span style="font-weight:500; color:var(--text-primary);" id="detalhe-venda-profissional">—</span>
+            <span style="font-weight:600; color:var(--text-secondary);">Data / Hora</span>
+            <span style="font-weight:500; color:var(--text-primary); font-variant-numeric:tabular-nums;" id="detalhe-venda-datahora">--/--/---- · --:--</span>
+            <span style="font-weight:600; color:var(--text-secondary);">Pagamento</span>
+            <span style="font-weight:500; color:var(--text-primary);" id="detalhe-venda-pagamento">Numerário</span>
+          </div>
+          <div style="border-top:1px dashed var(--border-soft); margin:6px 0 8px;"></div>
+          <div style="display:grid; grid-template-columns:1fr 36px 48px 56px; gap:4px; font-weight:600; font-size:0.6rem; text-transform:uppercase; color:var(--text-secondary); letter-spacing:0.06em; padding-bottom:4px; border-bottom:1px solid var(--border-soft);">
+            <span>Descrição</span>
+            <span style="text-align:center;">Qtd</span>
+            <span style="text-align:right;">P.Unit</span>
+            <span style="text-align:right;">Total</span>
+          </div>
+          <div id="detalhe-venda-itens" style="margin-top:4px;"></div>
+          <div style="border-top:2px solid var(--gold); margin:8px 0 0; padding-top:6px; display:flex; justify-content:space-between; align-items:baseline; font-weight:700; font-size:0.9rem;">
+            <span style="color:var(--text-secondary); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em;">Total</span>
+            <span style="font-family:'Playfair Display',var(--font-serif); color:var(--gold-dark); font-variant-numeric:tabular-nums;" id="detalhe-venda-total">0 Kz</span>
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; width:100%;">
+          <button class="btn btn-secondary" id="btn-imprimir-sucesso" style="flex:1; padding:10px 0; font-size:0.75rem; border-color:var(--border-soft);">
+            Imprimir
+          </button>
+          <button class="btn btn-primary" id="btn-voltar-sucesso" style="flex:2; padding:10px 0; font-size:0.75rem; font-weight:600;">
+            Continuar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST, RECIBO, TOOLTIP -->
+  <div id="toast" class="toast"></div>
+  <div id="chart-tooltip" class="chart-tooltip"></div>
+  <div id="recibo-print"></div>
+
+  <!-- ROW MENU -->
+  <div id="row-menu" class="row-menu" role="menu" aria-hidden="true">
+    <button type="button" class="row-menu-item" id="row-menu-edit" role="menuitem">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+      <span id="row-menu-edit-label">Ajustar</span>
+    </button>
+    <button type="button" class="row-menu-item row-menu-danger" id="row-menu-delete" role="menuitem" data-action="" data-id="">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+      <span id="row-menu-delete-label">Excluir</span>
+    </button>
+  </div>
+
+  <!-- SCRIPTS — runtime único (Fase 1.4). Fontes individuais ficam no repo para edição; ordem em build-bundle.js. -->
+  
+<!-- Sheet: espaço temporal dos KPIs -->
+<div id="modal-kpi-temporal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="kpi-temporal-title">
+  <div class="bp-sheet modal-sheet kpi-temporal-sheet">
+    <div class="bp-sheet-handle handle" aria-hidden="true"></div>
+    <div class="bp-sheet-header">
+      <div class="bp-sheet-eyebrow">Resumo</div>
+      <h2 class="bp-sheet-title" id="kpi-temporal-title">Espaço temporal</h2>
+      <p class="bp-sheet-subtitle">Os KPIs e o mini-gráfico usam o mesmo intervalo.</p>
+    </div>
+    <div class="bp-sheet-body" id="kpi-temporal-body">
+      <div class="kpi-temporal-seg" role="group" aria-label="Espaço temporal">
+        <button type="button" class="kpi-temporal-opt" data-periodo="7dias">7 dias</button>
+        <button type="button" class="kpi-temporal-opt" data-periodo="30dias">30 dias</button>
+        <button type="button" class="kpi-temporal-opt" data-periodo="mes">Mês</button>
+        <button type="button" class="kpi-temporal-opt" data-periodo="ano">Ano</button>
+      </div>
+      <div class="kpi-temporal-summary">
+        <div class="kpi-temporal-row"><span>Intervalo</span><strong id="kpi-temporal-range">—</strong></div>
+        <div class="kpi-temporal-row"><span>Receita</span><strong id="kpi-temporal-rev">—</strong></div>
+        <div class="kpi-temporal-row"><span>Vendas</span><strong id="kpi-temporal-n">—</strong></div>
+      </div>
+      <canvas id="kpi-temporal-chart" width="320" height="100" style="width:100%;height:100px;display:block;"></canvas>
+    </div>
+    <div class="bp-sheet-footer modal-actions">
+      <button type="button" class="btn btn-secondary" data-close="modal-kpi-temporal">Fechar</button>
+      <button type="button" class="btn btn-primary" id="kpi-temporal-apply">Aplicar</button>
+    </div>
+  </div>
+</div>
+
+  
+<!-- Drill-down do gráfico (Fase 5) -->
+<div id="modal-chart-drill" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="chart-drill-title">
+  <div class="bp-sheet modal-sheet chart-drill-sheet">
+    <div class="bp-sheet-handle handle" aria-hidden="true"></div>
+    <div class="bp-sheet-header">
+      <div class="bp-sheet-eyebrow">Análise</div>
+      <h2 class="bp-sheet-title" id="chart-drill-title">Detalhe do dia</h2>
+      <p class="bp-sheet-subtitle" id="chart-drill-sub">—</p>
+    </div>
+    <div class="bp-sheet-body" id="chart-drill-body"></div>
+    <div class="bp-sheet-footer modal-actions">
+      <button type="button" class="btn btn-secondary" data-close="modal-chart-drill">Fechar</button>
+    </div>
+  </div>
+</div>
+
+  <!-- Única entrada JS da app. NÃO carregar app.js (legado modularizado). -->
+  
+  <!-- Modal de expiração de agendamento (Etapa 2) -->
+      <div id="modal-expirar" class="modal-overlay modal-overlay--center" role="dialog" aria-modal="true" aria-labelledby="expirar-title" hidden>
+    <div class="modal-confirm-sheet bp-modal-expirar">
+      <div class="bp-expirar-header">
+        <span id="expirar-title" class="bp-expirar-title">
+          <span class="bp-expirar-title-main">Perdendo cliente</span>
+        </span>
+      </div>
+      <p id="expirar-message" class="confirm-message bp-expirar-msg">
+        O agendamento com <strong id="expirar-cliente-nome" class="bp-expirar-cliente">Cliente</strong> está prestes a ser marcado como não realizado em <strong id="expirar-tempo" class="bp-expirar-tempo">poucos minutos</strong>. Entre em contacto agora para tentar recuperar o atendimento ou combinar um novo horário com a cliente.
+      </p>
+      <div class="bp-expirar-actions">
+        <div class="bp-expirar-actions-row">
+          <button type="button" class="btn btn-sm bp-btn-whatsapp" id="expirar-whatsapp">
+            <svg class="bp-ic-wa" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.47 14.3c-.28-.14-1.64-.81-1.9-.9-.25-.1-.44-.14-.62.14-.18.28-.71.9-.87 1.08-.16.18-.32.2-.6.07-.28-.14-1.17-.43-2.23-1.37-.82-.73-1.38-1.64-1.54-1.92-.16-.28-.02-.43.12-.57.13-.13.28-.32.42-.48.14-.16.18-.28.28-.46.09-.18.05-.35-.02-.49-.07-.14-.62-1.49-.85-2.04-.22-.53-.45-.46-.62-.47h-.53c-.18 0-.47.07-.71.35-.25.28-.93.91-.93 2.22s.96 2.58 1.09 2.76c.14.18 1.88 2.87 4.56 4.02 1.7.73 2.15.8 2.92.67.45-.08 1.64-.67 1.87-1.32.23-.65.23-1.2.16-1.32-.07-.11-.25-.18-.53-.32z"/><path fill="currentColor" d="M12.04 2C6.5 2 2.01 6.49 2.01 12.03c0 1.85.5 3.57 1.37 5.07L2 22l5.04-1.32A9.96 9.96 0 0 0 12.04 22C17.57 22 22 17.52 22 11.99 22 6.49 17.57 2 12.04 2zm0 18.15c-1.67 0-3.22-.48-4.54-1.32l-.33-.19-3.08.81.82-3-.21-.35a7.94 7.94 0 0 1-1.3-4.38c0-4.4 3.58-7.98 7.99-7.98 4.4 0 7.98 3.58 7.98 7.98 0 4.4-3.58 7.98-7.98 7.98z"/></svg>
+            <span>WhatsApp</span>
+          </button>
+          <button type="button" class="btn btn-sm bp-btn-call bp-call-anim" id="expirar-ligar">
+            <span class="bp-call-icon-wrap" aria-hidden="true">
+              <svg class="bp-ic-call" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </span>
+            <span>Ligar</span>
+          </button>
+        </div>
+        <button type="button" class="btn btn-secondary bp-expirar-ignore" id="expirar-visto">Visto</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- D-1: constantes CORE — ANTES do bundle -->
+  <script src="src/core/shared/constants.js?v=20261024-f5"></script>
+  <script src="src/core/shared/utils.js?v=20261021-opstab"></script>
+  <script src="src/app/hide-splash.js?v=20260829-f36b"></script>
+  <!-- D-4: estado + store — DEPOIS de utils, ANTES do bundle -->
+  <script src="src/core/state/state.js?v=20260904-ui2"></script>
+  <script src="src/core/state/store.js?v=20260828-d4"></script>
+  <script src="src/core/state/list-writers.js?v=20260829-e19"></script>
+  <!-- D-5.1: IndexedDB + mirror — ANTES do bundle (Sync monkey-patch + CRUD) -->
+  <script src="src/core/storage/db-indexeddb.js?v=20260828-d51"></script>
+  <!-- D-5.2: fetch/retry/health Supabase — ANTES do bundle (sync-rest usa bpFetchSupabase) -->
+  <script src="src/core/api/supabase-resilience.js?v=20260828-d52"></script>
+  <!-- D-5.3: Auth / sessão / supabaseClient — ANTES de sync+CRUD no bundle -->
+  <script src="src/core/auth/auth-supabase.js?v=20261024-f5"></script>
+  <!-- D-5.4: fila sync + monkey-patch dbPut — ANTES de sync-rest/crud no bundle -->
+  <script src="src/core/sync/sync-policy.js?v=20260829-e19"></script>
+  <script src="src/core/sync/sync-tombstone.js?v=20260829-e19"></script>
+  <script src="src/core/sync/sync-dlq.js?v=20260829-e19"></script>
+  <script src="src/core/sync/sync-queue-store.js?v=20260829-e19"></script>
+  <script src="src/core/sync/sync-outbox.js?v=20260829-e19"></script>
+  <script src="src/core/sync/sync-lock.js?v=20260829-e19"></script>
+  <script src="src/core/sync/sync-recover.js?v=20260829-e19"></script>
+  <script src="src/core/sync/sync-queue.js?v=20261023-lock"></script>
+  <script src="src/core/sync/sync-ui.js?v=20261023-lock"></script>
+  <script src="src/core/sync/sync-scheduler.js?v=20260829-e19"></script>
+  <!-- D-5.5: REST Supabase + carregarDoSupabase — ANTES do CRUD no bundle -->
+  <script src="src/core/sync/sync-rest.js?v=20260828-d55"></script>
+<!-- Etapa 1b: app.bundle.js shell removido do load path (0 lógica) -->
+  <!-- D-3 / D-5.6: planos ANTES do CRUD; CRUD última fatia core -->
+  <script src="src/core/shared/plano-limites.js?v=20260828-d3"></script>
+  <script src="src/core/shared/crud-operations.js?v=20260829-e19"></script>
+  <script src="src/core/shared/metrics-periodo.js?v=20260908-phase1"></script>
+  <!-- D-3: planos/limites — DEPOIS do bundle (precisa de state) -->
+  <!-- F3.5: charts NÃO bloqueiam o 1.º parse — src/app/main.js carrega-os depois do init -->
+  <!-- C-5: render UI (updateUI / tabs) — obrigatório antes de eventos de UI -->
+  <script src="src/ui/shared-formatters.js?v=20260831-p0"></script>
+  <script src="src/ui/list-helpers.js?v=20260830-m2"></script>
+  <script src="src/modules/dashboard/dashboard-render.js?v=20261021-full"></script>
+  <script src="src/modules/clientes/clientes-render.js?v=20260830-m2"></script>
+  <script src="src/modules/clientes/clientes-events.js?v=20260904-ui3"></script>
+  <script src="src/modules/caixa/caixa-render.js?v=20261021-full"></script>
+  <script src="src/modules/equipa/equipa-render.js?v=20260830-m2"></script>
+  <script src="src/modules/equipa/equipa-fin-controle.js?v=20260901-fin2"></script>
+  <script src="src/modules/equipa/equipa-events.js?v=20260830-e3"></script>
+  <script src="src/modules/servicos/servicos-render.js?v=20260906-srv"></script>
+  <script>
+  /* Kick: CORE pode ter saltado updateUI no boot se render ainda não existia */
+  (function () {
+    try {
+      if (typeof initStoreBindings === 'function') initStoreBindings();
+      if (typeof updateUI === 'function') updateUI();
+    } catch (e) {
+      console.warn('[C-5] post-render kick', e);
+    }
+  })();
+  </script>
+  <!-- F3.6-D: desktop diferido (só ≥1024px) via bpLoadDeferredDesktop em src/app/main.js -->
+  <!-- B3: Media + Avatares fora do monólito -->
+  <script src="src/media/avatars-realistas.js?v=20260827-b3"></script>
+  <script src="src/media/media-galeria.js?v=20260829-f5final"></script>
+  <script src="src/media/avatars-listas.js?v=20260827-b3"></script>
+  <!-- B4: IA / Benza fora do monólito -->
+  <!-- F3.6-C: IA diferida em src/app/main.js (bpLoadDeferredIA) após hideSplash no boot -->
+  <!-- B5: UI polish residual fora do monólito -->
+  <script src="src/ui/menu-accordion.js?v=20261023-lock"></script>
+  <script src="src/modules/agenda/agenda-board.js?v=20261021-ab"></script>
+  <script src="src/modules/agenda/agenda-render.js?v=20260829-e19"></script>
+  <script src="src/modules/agenda/agenda-events.js?v=20260904-ui3"></script>
+  <!-- C-1: a11y + permissões + tabs (após polish) -->
+  <script src="src/ui/navegacao-events.js?v=20261024-f6"></script>
+  <script src="src/ui/accessibility.js?v=20260829-e19"></script>
+  <!-- C-2: eventos globais (agenda nav, menu linha, online/offline) -->
+  <script src="src/ui/app-events.js?v=20260828-c2"></script>
+  <!-- C-3: vendas / carrinho / modais serviço -->
+  <script src="src/modules/vendas/vendas-modais.js?v=20260904-p1b"></script>
+  <script src="src/modules/vendas/vendas-events.js?v=20260904-p1b"></script>
+  <script src="src/modules/servicos/servicos-modal.js?v=20260830-e81"></script>
+  <script src="src/modules/servicos/servicos-events.js?v=20260830-e81"></script>
+  <!-- Etapa 5–7: app-shell-events + modules events + security -->
+  <script src="src/app/app-shell-events.js?v=20261023-f1auth"></script>
+  <script src="src/modules/caixa/caixa-events.js?v=20260907-loc3"></script>
+  <script src="src/ui/security.js?v=20260828-c4"></script>
+  <!-- B6/E8: features diferidas em src/app/main.js
+       marketing · ops · equipa · finance · gestao · expirar -->
+  <script type="module" src="experiments/piloto-legacy/boot-pilot.js"></script>
+  <script src="src/modules/dashboard/bp-resumo-kpi.js?v=20260822-mirror3"></script>
+  <!-- C-7: boot/main — por último (CORE + UI já carregados) -->
+  <script src="src/modules/notificacoes/push.js?v=20260830-m6"></script>
+  <script src="src/app/ui-coordinator.js?v=20260830-e7"></script>
+  <script src="src/app/boot-migrations.js?v=20260830-e83"></script>
+  <script src="src/app/main.js?v=20260901-boot2"></script>
+
+
+
+  <!-- Modal limpo: cliente não encontrado -->
+
+  <!-- ET4.10 — Offline informativo (centro, leitura + Entendi, depois desaparece) -->
+  <div id="modal-offline-info" class="modal-overlay modal-overlay--center" role="dialog" aria-modal="true" aria-labelledby="offline-info-title" hidden>
+    <div class="modal-confirm-sheet modal-info-sheet">
+      <h2 id="offline-info-title" class="confirm-title">Sem ligação à internet</h2>
+      <p class="confirm-message">Estás sem ligação neste momento. As alterações que fizeres ficam guardadas neste dispositivo e serão sincronizadas automaticamente quando a rede voltar.</p>
+      <div class="confirm-actions confirm-actions--end">
+        <button type="button" class="btn btn-primary" id="modal-offline-info-ok">Entendi</button>
+      </div>
+    </div>
+  </div>
+
+
+    <div id="modal-ia-habilidade" class="modal-overlay ia-hab-overlay" role="dialog" aria-modal="true" aria-label="Habilidade" hidden>
+    <div class="ia-hab-sheet" role="menu">
+      <p class="ia-hab-sheet-title">Habilidade</p>
+      <div id="ia-habilidade-opcoes" class="ia-hab-opcoes"></div>
+    </div>
+  </div>
+
+  <div id="modal-caixa-loc-periodo" class="modal-overlay modal-overlay--center" role="dialog" aria-modal="true" aria-labelledby="caixa-loc-periodo-title">
+    <div class="modal-confirm-sheet modal-info-sheet bp-caixa-loc-sheet">
+      <div class="bp-caixa-loc-body">
+        <h2 id="caixa-loc-periodo-title" class="confirm-title">Sem histórico neste período</h2>
+        <p class="confirm-message" id="caixa-loc-periodo-msg">Não há vendas deste cliente no período seleccionado. Podes filtrar por outro período.</p>
+        <div id="caixa-loc-sugestoes" class="bp-caixa-loc-sugestoes" hidden></div>
+      </div>
+      <div class="confirm-actions confirm-actions--end bp-caixa-loc-actions">
+        <button type="button" class="btn btn-primary" id="modal-caixa-loc-periodo-ok">Entendi</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-cliente-nao-encontrado" class="modal-overlay modal-overlay--center" role="dialog" aria-modal="true" aria-labelledby="cliente-nao-encontrado-title">
+    <div class="modal-confirm-sheet modal-info-sheet">
+      <h2 id="cliente-nao-encontrado-title" class="confirm-title">Cliente não encontrado</h2>
+      <p class="confirm-message" id="cliente-nao-encontrado-msg">Não encontrei o cliente. Verifica se o nome está correcto ou se o cliente que procura está cadastrado.</p>
+      <div class="confirm-actions confirm-actions--end">
+        <button type="button" class="btn btn-primary" id="modal-cliente-nao-encontrado-ok">Entendi</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Dashboard executivo (Gestão) — shell HTML + body preenchido em JS -->
+  <div id="modal-bp-dash" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-bp-dash-title">
+    <div class="bp-sheet modal-sheet">
+      <div class="bp-sheet-handle handle" aria-hidden="true"></div>
+      <div class="bp-sheet-header">
+        <div class="bp-sheet-eyebrow">Gestão</div>
+        <h2 class="bp-sheet-title modal-title" id="modal-bp-dash-title">Dashboard executivo</h2>
+        <p class="bp-sheet-subtitle">KPIs, gráfico diário e tabelas do mês corrente.</p>
+      </div>
+      <div class="bp-sheet-body" id="modal-bp-dash-body">
+        <!-- conteúdo injectado por gestao.js -->
+      </div>
+      <div class="bp-sheet-footer modal-actions">
+        <button type="button" class="btn btn-secondary" data-close="modal-bp-dash">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
