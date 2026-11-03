@@ -1,0 +1,390 @@
+
+/* BeautyPro — circuito Criar conta (ecrã inteiro) */
+:root {
+  --bp-gold: #C4A35A;
+  --bp-gold-hover: #B08F48;
+  --bp-gold-soft: #F5F0E6;
+  --bp-bg: #F3F1ED;
+  --bp-surface: #FFFFFF;
+  --bp-text: #1C1917;
+  --bp-text-2: #6B6560;
+  --bp-border: #E8E4DE;
+  --bp-danger: #B42318;
+  --bp-danger-soft: #FEF3F2;
+  --bp-ok: #18794E;
+  --bp-radius: 12px;
+  --bp-font: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; font-family: var(--bp-font); background: var(--bp-bg); color: var(--bp-text); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; border: none; background: none; }
+
+.bp-auth-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 48px;
+}
+.bp-auth-top {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+.bp-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  color: var(--bp-text);
+}
+.bp-brand-mark {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #D4AF37, #8B7355);
+  display: grid; place-items: center;
+  color: #fff; font-size: 14px; font-weight: 700;
+}
+.bp-lang-select {
+  appearance: none;
+  border: 1px solid var(--bp-border);
+  background: var(--bp-surface);
+  border-radius: 8px;
+  padding: 8px 28px 8px 12px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--bp-text-2);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B6560' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+.bp-auth-tagline {
+  width: 100%; max-width: 520px;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--bp-text-2);
+  margin: -12px 0 24px;
+}
+
+.bp-signup-shell {
+  width: 100%;
+  max-width: 520px;
+  background: var(--bp-surface);
+  border: 1px solid var(--bp-border);
+  border-radius: 16px;
+  padding: 28px 28px 24px;
+  box-shadow: 0 4px 24px rgba(28, 25, 23, 0.04);
+}
+/* full screen: hide legacy visual column if present */
+.bp-signup-visual { display: none !important; }
+.bp-signup-layout { display: block; }
+.bp-signup-form { width: 100%; }
+
+.bp-signup-form-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.bp-signup-back-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  display: grid; place-items: center;
+  color: var(--bp-text-2);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.bp-signup-back-icon:hover { background: var(--bp-bg); color: var(--bp-text); }
+.bp-signup-form-heading { flex: 1; min-width: 0; }
+.bp-signup-form-heading h1 {
+  margin: 0 0 4px;
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+.bp-signup-form-heading p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--bp-text-2);
+  line-height: 1.4;
+}
+
+.bp-signup-steps {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+.bp-signup-dot {
+  height: 4px;
+  flex: 1;
+  border-radius: 999px;
+  background: var(--bp-border);
+  transition: background 0.2s, flex 0.2s;
+}
+.bp-signup-dot.is-done { background: var(--bp-gold); opacity: 0.45; }
+.bp-signup-dot.is-active { background: var(--bp-gold); flex: 1.4; }
+.bp-signup-step-meta {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--bp-text-2);
+  margin-bottom: 16px;
+  letter-spacing: 0.02em;
+}
+
+.bp-signup-banner {
+  background: var(--bp-danger-soft);
+  color: var(--bp-danger);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+.bp-signup-banner[hidden] { display: none !important; }
+.bp-signup-banner-ok {
+  background: #E8F5EE;
+  color: var(--bp-ok);
+}
+.bp-signup-banner a, .bp-signup-banner button.bp-link {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.bp-signup-pane[hidden] { display: none !important; }
+.bp-signup-intro {
+  font-size: 0.9375rem;
+  color: var(--bp-text);
+  line-height: 1.5;
+  margin: 0 0 14px;
+}
+.bp-signup-bullets {
+  margin: 0 0 8px;
+  padding-left: 1.15rem;
+  color: var(--bp-text-2);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+.bp-signup-bullets li { margin-bottom: 8px; }
+.bp-signup-bullets strong { color: var(--bp-text); font-weight: 600; }
+.bp-signup-note, .bp-signup-hint {
+  font-size: 0.8125rem;
+  color: var(--bp-text-2);
+  margin: 0 0 14px;
+  line-height: 1.4;
+}
+
+.input-group { margin-bottom: 14px; }
+.input-label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bp-text-2);
+  margin-bottom: 6px;
+}
+.login-optional { font-weight: 500; text-transform: none; letter-spacing: 0; opacity: 0.85; }
+.input-field {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--bp-border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.9375rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input-field:focus {
+  outline: none;
+  border-color: var(--bp-gold);
+  box-shadow: 0 0 0 3px var(--bp-gold-soft);
+}
+.input-field.is-invalid {
+  border-color: var(--bp-danger);
+  box-shadow: 0 0 0 3px var(--bp-danger-soft);
+}
+.bp-field-error {
+  margin: 6px 0 0;
+  font-size: 0.8125rem;
+  color: var(--bp-danger);
+  font-weight: 500;
+  line-height: 1.35;
+}
+.bp-field-error[hidden] { display: none !important; }
+
+.login-pass-wrap { position: relative; }
+.login-pass-wrap .input-field { padding-right: 44px; }
+.login-pass-toggle {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px; display: grid; place-items: center;
+  color: var(--bp-text-2); border-radius: 6px;
+}
+.login-pass-toggle:hover { background: var(--bp-bg); }
+
+.bp-signup-terms-box {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid var(--bp-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: var(--bp-bg);
+  font-size: 0.8125rem;
+  color: var(--bp-text-2);
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.bp-terms-check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+.bp-terms-check input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--bp-gold); flex-shrink: 0; }
+
+.bp-signup-summary {
+  margin: 0;
+  border: 1px solid var(--bp-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.bp-signup-summary > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--bp-border);
+  font-size: 0.875rem;
+}
+.bp-signup-summary > div:last-child { border-bottom: none; }
+.bp-signup-summary dt { color: var(--bp-text-2); font-weight: 500; margin: 0; }
+.bp-signup-summary dd { margin: 0; font-weight: 600; text-align: right; word-break: break-word; }
+
+.bp-signup-actions { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 12px 18px; border-radius: 8px;
+  font-weight: 600; font-size: 0.9375rem;
+  transition: background 0.15s, opacity 0.15s;
+}
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn-primary {
+  background: linear-gradient(180deg, #D4AF37 0%, #C4A35A 100%);
+  color: #1C1917;
+  box-shadow: 0 1px 2px rgba(28,25,23,0.08);
+}
+.btn-primary:hover:not(:disabled) { filter: brightness(0.97); }
+.btn-block { width: 100%; }
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--bp-border);
+  color: var(--bp-text);
+}
+.login-footer-line {
+  text-align: center;
+  margin: 16px 0 0;
+  font-size: 0.875rem;
+  color: var(--bp-text-2);
+}
+.login-text-btn {
+  font-weight: 600;
+  color: var(--bp-text-2);
+}
+.login-text-btn-accent { color: #9A7B2F; }
+.login-text-btn-accent:hover { text-decoration: underline; }
+
+/* Modal plano gratuito */
+.bp-modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(28, 25, 23, 0.4);
+  z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.bp-modal-backdrop[hidden] { display: none !important; }
+.bp-modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%; max-width: 420px;
+  padding: 28px 24px 24px;
+  box-shadow: 0 16px 48px rgba(28,25,23,0.16);
+}
+.bp-modal h2 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.bp-modal-lead {
+  margin: 0 0 16px;
+  font-size: 0.875rem;
+  color: var(--bp-text-2);
+  line-height: 1.45;
+}
+.bp-plan-card {
+  border: 1px solid var(--bp-border);
+  border-radius: 12px;
+  padding: 16px;
+  background: var(--bp-gold-soft);
+  margin-bottom: 20px;
+}
+.bp-plan-card .plan-name {
+  font-weight: 700;
+  font-size: 0.9375rem;
+  margin-bottom: 4px;
+}
+.bp-plan-card .plan-days {
+  font-size: 0.875rem;
+  color: var(--bp-text);
+  font-weight: 600;
+}
+.bp-plan-card ul {
+  margin: 12px 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.8125rem;
+  color: var(--bp-text-2);
+  line-height: 1.5;
+}
+.bp-modal-actions { display: flex; flex-direction: column; gap: 8px; }
+
+@media (max-width: 560px) {
+  .bp-signup-shell { padding: 22px 18px 20px; border-radius: 12px; }
+  .bp-auth-page { padding: 16px 12px 32px; }
+}
+
+/* v2 — estados de erro e CTA */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.15);
+}
+.input-group.has-error .input-label { color: var(--bp-danger); }
+.bp-terms-check.has-error,
+.input-group.has-error { }
+#err-signup-terms {
+  margin-top: 6px;
+}
+.bp-link {
+  font-weight: 700;
+  text-decoration: underline;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: inherit;
+}
+.bp-signup-banner .bp-link { margin-inline-start: 0.25em; }
+.bp-modal-backdrop[hidden] { display: none !important; }
+body.bp-modal-open { overflow: hidden; }
