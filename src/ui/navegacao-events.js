@@ -9,6 +9,11 @@
 
 function ativarAbaAtiva() {
   try { if (typeof bpHideChartTooltip === 'function') bpHideChartTooltip(); } catch (_) {}
+  try {
+    if (activeTab && activeTab !== 'acessos') {
+      document.body.classList.remove('bp-acessos-open');
+    }
+  } catch (_) {}
   /* Sair do modo ops se o utilizador escolheu outra aba na bottom-nav */
   try {
     if (activeTab && activeTab !== 'ops' && window.__bpOpsStack && window.__bpOpsStack.length) {
@@ -53,6 +58,9 @@ var BP_ACCESS_TABS = [
   { id: 'ia', label: 'Agente IA' }
 ];
 
+/** Cache em memória do JSON salao_config.acessos (roles + membros). */
+var __bpAcessosRemote = null;
+
 /** Predefinição: o que cada papel vê (admin vê tudo). */
 function bpAccessDefaults() {
   return {
@@ -70,37 +78,164 @@ function bpAccessStorageKey() {
   return 'bp_acessos_' + String(sid || 'none');
 }
 
-/** Overrides guardados (só gerente/operador). */
+function bpAccessRemoteStorageKey() {
+  var sid = '';
+  try {
+    sid = (state && state.config && state.config.salaoId) || localStorage.getItem('bp_salao_id_cache') || '';
+  } catch (_) {}
+  return 'bp_acessos_remote_' + String(sid || 'none');
+}
+
+/**
+ * Overrides de papel (gerente/operador) — local.
+ * Não inclui a chave "membros" (isso vive no remote).
+ */
 function bpLoadAccessOverrides() {
   try {
     var raw = localStorage.getItem(bpAccessStorageKey());
     if (!raw) return {};
     var o = JSON.parse(raw);
-    return o && typeof o === 'object' ? o : {};
+    if (!o || typeof o !== 'object') return {};
+    var clean = {};
+    ['gerente', 'operador'].forEach(function (role) {
+      if (o[role] && typeof o[role] === 'object') clean[role] = o[role];
+    });
+    return clean;
   } catch (_) {
     return {};
   }
 }
 
+/**
+ * Guarda overrides de papel sem apagar membros no servidor.
+ * Faz merge com __bpAcessosRemote.membros / remote cache.
+ */
 function bpSaveAccessOverrides(overrides) {
   try {
     localStorage.setItem(bpAccessStorageKey(), JSON.stringify(overrides || {}));
   } catch (_) {}
-  /* Melhor esforço: salao_config.acessos (se a coluna existir) */
   try {
     if (typeof supabaseClient === 'undefined' || !state || !state.config || !state.config.salaoId) return;
-    if (!navigator.onLine) return;
     supabaseClient.auth.getSession().then(function (res) {
       var session = res && res.data && res.data.session;
       if (!session) return;
+      var sid = state.config.salaoId;
       return supabaseClient
         .from('salao_config')
-        .upsert({ salao_id: state.config.salaoId, acessos: overrides || {} }, { onConflict: 'salao_id' });
+        .select('acessos')
+        .eq('salao_id', sid)
+        .maybeSingle()
+        .then(function (r) {
+          var prev = (r && r.data && r.data.acessos && typeof r.data.acessos === 'object')
+            ? r.data.acessos
+            : (__bpAcessosRemote && typeof __bpAcessosRemote === 'object' ? __bpAcessosRemote : {});
+          var next = {
+            gerente: (overrides && overrides.gerente) || prev.gerente || {},
+            operador: (overrides && overrides.operador) || prev.operador || {},
+            membros: (prev.membros && typeof prev.membros === 'object') ? prev.membros : {}
+          };
+          __bpAcessosRemote = next;
+          try {
+            localStorage.setItem(bpAccessRemoteStorageKey(), JSON.stringify(next));
+          } catch (_) {}
+          return supabaseClient
+            .from('salao_config')
+            .upsert({ salao_id: sid, acessos: next }, { onConflict: 'salao_id' });
+        });
     }).catch(function () {});
   } catch (_) {}
 }
 
-/** Matriz efectiva para um papel. */
+/** Aplica payload remoto (roles + membros) ao cache. */
+function bpApplyAcessosRemotePayload(payload) {
+  if (!payload || typeof payload !== 'object') return;
+  __bpAcessosRemote = payload;
+  try {
+    localStorage.setItem(bpAccessRemoteStorageKey(), JSON.stringify(payload));
+  } catch (_) {}
+  /* Espelhar só papéis no override local (UI de níveis) */
+  try {
+    var rolesOnly = {};
+    if (payload.gerente) rolesOnly.gerente = payload.gerente;
+    if (payload.operador) rolesOnly.operador = payload.operador;
+    if (Object.keys(rolesOnly).length) {
+      localStorage.setItem(bpAccessStorageKey(), JSON.stringify(rolesOnly));
+    }
+  } catch (_) {}
+}
+
+/**
+ * Carrega salao_config.acessos (melhor esforço).
+ * Chamar após login / troca de salão.
+ */
+function bpFetchAcessosRemote() {
+  return new Promise(function (resolve) {
+    try {
+      if (typeof supabaseClient === 'undefined' || !state || !state.config || !state.config.salaoId) {
+        resolve(__bpAcessosRemote);
+        return;
+      }
+      supabaseClient
+        .from('salao_config')
+        .select('acessos')
+        .eq('salao_id', state.config.salaoId)
+        .maybeSingle()
+        .then(function (r) {
+          if (r.error) {
+            resolve(__bpAcessosRemote);
+            return;
+          }
+          if (r.data && r.data.acessos) {
+            bpApplyAcessosRemotePayload(r.data.acessos);
+          }
+          resolve(__bpAcessosRemote);
+        })
+        .catch(function () {
+          resolve(__bpAcessosRemote);
+        });
+    } catch (_) {
+      resolve(__bpAcessosRemote);
+    }
+  });
+}
+
+/** Hidrata cache remoto a partir do localStorage (boot offline). */
+function bpHydrateAcessosRemoteFromLocal() {
+  try {
+    var raw = localStorage.getItem(bpAccessRemoteStorageKey());
+    if (!raw) return;
+    var o = JSON.parse(raw);
+    if (o && typeof o === 'object') __bpAcessosRemote = o;
+  } catch (_) {}
+}
+
+/**
+ * Tabs explícitas do utilizador actual (convite), se existirem.
+ */
+function bpMemberTabsForCurrentUser() {
+  try {
+    var uid = null;
+    if (typeof state !== 'undefined' && state && state.session && state.session.user) {
+      uid = state.session.user.id;
+    }
+    if (!uid && typeof supabaseClient !== 'undefined' && supabaseClient.auth) {
+      /* sync path: session may only be async — try cache */
+      try {
+        uid = localStorage.getItem('bp_uid_cache') || null;
+      } catch (_) {}
+    }
+    if (!uid) return null;
+    var remote = __bpAcessosRemote;
+    if (!remote || !remote.membros || typeof remote.membros !== 'object') return null;
+    var entry = remote.membros[uid];
+    if (!entry || !entry.tabs || typeof entry.tabs !== 'object') return null;
+    return entry.tabs;
+  } catch (_) {
+    return null;
+  }
+}
+
+/** Matriz efectiva: admin tudo; membro com tabs próprias; senão papel + overrides. */
 function bpAccessMatrixFor(role) {
   role = normalizarRole(role);
   var defaults = bpAccessDefaults();
@@ -111,7 +246,27 @@ function bpAccessMatrixFor(role) {
     });
     return base;
   }
+  /* 1) Tabs por membro (convite) — prioridade sobre o papel genérico */
+  var memberTabs = bpMemberTabsForCurrentUser();
+  if (memberTabs) {
+    BP_ACCESS_TABS.forEach(function (tab) {
+      if (typeof memberTabs[tab.id] === 'boolean') {
+        base[tab.id] = memberTabs[tab.id];
+      }
+    });
+    return base;
+  }
+  /* 2) Overrides de papel (local + remote roles) */
   var over = bpLoadAccessOverrides();
+  var remote = __bpAcessosRemote;
+  if (remote && remote[role] && typeof remote[role] === 'object') {
+    Object.keys(remote[role]).forEach(function (k) {
+      if (typeof remote[role][k] === 'boolean') {
+        over[role] = over[role] || {};
+        if (typeof over[role][k] !== 'boolean') over[role][k] = remote[role][k];
+      }
+    });
+  }
   var part = over[role] || {};
   Object.keys(part).forEach(function (k) {
     if (typeof part[k] === 'boolean') base[k] = part[k];
@@ -173,6 +328,10 @@ function bpExigirRole(rolesPermitidos, mensagem) {
 }
 
 function aplicarPermissoes() {
+  try {
+    bpHydrateAcessosRemoteFromLocal();
+  } catch (_) {}
+
   var role = normalizarRole(state && state.config ? state.config.userRole : null);
   if (state && state.config) state.config.userRole = role;
   try {
@@ -367,3 +526,14 @@ if (typeof window !== 'undefined') {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
   else bind();
 })();
+
+try {
+  window.BP_ACCESS_TABS = BP_ACCESS_TABS;
+  window.bpAccessDefaults = bpAccessDefaults;
+  window.bpLoadAccessOverrides = bpLoadAccessOverrides;
+  window.bpSaveAccessOverrides = bpSaveAccessOverrides;
+  window.bpAccessMatrixFor = bpAccessMatrixFor;
+  window.bpFetchAcessosRemote = bpFetchAcessosRemote;
+  window.bpApplyAcessosRemotePayload = bpApplyAcessosRemotePayload;
+  window.bpMemberTabsForCurrentUser = bpMemberTabsForCurrentUser;
+} catch (_) {}

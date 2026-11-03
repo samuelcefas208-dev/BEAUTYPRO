@@ -1,7 +1,7 @@
 // BeautyPro Service Worker — alinhado ao index.html (E20: APP_SHELL inclui cadeia sync + list-writers)
 // v20260824-f7-7: Agenda título+sticky, IA sticky, gap lista;  força actualização do shell após correcção da Benza (lista = aba Clientes)
 /* P3 perf: precache leve — ícones 1MB+ ficam em runtime (evita install lento) */
-const CACHE_NAME = "belezapro-shell-v=20260928-full2";
+const CACHE_NAME = "belezapro-shell-v=20260928-full1";
 const APP_SHELL = [
   './src/core/shared/constants.js',
   './src/core/shared/utils.js',

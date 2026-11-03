@@ -190,3 +190,355 @@ input[type="date"], input[type="datetime-local"] { appearance: none; -webkit-app
 }
 
 #login-onboarding-card[hidden] { display: none !important; }
+
+/* —— Criar conta: wizard 4 passos (Sergest-like, identidade BeautyPro) —— */
+.bp-signup-steps {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin: 0 0 20px;
+  padding: 0 2px;
+}
+.bp-signup-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  min-width: 52px;
+  color: var(--text-muted, #888);
+  font-size: 11px;
+  font-weight: 500;
+}
+.bp-signup-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border-soft, #e5e0d8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--surface, #fff);
+  color: inherit;
+}
+.bp-signup-step.is-active {
+  color: var(--text, #1a1a1a);
+}
+.bp-signup-step.is-active .bp-signup-step-num {
+  border-color: var(--gold, #b7791f);
+  background: var(--gold, #b7791f);
+  color: #fff;
+}
+.bp-signup-step.is-done .bp-signup-step-num {
+  border-color: var(--gold, #b7791f);
+  color: var(--gold, #b7791f);
+  background: transparent;
+}
+.bp-signup-step-line {
+  flex: 1 1 12px;
+  height: 2px;
+  background: var(--border-soft, #e5e0d8);
+  margin-bottom: 18px;
+  border-radius: 1px;
+}
+.bp-signup-step-line.is-done {
+  background: var(--gold, #b7791f);
+}
+.bp-signup-step-label {
+  max-width: 64px;
+  text-align: center;
+  line-height: 1.2;
+}
+.bp-signup-pane[hidden] { display: none !important; }
+.bp-signup-intro {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-muted, #666);
+  margin: 0 0 14px;
+}
+.bp-signup-bullets {
+  margin: 0 0 14px;
+  padding-left: 1.15rem;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text, #1a1a1a);
+}
+.bp-signup-bullets li { margin-bottom: 8px; }
+.bp-signup-bullets li:last-child { margin-bottom: 0; }
+.bp-signup-note {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-muted, #777);
+  margin: 0 0 4px;
+  padding: 10px 12px;
+  background: var(--bg-soft, #f8f7f4);
+  border-radius: 10px;
+  border: 1px solid var(--border-soft, #ebe6df);
+}
+.bp-signup-hint {
+  font-size: 12px;
+  color: var(--text-muted, #777);
+  margin: -6px 0 12px;
+}
+.bp-signup-summary {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-soft, #ebe6df);
+  background: var(--surface, #fff);
+}
+.bp-signup-summary > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-soft, #f0ebe4);
+  font-size: 13px;
+}
+.bp-signup-summary > div:last-child { border-bottom: none; }
+.bp-signup-summary dt {
+  color: var(--text-muted, #777);
+  font-weight: 500;
+}
+.bp-signup-summary dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text, #1a1a1a);
+  text-align: right;
+  word-break: break-word;
+}
+.bp-signup-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.bp-signup-actions .btn { flex: 1 1 auto; min-height: 44px; }
+.bp-signup-actions #signup-submit-btn { flex: 1 1 100%; }
+#login-signup-card .login-title { margin-bottom: 6px; }
+
+/* —— Signup shell 6 passos + split + erros no campo —— */
+#login-signup-card.bp-signup-shell {
+  max-width: 920px;
+  width: min(920px, 100%);
+  padding: 0;
+  overflow: hidden;
+}
+.bp-signup-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 0;
+}
+@media (min-width: 860px) {
+  .bp-signup-layout {
+    grid-template-columns: minmax(240px, 0.95fr) minmax(300px, 1.1fr);
+  }
+  .bp-signup-visual {
+    display: flex;
+  }
+}
+.bp-signup-visual {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: 28px 24px;
+  background: linear-gradient(165deg, #f7f3ec 0%, #efe8dc 100%);
+  color: var(--gold, #b7791f);
+  border-right: 1px solid var(--border-soft, #ebe6df);
+}
+.bp-signup-visual-inner {
+  text-align: center;
+}
+.bp-signup-visual-inner[hidden] { display: none !important; }
+.bp-signup-illu {
+  max-width: 240px;
+  margin: 0 auto 16px;
+  color: var(--gold, #b7791f);
+}
+.bp-signup-visual-caption {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-muted, #666);
+  margin: 0;
+  font-weight: 500;
+}
+.bp-signup-form {
+  padding: 20px 20px 24px;
+}
+@media (min-width: 860px) {
+  .bp-signup-form { padding: 24px 28px 28px; }
+}
+.bp-signup-form-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.bp-signup-back-icon {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  margin-left: -8px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  color: var(--text, #1a1a1a);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.bp-signup-back-icon:hover {
+  background: var(--bg-soft, #f5f2ec);
+}
+.bp-signup-back-icon[hidden] { display: none !important; }
+.bp-signup-form-heading { flex: 1; min-width: 0; }
+.bp-signup-form-heading .login-title { margin: 0 0 4px; font-size: 1.25rem; }
+.bp-signup-form-heading .login-recovery-lead { margin: 0; font-size: 13px; }
+
+.bp-signup-steps {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin: 0 0 16px;
+}
+.bp-signup-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--border-soft, #ddd5c8);
+  transition: width .2s, background .2s;
+}
+.bp-signup-dot.is-active {
+  width: 22px;
+  background: var(--gold, #b7791f);
+}
+.bp-signup-dot.is-done {
+  background: var(--gold, #b7791f);
+  opacity: 0.55;
+}
+
+/* Banner estilo imagem (erro suave no circuito) */
+.bp-signup-banner {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  background: #fdeceb;
+  color: #9b2c2c;
+  border: 1px solid #f5c6c2;
+}
+.bp-signup-banner[hidden] { display: none !important; }
+.bp-signup-banner-ok {
+  background: #ecfdf5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+.bp-field-error {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: #9b2c2c;
+  line-height: 1.35;
+}
+.bp-field-error[hidden] { display: none !important; }
+.input-group.is-invalid .input-field {
+  border-color: #e8a0a0;
+  background: #fff8f8;
+}
+
+.bp-signup-pane[hidden] { display: none !important; }
+.bp-signup-intro {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-muted, #666);
+  margin: 0 0 12px;
+}
+.bp-signup-bullets {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.bp-signup-bullets li { margin-bottom: 8px; }
+.bp-signup-note {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-muted, #777);
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  background: var(--bg-soft, #f8f7f4);
+  border-radius: 10px;
+  border: 1px solid var(--border-soft, #ebe6df);
+}
+.bp-signup-hint {
+  font-size: 12px;
+  color: var(--text-muted, #777);
+  margin: -4px 0 12px;
+}
+.bp-signup-terms-box {
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-soft, #ebe6df);
+  background: var(--bg-soft, #faf9f7);
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.bp-signup-terms-box p { margin: 0 0 10px; }
+.bp-signup-terms-box p:last-child { margin-bottom: 0; }
+.bp-signup-terms-muted { color: var(--text-muted, #777); font-size: 12px; }
+.bp-signup-check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+.bp-signup-check input {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--gold, #b7791f);
+  flex-shrink: 0;
+}
+.bp-signup-summary {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-soft, #ebe6df);
+}
+.bp-signup-summary > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-soft, #f0ebe4);
+  font-size: 13px;
+}
+.bp-signup-summary > div:last-child { border-bottom: none; }
+.bp-signup-summary dt { color: var(--text-muted, #777); font-weight: 500; }
+.bp-signup-summary dd { margin: 0; font-weight: 600; text-align: right; word-break: break-word; }
+.bp-signup-actions { margin-top: 16px; }
+.bp-signup-actions .btn { min-height: 46px; }
+
+
+/* bp-signup-shell safety — não colapsar o ecrã de login */
+#login-signup-card.bp-signup-shell:not([hidden]) {
+  display: block;
+  max-width: min(920px, 100%);
+}
+#login-view {
+  min-height: 100%;
+  overflow-y: auto;
+}
+#login-signup-card .bp-signup-form {
+  min-width: 0;
+}

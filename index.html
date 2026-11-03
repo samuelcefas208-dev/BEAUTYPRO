@@ -97,7 +97,7 @@
   <link rel="stylesheet" href="styles/modules/menus-agenda.css?v=20260824-f7-9r">
   <link rel="stylesheet" href="styles/components/modais-toast-fab.css?v=20260901-boot2">
   <link rel="stylesheet" href="styles/components/ops-shell.css?v=20261021-opstab" />
-  <link rel="stylesheet" href="styles/modules/login.css?v=20261024-f5">
+  <link rel="stylesheet" href="styles/modules/login.css?v=20261029-signup-fix">
   <link rel="stylesheet" href="styles/modules/venda-carrinho.css?v=20260905-cta4">
   <!-- Etapa 6: historico-fecho-equipa partido → caixa.css + equipa.css -->
   <link rel="stylesheet" href="styles/modules/ia.css?v=20261021-visao">
@@ -108,8 +108,8 @@
   <link rel="stylesheet" href="styles/themes/dark-mode.css?v=20260828-org">
   <link rel="stylesheet" href="styles/modules/splash-sparkline.css?v=20260828-org">
   <link rel="stylesheet" href="styles/modules/premium-panels.css?v=20261023-lock">
-  <link rel="stylesheet" href="styles/foundation/desktop-responsive.css?v=20260828-org">
-  <link rel="stylesheet" href="styles/modules/acessos.css?v=20261024-f6">
+  <link rel="stylesheet" href="styles/foundation/desktop-responsive.css?v=20261027">
+  <link rel="stylesheet" href="styles/modules/acessos.css?v=20261028-fix">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -245,41 +245,203 @@
       </p>
     </div>
 
-    <div class="card login-card" id="login-signup-card" hidden>
+        <div class="card login-card bp-signup-shell" id="login-signup-card" hidden>
+      <div class="bp-signup-layout">
+        <!-- Coluna visual (desktop / tablets largos) -->
+        <aside class="bp-signup-visual" aria-hidden="true">
+          <div class="bp-signup-visual-inner" data-signup-visual="1">
+            <div class="bp-signup-illu bp-signup-illu-1">
+              <svg viewBox="0 0 240 200" width="100%" height="auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="24" y="28" width="140" height="144" rx="16" stroke="currentColor" stroke-width="2" opacity=".35"/>
+                <rect x="40" y="48" width="108" height="12" rx="4" fill="currentColor" opacity=".2"/>
+                <rect x="40" y="72" width="88" height="8" rx="3" fill="currentColor" opacity=".12"/>
+                <rect x="40" y="92" width="100" height="8" rx="3" fill="currentColor" opacity=".12"/>
+                <circle cx="176" cy="56" r="36" stroke="currentColor" stroke-width="2" opacity=".4"/>
+                <path d="M160 56h32M176 40v32" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+              </svg>
+            </div>
+            <p class="bp-signup-visual-caption">Operação do salão num só sítio</p>
+          </div>
+          <div class="bp-signup-visual-inner" data-signup-visual="2" hidden>
+            <div class="bp-signup-illu">
+              <svg viewBox="0 0 240 200" width="100%" height="auto" fill="none">
+                <rect x="36" y="40" width="72" height="100" rx="12" stroke="currentColor" stroke-width="2" opacity=".35"/>
+                <rect x="132" y="56" width="72" height="100" rx="12" stroke="currentColor" stroke-width="2" opacity=".5"/>
+                <path d="M108 90h24" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".45"/>
+                <circle cx="168" cy="100" r="14" stroke="currentColor" stroke-width="2" opacity=".55"/>
+                <path d="M162 100l4 4 8-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <p class="bp-signup-visual-caption">Offline fiável · sincronização quando houver rede</p>
+          </div>
+          <div class="bp-signup-visual-inner" data-signup-visual="3" hidden>
+            <div class="bp-signup-illu">
+              <svg viewBox="0 0 240 200" width="100%" height="auto" fill="none">
+                <rect x="48" y="36" width="144" height="128" rx="14" stroke="currentColor" stroke-width="2" opacity=".35"/>
+                <circle cx="96" cy="88" r="22" stroke="currentColor" stroke-width="2" opacity=".45"/>
+                <path d="M128 76h48M128 92h36M128 108h44" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".3"/>
+                <rect x="72" y="128" width="96" height="16" rx="6" fill="currentColor" opacity=".15"/>
+              </svg>
+            </div>
+            <p class="bp-signup-visual-caption">A sua organização, com identidade própria</p>
+          </div>
+          <div class="bp-signup-visual-inner" data-signup-visual="4" hidden>
+            <div class="bp-signup-illu">
+              <svg viewBox="0 0 240 200" width="100%" height="auto" fill="none">
+                <rect x="60" y="48" width="120" height="104" rx="12" stroke="currentColor" stroke-width="2" opacity=".4"/>
+                <circle cx="120" cy="88" r="18" stroke="currentColor" stroke-width="2" opacity=".5"/>
+                <path d="M88 128h64" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".35"/>
+                <rect x="84" y="140" width="72" height="8" rx="3" fill="currentColor" opacity=".12"/>
+              </svg>
+            </div>
+            <p class="bp-signup-visual-caption">Acesso seguro do proprietário</p>
+          </div>
+          <div class="bp-signup-visual-inner" data-signup-visual="5" hidden>
+            <div class="bp-signup-illu">
+              <svg viewBox="0 0 240 200" width="100%" height="auto" fill="none">
+                <rect x="52" y="40" width="136" height="120" rx="12" stroke="currentColor" stroke-width="2" opacity=".35"/>
+                <path d="M72 72h96M72 96h96M72 120h64" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".25"/>
+                <rect x="72" y="140" width="20" height="20" rx="4" stroke="currentColor" stroke-width="2" opacity=".5"/>
+                <path d="M77 150l5 5 10-12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <p class="bp-signup-visual-caption">Regras claras · dados da empresa protegidos</p>
+          </div>
+          <div class="bp-signup-visual-inner" data-signup-visual="6" hidden>
+            <div class="bp-signup-illu">
+              <svg viewBox="0 0 240 200" width="100%" height="auto" fill="none">
+                <circle cx="120" cy="96" r="40" stroke="currentColor" stroke-width="2" opacity=".4"/>
+                <path d="M100 98l14 14 28-32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
+              </svg>
+            </div>
+            <p class="bp-signup-visual-caption">Pronto para criar o espaço de trabalho</p>
+          </div>
+        </aside>
 
-      <h1 class="login-title">Criar conta</h1>
-      <div class="input-group">
-        <label class="input-label" for="signup-empresa">Empresa ou organização</label>
-        <input type="text" id="signup-empresa" class="input-field" placeholder="Nome da empresa" autocomplete="organization" required>
-      </div>
-      <div class="input-group">
-        <label class="input-label" for="signup-nif">NIF ou BI <span class="login-optional">(opcional)</span></label>
-        <input type="text" id="signup-nif" class="input-field" placeholder="NIF ou BI" autocomplete="off" inputmode="numeric">
-      </div>
-      <div class="input-group">
-        <label class="input-label" for="signup-email">Email</label>
-        <input type="email" id="signup-email" class="input-field" placeholder="email@exemplo.com" autocomplete="email">
-      </div>
-      <div class="input-group">
-        <label class="input-label" for="signup-password">Palavra-passe</label>
-        <div class="login-pass-wrap">
-          <input type="password" id="signup-password" class="input-field" placeholder="Mínimo 8 caracteres" autocomplete="new-password" minlength="8">
-          <button type="button" class="login-pass-toggle" id="signup-pass-toggle" aria-label="Mostrar palavra-passe" data-target="signup-password">
-            <svg class="login-pass-icon login-pass-icon-show" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            <svg class="login-pass-icon login-pass-icon-hide" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" hidden aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-          </button>
+        <!-- Coluna formulário -->
+        <div class="bp-signup-form">
+          <div class="bp-signup-form-top">
+            <button type="button" class="bp-signup-back-icon" id="signup-prev-btn" aria-label="Voltar" hidden>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div class="bp-signup-form-heading">
+              <h1 class="login-title" id="signup-step-title">Criar conta</h1>
+              <p class="login-recovery-lead" id="signup-wizard-lead">Conheça a BeautyPro.</p>
+            </div>
+          </div>
+
+          <div class="bp-signup-steps" role="navigation" aria-label="Passos">
+            <span class="bp-signup-dot is-active" data-signup-step-ind="1"></span>
+            <span class="bp-signup-dot" data-signup-step-ind="2"></span>
+            <span class="bp-signup-dot" data-signup-step-ind="3"></span>
+            <span class="bp-signup-dot" data-signup-step-ind="4"></span>
+            <span class="bp-signup-dot" data-signup-step-ind="5"></span>
+            <span class="bp-signup-dot" data-signup-step-ind="6"></span>
+          </div>
+
+          <p class="bp-signup-banner" id="signup-error" role="alert" hidden></p>
+          <p class="bp-signup-banner bp-signup-banner-ok" id="signup-success" hidden></p>
+
+          <!-- 1 -->
+          <div class="bp-signup-pane is-active" data-signup-pane="1">
+            <p class="bp-signup-intro">A BeautyPro concentra agenda, clientes, caixa e equipa para salões e centros de beleza — com controlo do proprietário.</p>
+            <ul class="bp-signup-bullets">
+              <li>Agenda e clientes com histórico</li>
+              <li>Caixa e vendas no mesmo critério de números</li>
+              <li>Uso offline e sincronização quando a rede voltar</li>
+            </ul>
+          </div>
+
+          <!-- 2 -->
+          <div class="bp-signup-pane" data-signup-pane="2" hidden>
+            <p class="bp-signup-intro">Como deve lidar com a plataforma no dia a dia:</p>
+            <ul class="bp-signup-bullets">
+              <li><strong>Proprietário</strong> — cria a organização e gere acessos.</li>
+              <li><strong>Gerente / operador</strong> — entram depois, com permissões definidas por si.</li>
+              <li><strong>Dados por organização</strong> — o trabalho de um salão não se mistura com outro.</li>
+              <li><strong>Rede instável</strong> — registe na mesma; a sincronização completa quando houver ligação.</li>
+            </ul>
+          </div>
+
+          <!-- 3 empresa -->
+          <div class="bp-signup-pane" data-signup-pane="3" hidden>
+            <div class="input-group" data-field="signup-empresa">
+              <label class="input-label" for="signup-empresa">Empresa ou organização</label>
+              <input type="text" id="signup-empresa" class="input-field" placeholder="Ex.: Salão Alfa" autocomplete="organization" maxlength="120">
+              <p class="bp-field-error" id="err-signup-empresa" hidden></p>
+            </div>
+            <div class="input-group" data-field="signup-nif">
+              <label class="input-label" for="signup-nif">NIF ou BI <span class="login-optional">(opcional)</span></label>
+              <input type="text" id="signup-nif" class="input-field" placeholder="Apenas números ou alfanumérico curto" autocomplete="off" inputmode="text" maxlength="32">
+              <p class="bp-field-error" id="err-signup-nif" hidden></p>
+            </div>
+            <p class="bp-signup-note">O nome da empresa aparece no espaço de trabalho. O NIF/BI pode ficar em branco e ser actualizado depois.</p>
+          </div>
+
+          <!-- 4 conta -->
+          <div class="bp-signup-pane" data-signup-pane="4" hidden>
+            <div class="input-group" data-field="signup-email">
+              <label class="input-label" for="signup-email">Email</label>
+              <input type="email" id="signup-email" class="input-field" placeholder="email@exemplo.com" autocomplete="email" maxlength="254">
+              <p class="bp-field-error" id="err-signup-email" hidden></p>
+            </div>
+            <p class="bp-signup-hint">É por este endereço que inicia sessão e recebe avisos de segurança.</p>
+            <div class="input-group" data-field="signup-password">
+              <label class="input-label" for="signup-password">Palavra-passe</label>
+              <div class="login-pass-wrap">
+                <input type="password" id="signup-password" class="input-field" placeholder="Mínimo 8 caracteres" autocomplete="new-password" minlength="8" maxlength="128">
+                <button type="button" class="login-pass-toggle" id="signup-pass-toggle" aria-label="Mostrar palavra-passe" data-target="signup-password">
+                  <svg class="login-pass-icon login-pass-icon-show" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="login-pass-icon login-pass-icon-hide" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" hidden aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.15M1 1l22 22"/></svg>
+                </button>
+              </div>
+              <p class="bp-field-error" id="err-signup-password" hidden></p>
+            </div>
+            <div class="input-group" data-field="signup-password-2">
+              <label class="input-label" for="signup-password-2">Repita a palavra-passe</label>
+              <input type="password" id="signup-password-2" class="input-field" placeholder="Confirme a palavra-passe" autocomplete="new-password" minlength="8" maxlength="128">
+              <p class="bp-field-error" id="err-signup-password-2" hidden></p>
+            </div>
+          </div>
+
+          <!-- 5 termos -->
+          <div class="bp-signup-pane" data-signup-pane="5" hidden>
+            <div class="bp-signup-terms-box" tabindex="0">
+              <p><strong>Termos de utilização (resumo)</strong></p>
+              <p>A BeautyPro é uma ferramenta de gestão para o seu negócio. Os dados que registar pertencem à sua organização. O proprietário é responsável pelos acessos que conceder (gerente e operador).</p>
+              <p>Deve utilizar a plataforma de boa fé, sem tentar aceder a dados de outras organizações. Operações sensíveis podem exigir nova confirmação da palavra-passe.</p>
+              <p>Em modo offline, os registos ficam no dispositivo até sincronizar. Mantenha cópias de segurança conforme a sua política interna.</p>
+              <p class="bp-signup-terms-muted">Versão resumida para criação de conta. O texto completo pode ser consultado nas definições após o acesso.</p>
+            </div>
+            <div class="input-group" data-field="signup-terms">
+              <label class="bp-signup-check">
+                <input type="checkbox" id="signup-terms" name="signup-terms">
+                <span>Li e aceito os termos de utilização para criar a conta da organização.</span>
+              </label>
+              <p class="bp-field-error" id="err-signup-terms" hidden></p>
+            </div>
+          </div>
+
+          <!-- 6 resumo -->
+          <div class="bp-signup-pane" data-signup-pane="6" hidden>
+            <p class="bp-signup-intro">Confirme os dados. A seguir a conta Auth é criada; o espaço de trabalho da empresa completa-se no passo de organização.</p>
+            <dl class="bp-signup-summary">
+              <div><dt>Empresa</dt><dd id="signup-sum-empresa">—</dd></div>
+              <div><dt>NIF / BI</dt><dd id="signup-sum-nif">—</dd></div>
+              <div><dt>Email</dt><dd id="signup-sum-email">—</dd></div>
+              <div><dt>Termos</dt><dd id="signup-sum-terms">—</dd></div>
+            </dl>
+          </div>
+
+          <div class="bp-signup-actions">
+            <button type="button" class="btn btn-primary btn-block" id="signup-next-btn">Continuar</button>
+            <button type="button" class="btn btn-primary btn-block" id="signup-submit-btn" hidden>Criar conta</button>
+          </div>
+          <p class="login-footer-line">
+            Já tem conta? <button type="button" class="login-text-btn login-text-btn-accent" id="signup-back-login">Iniciar sessão</button>
+          </p>
         </div>
       </div>
-      <div class="input-group">
-        <label class="input-label" for="signup-password-2">Confirmar palavra-passe</label>
-        <input type="password" id="signup-password-2" class="input-field" placeholder="Repita a palavra-passe" autocomplete="new-password" minlength="8">
-      </div>
-      <p class="login-error" id="signup-error" role="alert" hidden></p>
-      <p class="login-recovery-lead" id="signup-success" hidden></p>
-      <button type="button" class="btn btn-primary btn-block" id="signup-submit-btn">Criar conta</button>
-      <p class="login-footer-line">
-        Já tem conta? <button type="button" class="login-text-btn login-text-btn-accent" id="signup-back-login">Iniciar sessão</button>
-      </p>
     </div>
   </div>
 
@@ -840,6 +1002,25 @@
         </div>
 
       
+
+        <!-- Acessos — ecrã completo (7.ª área, após IA) -->
+        <div id="tab-acessos" class="tab-pane" data-role="admin">
+          <div class="tab-inner bp-acessos-tab-inner">
+            <div class="bp-acessos-head">
+              <button type="button" class="bp-acessos-back" id="bp-acessos-back" aria-label="Voltar">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <div class="bp-acessos-head-text">
+                <span class="bp-acessos-eyebrow" id="bp-acessos-eyebrow">Configurações</span>
+                <h1 class="bp-acessos-title" id="bp-acessos-title">Acessos</h1>
+              </div>
+            </div>
+            <div id="bp-acessos-mount" class="bp-acessos-mount" aria-live="polite"></div>
+          </div>
+        </div>
+
         <!-- OPS — Central / Gestão como aba (não modal por cima) -->
         <div id="tab-ops" class="tab-pane" data-bp-ops-tab="1">
           <div class="tab-inner bp-ops-tab-inner">
@@ -871,9 +1052,6 @@
       <button class="fab" id="fab-agendar" aria-label="Novo agendamento">+</button>
 
       <!-- ===== BOTTOM NAV ===== -->
-      
-        <button type="button" class="btn btn-sm btn-secondary" id="bp-acessos-btn" data-role="admin" title="Acessos da equipa" style="display:none">Acessos</button>
-
       <nav class="bottom-nav" role="tablist">
         <button class="nav-item active" data-tab="dashboard" role="tab" aria-selected="true" aria-controls="tab-dashboard">
           <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -1713,7 +1891,7 @@
 
   
   <!-- D-1: constantes CORE — ANTES do bundle -->
-  <script src="src/core/shared/constants.js?v=20261024-f5"></script>
+  <script src="src/core/shared/constants.js?v=20261025-f6"></script>
   <script src="src/core/shared/utils.js?v=20261021-opstab"></script>
   <script src="src/app/hide-splash.js?v=20260829-f36b"></script>
   <!-- D-4: estado + store — DEPOIS de utils, ANTES do bundle -->
@@ -1725,7 +1903,7 @@
   <!-- D-5.2: fetch/retry/health Supabase — ANTES do bundle (sync-rest usa bpFetchSupabase) -->
   <script src="src/core/api/supabase-resilience.js?v=20260828-d52"></script>
   <!-- D-5.3: Auth / sessão / supabaseClient — ANTES de sync+CRUD no bundle -->
-  <script src="src/core/auth/auth-supabase.js?v=20261024-f5"></script>
+  <script src="src/core/auth/auth-supabase.js?v=20261029-signup-fix"></script>
   <!-- D-5.4: fila sync + monkey-patch dbPut — ANTES de sync-rest/crud no bundle -->
   <script src="src/core/sync/sync-policy.js?v=20260829-e19"></script>
   <script src="src/core/sync/sync-tombstone.js?v=20260829-e19"></script>
@@ -1776,12 +1954,13 @@
   <!-- B4: IA / Benza fora do monólito -->
   <!-- F3.6-C: IA diferida em src/app/main.js (bpLoadDeferredIA) após hideSplash no boot -->
   <!-- B5: UI polish residual fora do monólito -->
-  <script src="src/ui/menu-accordion.js?v=20261023-lock"></script>
+  <script src="src/ui/menu-accordion.js?v=20261027"></script>
   <script src="src/modules/agenda/agenda-board.js?v=20261021-ab"></script>
   <script src="src/modules/agenda/agenda-render.js?v=20260829-e19"></script>
   <script src="src/modules/agenda/agenda-events.js?v=20260904-ui3"></script>
   <!-- C-1: a11y + permissões + tabs (após polish) -->
-  <script src="src/ui/navegacao-events.js?v=20261024-f6"></script>
+  <script src="src/ui/navegacao-events.js?v=20261025-f6"></script>
+  <script src="src/modules/acessos/acessos-governanca.js?v=20261028-fix"></script>
   <script src="src/ui/accessibility.js?v=20260829-e19"></script>
   <!-- C-2: eventos globais (agenda nav, menu linha, online/offline) -->
   <script src="src/ui/app-events.js?v=20260828-c2"></script>

@@ -15,6 +15,8 @@
   var WHATSAPP_NUMBER = '953980750';
   var IA_EDGE_URL = SUPABASE_URL + '/functions/v1/ia-query';
   var PROVISION_EDGE_URL = SUPABASE_URL + '/functions/v1/provision-empresa';
+  var INVITE_MEMBRO_EDGE_URL = SUPABASE_URL + '/functions/v1/invite-membro';
+  var SET_BLOQUEIO_EDGE_URL = SUPABASE_URL + '/functions/v1/set-membro-bloqueio';
   /** Domínio da app em produção (recovery + OAuth redirect). */
   var BP_AUTH_SITE_URL = 'https://tatilson.vercel.app';
 
@@ -70,6 +72,8 @@
   g.WHATSAPP_NUMBER = WHATSAPP_NUMBER;
   g.IA_EDGE_URL = IA_EDGE_URL;
   g.PROVISION_EDGE_URL = PROVISION_EDGE_URL;
+  g.INVITE_MEMBRO_EDGE_URL = INVITE_MEMBRO_EDGE_URL;
+  g.SET_BLOQUEIO_EDGE_URL = SET_BLOQUEIO_EDGE_URL;
   g.BP_AUTH_SITE_URL = BP_AUTH_SITE_URL;
   g.STORE_TO_TABLE = STORE_TO_TABLE;
   g.SYNC_QUEUE_KEY = SYNC_QUEUE_KEY;

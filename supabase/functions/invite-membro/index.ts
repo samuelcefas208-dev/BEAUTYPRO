@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
   }
   if (!actorProf.salao_id) return json(403, { error: "Organização não associada." });
 
-  let body: { email?: string; nome?: string; role?: string; password?: string } = {};
+  let body: { email?: string; nome?: string; role?: string; password?: string; access_tabs?: Record<string, boolean> } = {};
   try { body = await req.json(); } catch { body = {}; }
 
   const email = String(body.email || "").trim().toLowerCase();
@@ -126,13 +126,37 @@ Deno.serve(async (req) => {
     }
   }
 
+  /* Acessos por membro (escolha no convite) → salao_config.acessos.membros[user_id] */
+  const accessTabs = body.access_tabs && typeof body.access_tabs === "object" ? body.access_tabs : null;
+  if (accessTabs) {
+    try {
+      const { data: cfg } = await admin
+        .from("salao_config")
+        .select("acessos")
+        .eq("salao_id", actorProf.salao_id)
+        .maybeSingle();
+      const prev = (cfg && cfg.acessos && typeof cfg.acessos === "object") ? cfg.acessos as Record<string, unknown> : {};
+      const membros = (prev.membros && typeof prev.membros === "object")
+        ? { ...(prev.membros as Record<string, unknown>) }
+        : {};
+      membros[newUserId] = { role, tabs: accessTabs, updated_at: new Date().toISOString() };
+      const next = { ...prev, membros };
+      const { error: accErr } = await admin
+        .from("salao_config")
+        .upsert({ salao_id: actorProf.salao_id, acessos: next }, { onConflict: "salao_id" });
+      if (accErr) console.error("acessos membros", accErr);
+    } catch (eAcc) {
+      console.error("acessos membros", eAcc);
+    }
+  }
+
   let audit_ok = true;
   const { error: auditErr } = await admin.from("access_audit").insert({
     salao_id: actorProf.salao_id,
     actor_user_id: actor.id,
     target_user_id: newUserId,
     acao: "invite_membro",
-    detalhe: { email, role, nome, password_mode: explicitPass ? "owner_set" : "generated_internal" },
+    detalhe: { email, role, nome, password_mode: explicitPass ? "owner_set" : "generated_internal", access_tabs: accessTabs || null },
   });
   if (auditErr) {
     audit_ok = false;
@@ -159,6 +183,7 @@ Deno.serve(async (req) => {
     email,
     role,
     nome,
+    access_tabs_saved: !!accessTabs,
     password_set_by_owner: !!explicitPass,
     recovery_sent,
     audit_ok,

@@ -66,6 +66,22 @@ function bpAuthRedirectTo(extraQuery) {
   return url;
 }
 
+
+/** Remove query de recovery/OAuth da barra de endereço (sem recarregar). */
+function bpAuthCleanUrlParams() {
+  try {
+    if (typeof history === 'undefined' || !history.replaceState) return;
+    var u = new URL(location.href);
+    ['bp_recovery', 'type', 'code', 'error', 'error_description', 'error_code'].forEach(function (k) {
+      u.searchParams.delete(k);
+    });
+    if (u.hash && /access_token|refresh_token|type=recovery/i.test(u.hash)) {
+      u.hash = '';
+    }
+    history.replaceState({}, '', u.pathname + (u.search || '') + (u.hash || ''));
+  } catch (_) {}
+}
+
 function bpAuthHostIsUnreliableForOAuth() {
   try {
     var h = (location.hostname || '').toLowerCase();
@@ -114,6 +130,12 @@ async function bpWaitSessionFromUrl(maxMs) {
  * source: 'password' | 'google' | 'boot' | 'signed_in'
  */
 async function bpEnterFromSession(session, source) {
+  try {
+    if (session && session.user && session.user.id) {
+      localStorage.setItem('bp_uid_cache', session.user.id);
+    }
+  } catch (_) {}
+
   source = source || 'session';
   if (!session || !session.user) return { ok: false, reason: 'no_session' };
 
@@ -133,13 +155,40 @@ async function bpEnterFromSession(session, source) {
   try {
     var pr = await supabaseClient
       .from('profiles')
-      .select('salao_id, role, nome')
+      .select('salao_id, role, nome, bloqueado, ativo, is_owner')
       .eq('user_id', session.user.id)
       .maybeSingle();
     profileError = pr && pr.error;
     profile = pr && pr.data;
   } catch (e) {
     profileError = e;
+  }
+
+
+  if (profile && (profile.bloqueado === true || profile.ativo === false)) {
+    try {
+      if (typeof bpShowLoginShell === 'function') bpShowLoginShell();
+      if (typeof bpShowAuthPanel === 'function') bpShowAuthPanel('login');
+    } catch (_) {}
+    var orgName = '';
+    try {
+      if (profile.salao_id) {
+        var sn = await supabaseClient.from('saloes').select('nome').eq('id', profile.salao_id).maybeSingle();
+        orgName = (sn && sn.data && sn.data.nome) || '';
+      }
+    } catch (_) {}
+    var msgBloq =
+      'O seu acesso' +
+      (orgName ? ' a «' + orgName + '»' : '') +
+      ' está suspenso. Contacte o responsável da organização para repor o acesso.';
+    if (typeof toast === 'function') toast(msgBloq, 'error');
+    try {
+      if (typeof bpLoginShowError === 'function') bpLoginShowError(msgBloq);
+    } catch (_) {}
+    try {
+      await supabaseClient.auth.signOut({ scope: 'local' });
+    } catch (_) {}
+    return { ok: false, reason: 'blocked', session: session };
   }
 
   if (!profile || !profile.salao_id) {
@@ -195,7 +244,11 @@ async function bpEnterFromSession(session, source) {
   } catch (_) {}
 
   try {
-    if (typeof aplicarPermissoes === 'function') aplicarPermissoes();
+    if (typeof bpFetchAcessosRemote === 'function') {
+        bpFetchAcessosRemote().then(function () {
+          if (typeof aplicarPermissoes === 'function') aplicarPermissoes();
+        });
+      } else if (typeof aplicarPermissoes === 'function') aplicarPermissoes();
   } catch (_) {}
 
   try {
@@ -456,6 +509,11 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
     } catch (_) {}
   }
   if (event === 'SIGNED_IN' && session) {
+    /* Step-up (Acessos): validar senha sem reentrar app nem disparar sync de login */
+    if (typeof window !== 'undefined' && window.__bpAuthReauthInProgress) {
+      try { if (typeof bpTouchSessionLocal === 'function') bpTouchSessionLocal(); } catch (_) {}
+      return;
+    }
     try {
       if (typeof bpTouchSessionLocal === 'function') bpTouchSessionLocal();
     } catch (_) {}
@@ -592,7 +650,7 @@ async function checkSession() {
           var session = res && res.data ? res.data.session : null;
           if (!session) return null;
           return bpWithTimeout(
-            supabaseClient.from('profiles').select('salao_id, role, nome').eq('user_id', session.user.id).single(),
+            supabaseClient.from('profiles').select('salao_id, role, nome, bloqueado, ativo, is_owner').eq('user_id', session.user.id).single(),
             2000,
             'profile_bg'
           );
@@ -713,7 +771,7 @@ async function checkSession() {
     var profile = null;
     try {
       var pr = await bpWithTimeout(
-        supabaseClient.from('profiles').select('salao_id, role, nome').eq('user_id', session.user.id).single(),
+        supabaseClient.from('profiles').select('salao_id, role, nome, bloqueado, ativo, is_owner').eq('user_id', session.user.id).single(),
         2500,
         'profile'
       );
@@ -1212,6 +1270,9 @@ if (typeof window !== 'undefined') {
   window.bpClearSessionLocal = bpClearSessionLocal;
   window.bpHasLocalSession = bpHasLocalSession;
   window.bpTouchSessionLocal = bpTouchSessionLocal;
+  window.bpAuthPublicSite = bpAuthPublicSite;
+  window.bpAuthRedirectTo = bpAuthRedirectTo;
+  window.bpAuthCleanUrlParams = bpAuthCleanUrlParams;
 }
 
 /* D-5.3: API pública Auth (Sync/CRUD/UI consomem em runtime) */
@@ -1331,7 +1392,18 @@ function bpPasswordStrongEnough(pw) {
             toast('Palavra-passe actualizada. Já pode iniciar sessão.', 'success');
           }
           try {
+            if (typeof bpInfoEntendi === 'function') {
+              bpInfoEntendi(
+                'A palavra-passe foi actualizada. Use o email e a nova palavra-passe para iniciar sessão.',
+                'Palavra-passe actualizada'
+              );
+            }
+          } catch (_) {}
+          try {
             await supabaseClient.auth.signOut({ scope: 'local' });
+          } catch (_) {}
+          try {
+            if (typeof bpAuthCleanUrlParams === 'function') bpAuthCleanUrlParams();
           } catch (_) {}
           bpShowRecoveryPanel(false);
           try {
@@ -1370,6 +1442,9 @@ function bpPasswordStrongEnough(pw) {
             if (s && s.data && s.data.session) {
               if (typeof bpShowLoginShell === 'function') bpShowLoginShell();
               bpShowRecoveryPanel(true);
+              try {
+                if (typeof bpAuthCleanUrlParams === 'function') bpAuthCleanUrlParams();
+              } catch (_) {}
             }
           } catch (_) {}
         }, 400);
@@ -1407,6 +1482,13 @@ function bpShowAuthPanel(mode) {
   setEl(main, mode === 'login');
   setEl(rec, mode === 'recovery');
   setEl(sig, mode === 'signup');
+  if (mode === 'signup') {
+    try {
+      if (typeof bpSignupSetStep === 'function') bpSignupSetStep(1);
+    } catch (e) {
+      try { console.warn('[signup] setStep', e); } catch (_) {}
+    }
+  }
   setEl(onb, mode === 'onboarding');
   try {
     ['login-error', 'recovery-error', 'signup-error'].forEach(function (id) {
@@ -1434,7 +1516,7 @@ function bpShowRecoveryPanel(show) {
 function bpSignupShowError(msg) {
   var el = document.getElementById('signup-error');
   if (!el) {
-    if (typeof toast === 'function') toast(msg, 'error');
+    try { console.warn('[signup]', msg); } catch (_) {}
     return;
   }
   el.textContent = msg || '';
@@ -1459,6 +1541,202 @@ function bpSignupShowSuccess(msg) {
     el.setAttribute('hidden', '');
   }
 }
+
+
+/** Criar conta — 6 passos, erros no campo, sem toast neste circuito */
+var __bpSignupStep = 1;
+var __bpSignupMax = 6;
+
+function bpSignupClearFieldErrors() {
+  ['signup-empresa', 'signup-nif', 'signup-email', 'signup-password', 'signup-password-2', 'signup-terms'].forEach(function (id) {
+    var err = document.getElementById('err-' + id);
+    if (err) {
+      err.textContent = '';
+      err.hidden = true;
+    }
+    var grp = document.querySelector('.input-group[data-field="' + id + '"]');
+    if (grp) grp.classList.remove('is-invalid');
+  });
+}
+
+function bpSignupFieldError(fieldId, msg) {
+  var err = document.getElementById('err-' + fieldId);
+  if (err) {
+    err.textContent = msg || '';
+    err.hidden = !msg;
+  }
+  var grp = document.querySelector('.input-group[data-field="' + fieldId + '"]');
+  if (grp) {
+    if (msg) grp.classList.add('is-invalid');
+    else grp.classList.remove('is-invalid');
+  }
+  var input = document.getElementById(fieldId);
+  if (msg && input) {
+    try { input.focus(); } catch (_) {}
+  }
+}
+
+function bpSignupSetStep(step) {
+  step = Math.max(1, Math.min(__bpSignupMax, step | 0));
+  __bpSignupStep = step;
+  var card = document.getElementById('login-signup-card');
+  if (!card) return;
+
+  card.querySelectorAll('[data-signup-pane]').forEach(function (pane) {
+    var n = parseInt(pane.getAttribute('data-signup-pane'), 10);
+    var on = n === step;
+    pane.hidden = !on;
+    pane.classList.toggle('is-active', on);
+  });
+  card.querySelectorAll('[data-signup-visual]').forEach(function (v) {
+    var n = parseInt(v.getAttribute('data-signup-visual'), 10);
+    v.hidden = n !== step;
+  });
+  card.querySelectorAll('[data-signup-step-ind]').forEach(function (el) {
+    var n = parseInt(el.getAttribute('data-signup-step-ind'), 10);
+    el.classList.toggle('is-active', n === step);
+    el.classList.toggle('is-done', n < step);
+  });
+
+  var prev = document.getElementById('signup-prev-btn');
+  var next = document.getElementById('signup-next-btn');
+  var submit = document.getElementById('signup-submit-btn');
+  if (prev) prev.hidden = step <= 1;
+  if (next) next.hidden = step >= __bpSignupMax;
+  if (submit) submit.hidden = step < __bpSignupMax;
+
+  var titles = {
+    1: 'Bem-vindo à BeautyPro',
+    2: 'Como funciona',
+    3: 'A sua empresa',
+    4: 'A sua conta',
+    5: 'Termos de utilização',
+    6: 'Confirmar e criar'
+  };
+  var leads = {
+    1: 'Gestão do salão com controlo do proprietário.',
+    2: 'Papéis, dados e trabalho com rede instável.',
+    3: 'Nome da organização (NIF opcional).',
+    4: 'Email e palavra-passe do proprietário.',
+    5: 'Leia o resumo e confirme a aceitação.',
+    6: 'Revise os dados antes de criar a conta.'
+  };
+  var titleEl = document.getElementById('signup-step-title');
+  var lead = document.getElementById('signup-wizard-lead');
+  if (titleEl) titleEl.textContent = titles[step] || 'Criar conta';
+  if (lead) lead.textContent = leads[step] || '';
+
+  if (step === 6) {
+    function val(id) {
+      var el = document.getElementById(id);
+      return el && el.value ? String(el.value).trim() : '';
+    }
+    var se = document.getElementById('signup-sum-empresa');
+    var sn = document.getElementById('signup-sum-nif');
+    var sm = document.getElementById('signup-sum-email');
+    var st = document.getElementById('signup-sum-terms');
+    if (se) se.textContent = val('signup-empresa') || '—';
+    if (sn) sn.textContent = val('signup-nif') || 'Não indicado';
+    if (sm) sm.textContent = val('signup-email') || '—';
+    if (st) {
+      var ck = document.getElementById('signup-terms');
+      st.textContent = ck && ck.checked ? 'Aceites' : 'Não aceites';
+    }
+  }
+
+  bpSignupClearFieldErrors();
+  bpSignupShowError('');
+  bpSignupShowSuccess('');
+}
+
+function bpSignupNormalizeNif(raw) {
+  return String(raw || '').trim().replace(/\s+/g, '');
+}
+
+function bpSignupValidateStep(step) {
+  bpSignupClearFieldErrors();
+  bpSignupShowError('');
+  if (step === 1 || step === 2) return true;
+
+  if (step === 3) {
+    var emp = ((document.getElementById('signup-empresa') && document.getElementById('signup-empresa').value) || '').trim();
+    var nif = bpSignupNormalizeNif(document.getElementById('signup-nif') && document.getElementById('signup-nif').value);
+    var ok = true;
+    if (!emp) {
+      bpSignupFieldError('signup-empresa', 'Indique o nome da empresa ou organização.');
+      ok = false;
+    } else if (emp.length < 2) {
+      bpSignupFieldError('signup-empresa', 'O nome é demasiado curto.');
+      ok = false;
+    } else if (emp.length > 120) {
+      bpSignupFieldError('signup-empresa', 'O nome é demasiado longo (máx. 120).');
+      ok = false;
+    }
+    if (nif) {
+      if (nif.length < 5) {
+        bpSignupFieldError('signup-nif', 'NIF/BI parece incompleto. Deixe em branco ou complete.');
+        ok = false;
+      } else if (!/^[A-Za-z0-9./-]{5,32}$/.test(nif)) {
+        bpSignupFieldError('signup-nif', 'Use apenas letras, números ou . / -');
+        ok = false;
+      }
+    }
+    if (!ok) bpSignupShowError('Corrija os campos assinalados para continuar.');
+    return ok;
+  }
+
+  if (step === 4) {
+    var email = ((document.getElementById('signup-email') && document.getElementById('signup-email').value) || '').trim().toLowerCase();
+    var p1 = (document.getElementById('signup-password') && document.getElementById('signup-password').value) || '';
+    var p2 = (document.getElementById('signup-password-2') && document.getElementById('signup-password-2').value) || '';
+    var ok = true;
+    if (!email) {
+      bpSignupFieldError('signup-email', 'Indique o email.');
+      ok = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      bpSignupFieldError('signup-email', 'Email inválido.');
+      ok = false;
+    } else if (email.length > 254) {
+      bpSignupFieldError('signup-email', 'Email demasiado longo.');
+      ok = false;
+    }
+    if (!p1) {
+      bpSignupFieldError('signup-password', 'Indique a palavra-passe.');
+      ok = false;
+    } else if (p1.length < 8) {
+      bpSignupFieldError('signup-password', 'Mínimo 8 caracteres.');
+      ok = false;
+    } else if (typeof bpPasswordStrongEnough === 'function' && !bpPasswordStrongEnough(p1)) {
+      bpSignupFieldError('signup-password', 'Palavra-passe demasiado fraca. Use pelo menos 8 caracteres.');
+      ok = false;
+    } else if (/\s/.test(p1)) {
+      bpSignupFieldError('signup-password', 'Evite espaços na palavra-passe.');
+      ok = false;
+    }
+    if (!p2) {
+      bpSignupFieldError('signup-password-2', 'Confirme a palavra-passe.');
+      ok = false;
+    } else if (p1 !== p2) {
+      bpSignupFieldError('signup-password-2', 'As palavras-passe não coincidem.');
+      ok = false;
+    }
+    if (!ok) bpSignupShowError('Corrija os campos assinalados para continuar.');
+    return ok;
+  }
+
+  if (step === 5) {
+    var ck = document.getElementById('signup-terms');
+    if (!ck || !ck.checked) {
+      bpSignupFieldError('signup-terms', 'É necessário aceitar os termos para criar a conta.');
+      bpSignupShowError('Aceite os termos de utilização para continuar.');
+      return false;
+    }
+    return true;
+  }
+
+  return true;
+}
+
 
 (function bpBindSignupUi() {
   function bindToggle(btnId) {
@@ -1494,10 +1772,23 @@ function bpSignupShowSuccess(msg) {
       open.dataset.bpBound = '1';
       open.addEventListener('click', function () {
         bpShowAuthPanel('signup');
-        try {
-          var n = document.getElementById('signup-empresa');
-          if (n) n.focus();
-        } catch (_) {}
+        if (typeof bpSignupSetStep === 'function') bpSignupSetStep(1);
+      });
+    }
+
+    var nextBtn = document.getElementById('signup-next-btn');
+    if (nextBtn && !nextBtn.dataset.bpBound) {
+      nextBtn.dataset.bpBound = '1';
+      nextBtn.addEventListener('click', function () {
+        if (typeof bpSignupValidateStep === 'function' && !bpSignupValidateStep(__bpSignupStep)) return;
+        if (typeof bpSignupSetStep === 'function') bpSignupSetStep(__bpSignupStep + 1);
+      });
+    }
+    var prevBtn = document.getElementById('signup-prev-btn');
+    if (prevBtn && !prevBtn.dataset.bpBound) {
+      prevBtn.dataset.bpBound = '1';
+      prevBtn.addEventListener('click', function () {
+        if (typeof bpSignupSetStep === 'function') bpSignupSetStep(__bpSignupStep - 1);
       });
     }
 
@@ -1515,6 +1806,18 @@ function bpSignupShowSuccess(msg) {
       submit.addEventListener('click', async function () {
         bpSignupShowError('');
         bpSignupShowSuccess('');
+        if (typeof bpSignupValidateStep === 'function') {
+          if (!bpSignupValidateStep(3) || !bpSignupValidateStep(4) || !bpSignupValidateStep(5)) {
+            if (!bpSignupValidateStep(3)) bpSignupSetStep(3);
+            else if (!bpSignupValidateStep(4)) bpSignupSetStep(4);
+            else bpSignupSetStep(5);
+            return;
+          }
+        }
+        if (!navigator.onLine) {
+          bpSignupShowError('É necessária ligação à internet para criar a conta. Verifique a rede e tente de novo.');
+          return;
+        }
         var empresa = ((document.getElementById('signup-empresa') && document.getElementById('signup-empresa').value) || '').trim();
         var nif = ((document.getElementById('signup-nif') && document.getElementById('signup-nif').value) || '').trim();
         var email = ((document.getElementById('signup-email') && document.getElementById('signup-email').value) || '').trim().toLowerCase();
@@ -1570,19 +1873,22 @@ function bpSignupShowSuccess(msg) {
           var user = res.data && res.data.user;
           /* Confirmação de email activa: session null até clicar no link */
           if (!session && user) {
-            bpSignupShowSuccess('Conta criada. Confirme o email e depois inicie sessão.');
-            if (typeof toast === 'function') {
-              toast('Verifique o email para confirmar a conta.', 'info');
-            }
+            /* Confirmação de email obrigatória: banner no login, email pré-preenchido */
+            bpShowAuthPanel('login');
+            try {
+              var le1 = document.getElementById('login-email');
+              if (le1) le1.value = email;
+              var leErr = document.getElementById('login-error');
+              if (leErr) {
+                leErr.textContent = 'Conta criada. Confirme o email (link na caixa de entrada) e depois inicie sessão.';
+                leErr.hidden = false;
+                leErr.removeAttribute('hidden');
+              }
+            } catch (_) {}
             return;
           }
           if (session && user) {
-            /* Email confirm desligado no projecto: sessão imediata */
-            bpSignupShowSuccess('Conta criada. Inicie sessão para continuar.');
-            if (typeof toast === 'function') {
-              toast('Conta criada. Inicie sessão.', 'success');
-            }
-            /* Não inventar salao_id no cliente — F5 */
+            /* Sessão imediata: não inventar salao_id — F5 após login se não houver profile */
             try {
               await supabaseClient.auth.signOut({ scope: 'local' });
             } catch (_) {}
@@ -1590,22 +1896,48 @@ function bpSignupShowSuccess(msg) {
             try {
               var le = document.getElementById('login-email');
               if (le) le.value = email;
+              var leOk = document.getElementById('login-error');
+              if (leOk) {
+                leOk.textContent = 'Conta criada. Inicie sessão para configurar a organização.';
+                leOk.hidden = false;
+                leOk.removeAttribute('hidden');
+                leOk.style.color = '';
+              }
             } catch (_) {}
             return;
           }
-          bpSignupShowSuccess('Pedido registado. Verifique o email ou tente iniciar sessão.');
           bpShowAuthPanel('login');
+          try {
+            var le2 = document.getElementById('login-email');
+            if (le2) le2.value = email;
+            var le3 = document.getElementById('login-error');
+            if (le3) {
+              le3.textContent = 'Pedido registado. Verifique o email ou tente iniciar sessão.';
+              le3.hidden = false;
+              le3.removeAttribute('hidden');
+            }
+          } catch (_) {}
         } catch (err) {
           var raw = err && err.message ? String(err.message) : '';
-          var msg = 'Não foi possível criar a conta.';
-          if (/already|registered|exists/i.test(raw)) {
+          var msg = 'Não foi possível criar a conta. Tente de novo.';
+          if (/already|registered|exists|User already/i.test(raw)) {
             msg = 'Este email já está registado. Use Iniciar sessão ou recuperar palavra-passe.';
+            bpSignupSetStep(4);
+            bpSignupFieldError('signup-email', 'Este email já tem conta.');
           } else if (/password/i.test(raw) && /weak|least|character/i.test(raw)) {
-            msg = 'Palavra-passe demasiado fraca. Use pelo menos 8 caracteres.';
-          } else if (/rate|limit/i.test(raw)) {
+            msg = 'Palavra-passe rejeitada pelo servidor. Use pelo menos 8 caracteres.';
+            bpSignupSetStep(4);
+            bpSignupFieldError('signup-password', 'Palavra-passe demasiado fraca.');
+          } else if (/rate|limit|too many/i.test(raw)) {
             msg = 'Demasiadas tentativas. Aguarde um momento e tente de novo.';
           } else if (/email/i.test(raw) && /invalid/i.test(raw)) {
             msg = 'Email inválido.';
+            bpSignupSetStep(4);
+            bpSignupFieldError('signup-email', 'Email inválido.');
+          } else if (/network|fetch|Failed to fetch|timeout/i.test(raw)) {
+            msg = 'Não foi possível contactar o servidor. Verifique a internet e tente de novo.';
+          } else if (/confirm|verify/i.test(raw)) {
+            msg = 'Conta criada, mas é necessário confirmar o email antes de entrar.';
           }
           bpSignupShowError(msg);
         } finally {
@@ -1731,4 +2063,6 @@ async function bpProvisionEmpresa(empresa, nifBi) {
 
 if (typeof window !== 'undefined') {
   window.bpProvisionEmpresa = bpProvisionEmpresa;
+  window.bpSignupSetStep = bpSignupSetStep;
+  window.bpShowAuthPanel = bpShowAuthPanel;
 }

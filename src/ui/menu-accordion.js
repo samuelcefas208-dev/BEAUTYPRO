@@ -92,6 +92,13 @@
         { action: "audit", label: "Auditoria" },
         { action: "filiais", label: "Filiais" }
       ]
+    },
+    {
+      key: "config",
+      label: "Configurações",
+      items: [
+        { action: "acessos", label: "Acessos" }
+      ]
     }
   ];
 
@@ -129,7 +136,8 @@
       toggle.setAttribute("data-bp-menu", g.key); // impede re-injecção dos módulos
       toggle.setAttribute("aria-expanded", "false");
       toggle.setAttribute("data-acc-key", g.key);
-      if (BP_MENU_AREAS_LOCKED) {
+      var groupUnlocked = g.key === "config";
+      if (BP_MENU_AREAS_LOCKED && !groupUnlocked) {
         toggle.classList.add("bp-acc-locked");
         toggle.setAttribute("aria-disabled", "true");
         toggle.setAttribute("title", "Disponível em breve");
@@ -148,7 +156,7 @@
         btn.type = "button";
         btn.setAttribute("data-bp-menu", g.key);
         btn.setAttribute("data-bp-action", it.action);
-        if (BP_MENU_AREAS_LOCKED) {
+        if (BP_MENU_AREAS_LOCKED && g.key !== "config") {
           btn.classList.add("bp-acc-item-locked");
           btn.setAttribute("aria-disabled", "true");
           btn.setAttribute("title", "Disponível em breve");
@@ -166,7 +174,8 @@
 
     var logout = dd.querySelector("#logout-btn");
     if (logout) dd.insertBefore(root, logout);
-    else dd.appendChild(root);
+    else 
+dd.appendChild(root);
 
     // Acções dos itens (galeria, nps, etc.) — o acordeão só abria painéis
     root.addEventListener("click", function (e) {
@@ -174,7 +183,10 @@
       if (actBtn && root.contains(actBtn) && !actBtn.classList.contains("bp-acc-toggle")) {
         e.preventDefault();
         e.stopPropagation();
-        if (BP_MENU_AREAS_LOCKED || actBtn.classList.contains("bp-acc-item-locked")) {
+        var menuKey = actBtn.getAttribute("data-bp-menu") || "";
+        var actName = actBtn.getAttribute("data-bp-action") || "";
+        var isConfigOpen = menuKey === "config" || actName === "acessos";
+        if ((BP_MENU_AREAS_LOCKED && !isConfigOpen) || actBtn.classList.contains("bp-acc-item-locked")) {
           if (typeof toast === "function") toast("Esta área está bloqueada por agora.", "info");
           return;
         }
@@ -190,7 +202,10 @@
             return false;
           }
           var ok = false;
-          if (a === "galeria") {
+          if (a === "acessos") {
+            ok = call(window.bpOpenAcessosHub);
+            if (!ok && typeof toast === "function") toast("Acessos indisponível neste momento.", "warning");
+          } else if (a === "galeria") {
             ok = call(window.openGaleria) || call(window.BPMedia && BPMedia.openGaleria);
             if (!ok) {
               console.warn("[menu] openGaleria ausente — BPMedia?", !!window.BPMedia);
@@ -315,7 +330,8 @@
       if (!tog || !root.contains(tog)) return;
       e.preventDefault();
       e.stopPropagation();
-      if (BP_MENU_AREAS_LOCKED || tog.classList.contains("bp-acc-locked")) {
+      var togKey = tog.getAttribute("data-acc-key") || "";
+      if ((BP_MENU_AREAS_LOCKED && togKey !== "config") || tog.classList.contains("bp-acc-locked")) {
         if (typeof toast === "function") toast("Esta área está bloqueada por agora.", "info");
         return;
       }
