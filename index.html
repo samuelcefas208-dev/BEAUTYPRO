@@ -97,7 +97,7 @@
   <link rel="stylesheet" href="styles/modules/menus-agenda.css?v=20260824-f7-9r">
   <link rel="stylesheet" href="styles/components/modais-toast-fab.css?v=20260901-boot2">
   <link rel="stylesheet" href="styles/components/ops-shell.css?v=20261021-opstab" />
-  <link rel="stylesheet" href="styles/modules/login.css?v=20261029-signup-fix">
+  <link rel="stylesheet" href="styles/modules/login.css?v=20261106-s4">
   <link rel="stylesheet" href="styles/modules/venda-carrinho.css?v=20260905-cta4">
   <!-- Etapa 6: historico-fecho-equipa partido → caixa.css + equipa.css -->
   <link rel="stylesheet" href="styles/modules/ia.css?v=20261021-visao">
@@ -155,6 +155,7 @@
 
   <!-- ===== LOGIN VIEW ===== -->
   <div id="login-view" class="view active">
+    <div class="bp-auth-lang-host" id="bp-auth-lang-host"></div>
     <div class="login-brand">
       <div class="logo" style="display:flex;align-items:center;justify-content:center;gap:8px;">
         <img src="assets/img/logo.png" alt="BeautyPro" style="height:60px;width:auto;">
@@ -245,7 +246,7 @@
       </p>
     </div>
 
-        <div class="card login-card bp-signup-shell" id="login-signup-card" hidden>
+        <div class="card login-card bp-signup-shell bp-signup-shell--full" id="login-signup-card" hidden>
       <div class="bp-signup-layout">
         <!-- Coluna visual (desktop / tablets largos) -->
         <aside class="bp-signup-visual" aria-hidden="true">
@@ -338,6 +339,8 @@
             <span class="bp-signup-dot" data-signup-step-ind="5"></span>
             <span class="bp-signup-dot" data-signup-step-ind="6"></span>
           </div>
+          <p class="bp-signup-step-label" id="signup-step-label" aria-live="polite">Passo 1 de 6 · Bem-vindo</p>
+
 
           <p class="bp-signup-banner" id="signup-error" role="alert" hidden></p>
           <p class="bp-signup-banner bp-signup-banner-ok" id="signup-success" hidden></p>
@@ -369,6 +372,12 @@
               <label class="input-label" for="signup-empresa">Empresa ou organização</label>
               <input type="text" id="signup-empresa" class="input-field" placeholder="Ex.: Salão Alfa" autocomplete="organization" maxlength="120">
               <p class="bp-field-error" id="err-signup-empresa" hidden></p>
+            </div>
+            <div class="input-group" data-field="signup-localizacao">
+              <label class="input-label" for="signup-localizacao">Localização</label>
+              <input type="text" id="signup-localizacao" class="input-field" placeholder="Cidade ou província" autocomplete="address-level2" maxlength="120">
+              <p class="bp-field-hint">Cidade ou província onde o salão opera.</p>
+              <p class="bp-field-error" id="err-signup-localizacao" hidden></p>
             </div>
             <div class="input-group" data-field="signup-nif">
               <label class="input-label" for="signup-nif">NIF ou BI <span class="login-optional">(opcional)</span></label>
@@ -406,12 +415,13 @@
 
           <!-- 5 termos -->
           <div class="bp-signup-pane" data-signup-pane="5" hidden>
-            <div class="bp-signup-terms-box" tabindex="0">
+            <div class="bp-signup-terms-box" id="signup-terms-box" tabindex="0" data-terms-version="1.0.0">
               <p><strong>Termos de utilização (resumo)</strong></p>
               <p>A BeautyPro é uma ferramenta de gestão para o seu negócio. Os dados que registar pertencem à sua organização. O proprietário é responsável pelos acessos que conceder (gerente e operador).</p>
               <p>Deve utilizar a plataforma de boa fé, sem tentar aceder a dados de outras organizações. Operações sensíveis podem exigir nova confirmação da palavra-passe.</p>
               <p>Em modo offline, os registos ficam no dispositivo até sincronizar. Mantenha cópias de segurança conforme a sua política interna.</p>
               <p class="bp-signup-terms-muted">Versão resumida para criação de conta. O texto completo pode ser consultado nas definições após o acesso.</p>
+              <p class="bp-signup-terms-muted" id="signup-terms-version-label">Versão dos termos: 1.0.0</p>
             </div>
             <div class="input-group" data-field="signup-terms">
               <label class="bp-signup-check">
@@ -426,10 +436,26 @@
           <div class="bp-signup-pane" data-signup-pane="6" hidden>
             <p class="bp-signup-intro">Confirme os dados. A seguir a conta Auth é criada; o espaço de trabalho da empresa completa-se no passo de organização.</p>
             <dl class="bp-signup-summary">
-              <div><dt>Empresa</dt><dd id="signup-sum-empresa">—</dd></div>
-              <div><dt>NIF / BI</dt><dd id="signup-sum-nif">—</dd></div>
-              <div><dt>Email</dt><dd id="signup-sum-email">—</dd></div>
-              <div><dt>Termos</dt><dd id="signup-sum-terms">—</dd></div>
+              <div class="bp-signup-sum-row">
+                <div><dt data-i18n-sum="sum_empresa">Empresa</dt><dd id="signup-sum-empresa">—</dd></div>
+                <button type="button" class="bp-signup-alter" data-goto-step="3" data-i18n="alter">Alterar</button>
+              </div>
+              <div class="bp-signup-sum-row">
+                <div><dt data-i18n-sum="sum_loc">Localização</dt><dd id="signup-sum-localizacao">—</dd></div>
+                <button type="button" class="bp-signup-alter" data-goto-step="3" data-i18n="alter">Alterar</button>
+              </div>
+              <div class="bp-signup-sum-row">
+                <div><dt data-i18n-sum="sum_nif">NIF / BI</dt><dd id="signup-sum-nif">—</dd></div>
+                <button type="button" class="bp-signup-alter" data-goto-step="3" data-i18n="alter">Alterar</button>
+              </div>
+              <div class="bp-signup-sum-row">
+                <div><dt data-i18n-sum="sum_email">Email</dt><dd id="signup-sum-email">—</dd></div>
+                <button type="button" class="bp-signup-alter" data-goto-step="4" data-i18n="alter">Alterar</button>
+              </div>
+              <div class="bp-signup-sum-row">
+                <div><dt data-i18n-sum="sum_terms">Termos</dt><dd id="signup-sum-terms">—</dd></div>
+                <button type="button" class="bp-signup-alter" data-goto-step="5" data-i18n="alter">Alterar</button>
+              </div>
             </dl>
           </div>
 
@@ -441,6 +467,27 @@
             Já tem conta? <button type="button" class="login-text-btn login-text-btn-accent" id="signup-back-login">Iniciar sessão</button>
           </p>
         </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Plano gratuito — pós criar conta (Etapa 3) -->
+  <div id="bp-plan-modal" class="bp-plan-modal" hidden role="dialog" aria-modal="true" aria-labelledby="bp-plan-title">
+    <div class="bp-plan-modal-backdrop" id="bp-plan-modal-backdrop" aria-hidden="true"></div>
+    <div class="bp-plan-modal-card">
+      <h2 class="bp-plan-title" id="bp-plan-title">Plano gratuito</h2>
+      <p class="bp-plan-lead" id="bp-plan-lead">A sua conta foi criada.</p>
+      <p class="bp-plan-body" id="bp-plan-body">Está a utilizar o plano gratuito durante <strong id="bp-plan-days">—</strong> dias, conforme a política BeautyPro. Pode continuar e organizar o salão de imediato.</p>
+      <ul class="bp-plan-points" id="bp-plan-points">
+        <li>Agenda, clientes e caixa no mesmo espaço</li>
+        <li>Controlo do proprietário sobre acessos</li>
+        <li>Uso offline com sincronização quando houver rede</li>
+      </ul>
+      <p class="bp-plan-note" id="bp-plan-note">Quando o prazo terminar, a política de planos da BeautyPro define as opções de continuidade.</p>
+      <div class="bp-plan-actions">
+        <button type="button" class="btn btn-primary btn-block" id="bp-plan-continue">Continuar com o plano gratuito</button>
+        <button type="button" class="btn btn-block bp-plan-btn-secondary" id="bp-plan-view">Ver planos</button>
       </div>
     </div>
   </div>
@@ -1903,7 +1950,8 @@
   <!-- D-5.2: fetch/retry/health Supabase — ANTES do bundle (sync-rest usa bpFetchSupabase) -->
   <script src="src/core/api/supabase-resilience.js?v=20260828-d52"></script>
   <!-- D-5.3: Auth / sessão / supabaseClient — ANTES de sync+CRUD no bundle -->
-  <script src="src/core/auth/auth-supabase.js?v=20261029-signup-fix"></script>
+  <script src="src/core/auth/auth-i18n.js?v=20261106-s4"></script>
+  <script src="src/core/auth/auth-supabase.js?v=20261106-s4"></script>
   <!-- D-5.4: fila sync + monkey-patch dbPut — ANTES de sync-rest/crud no bundle -->
   <script src="src/core/sync/sync-policy.js?v=20260829-e19"></script>
   <script src="src/core/sync/sync-tombstone.js?v=20260829-e19"></script>

@@ -542,3 +542,273 @@ input[type="date"], input[type="datetime-local"] { appearance: none; -webkit-app
 #login-signup-card .bp-signup-form {
   min-width: 0;
 }
+
+/* —— Etapa 1: progresso textual + localização + CTA disabled —— */
+.bp-signup-step-label {
+  margin: 0 0 14px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--text-secondary, #6b7280);
+  line-height: 1.4;
+}
+.bp-field-hint {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-secondary, #6b7280);
+}
+#signup-next-btn:disabled,
+#signup-submit-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.bp-signup-dot.is-done {
+  background: var(--gold, #b7791f);
+  opacity: 0.5;
+}
+.bp-signup-dot.is-active {
+  width: 22px;
+  background: var(--gold, #b7791f);
+  opacity: 1;
+}
+
+/* —— Etapa 2: ecrã inteiro (sem coluna visual) · alinhamento · identidade login —— */
+#login-signup-card.bp-signup-shell.bp-signup-shell--full {
+  max-width: 400px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+#login-signup-card.bp-signup-shell--full .bp-signup-layout {
+  display: block;
+  grid-template-columns: none;
+  width: 100%;
+}
+#login-signup-card.bp-signup-shell--full .bp-signup-visual {
+  display: none !important;
+}
+#login-signup-card.bp-signup-shell--full .bp-signup-form {
+  padding: 22px 20px 24px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+#login-signup-card.bp-signup-shell--full .bp-signup-form-top {
+  align-items: flex-start;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+#login-signup-card.bp-signup-shell--full .bp-signup-form-heading .login-title {
+  font-size: 1.2rem;
+  line-height: 1.3;
+  margin: 0 0 4px;
+}
+#login-signup-card.bp-signup-shell--full .bp-signup-form-heading .login-recovery-lead {
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 0;
+  color: var(--text-secondary, #6b7280);
+}
+#login-signup-card.bp-signup-shell--full .bp-signup-steps {
+  margin: 0 0 8px;
+}
+#login-signup-card.bp-signup-shell--full .bp-signup-step-label {
+  margin: 0 0 14px;
+}
+#login-signup-card.bp-signup-shell--full .input-group {
+  margin-bottom: 14px;
+}
+#login-signup-card.bp-signup-shell--full .input-field {
+  width: 100%;
+  box-sizing: border-box;
+}
+#login-signup-card.bp-signup-shell--full .bp-signup-actions {
+  margin-top: 18px;
+}
+#login-signup-card.bp-signup-shell--full .bp-signup-actions .btn {
+  width: 100%;
+}
+#login-signup-card.bp-signup-shell--full .login-footer-line {
+  margin-top: 16px;
+  text-align: center;
+}
+/* Anular split em viewports largos */
+@media (min-width: 860px) {
+  #login-signup-card.bp-signup-shell--full .bp-signup-layout {
+    grid-template-columns: 1fr !important;
+  }
+  #login-signup-card.bp-signup-shell--full .bp-signup-visual {
+    display: none !important;
+  }
+  #login-signup-card.bp-signup-shell--full .bp-signup-form {
+    padding: 24px 22px 26px;
+  }
+}
+
+/* —— Etapa 3: modal plano gratuito (identidade BeautyPro) —— */
+.bp-plan-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.bp-plan-modal[hidden] {
+  display: none !important;
+}
+.bp-plan-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(31, 41, 55, 0.45);
+}
+.bp-plan-modal-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 24px 22px 22px;
+  background: var(--bp-surface, #fff);
+  border: 1px solid var(--border-soft, rgba(31, 41, 55, 0.12));
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(31, 41, 55, 0.14);
+  box-sizing: border-box;
+}
+.bp-plan-title {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+  line-height: 1.3;
+}
+.bp-plan-lead {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--text-secondary, #6b7280);
+  line-height: 1.45;
+}
+.bp-plan-body {
+  margin: 0 0 14px;
+  font-size: 14px;
+  color: var(--text-primary, #1f2937);
+  line-height: 1.5;
+}
+.bp-plan-points {
+  margin: 0 0 14px;
+  padding-left: 1.15rem;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary, #4b5563);
+}
+.bp-plan-points li {
+  margin-bottom: 6px;
+}
+.bp-plan-note {
+  margin: 0 0 18px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-secondary, #6b7280);
+}
+.bp-plan-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bp-plan-btn-secondary {
+  background: transparent !important;
+  border: 1px solid var(--border-soft, rgba(31, 41, 55, 0.16)) !important;
+  color: var(--text-primary, #1f2937) !important;
+  box-shadow: none !important;
+}
+.bp-plan-btn-secondary:hover {
+  background: var(--bg-soft, #f8f7f4) !important;
+}
+
+/* —— Etapa 4: selector de idioma + Alterar no resumo —— */
+.bp-auth-lang-host {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+}
+#login-view {
+  position: relative;
+}
+.bp-auth-lang-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.bp-auth-lang-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+.bp-auth-lang {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border-soft, rgba(31, 41, 55, 0.14));
+  background: var(--bp-surface, #fff);
+  color: var(--text-primary, #1f2937);
+  min-height: 32px;
+  cursor: pointer;
+}
+.bp-signup-sum-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-soft, #f0ebe4);
+}
+.bp-signup-sum-row:last-child {
+  border-bottom: none;
+}
+.bp-signup-sum-row > div {
+  flex: 1;
+  min-width: 0;
+}
+.bp-signup-sum-row dt {
+  color: var(--text-secondary, #777);
+  font-weight: 500;
+  font-size: 12px;
+}
+.bp-signup-sum-row dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+  font-size: 13px;
+  word-break: break-word;
+}
+.bp-signup-alter {
+  flex: 0 0 auto;
+  border: none;
+  background: transparent;
+  color: var(--gold, #b7791f);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0 4px 8px;
+  min-height: 32px;
+}
+.bp-signup-alter:hover {
+  text-decoration: underline;
+}
+html[dir="rtl"] .bp-auth-lang-host {
+  right: auto;
+  left: 12px;
+}
+/* resumo antigo dl > div padding anulado quando há rows */
+#login-signup-card .bp-signup-summary > .bp-signup-sum-row {
+  border-bottom: 1px solid var(--border-soft, #f0ebe4);
+}
